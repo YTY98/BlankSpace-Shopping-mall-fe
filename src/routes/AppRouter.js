@@ -13,6 +13,9 @@ import RegisterPage from "../page/RegisterPage/RegisterPage";
 import PrivateRoute from "./PrivateRoute";
 import CollectionPage from "../page/CollectionPage";
 import ShopPage from "../page/ShopPage";
+import NoticePage from "../page/NoticePage/NoticePage"; // 사용자용 공지사항 페이지
+import AdminNoticePage from "../page/AdminNoticePage/AdminNoticePage";
+import NoticeDetailPage from "../page/NoticeDetailPage/NoticeDetailPage";
 
 const AppRouter = () => {
   return (
@@ -28,6 +31,9 @@ const AppRouter = () => {
         <Route path="/account/purchase" element={<MyPage />} />
         <Route path="/collection" element={<CollectionPage />} />
         <Route path="/shop" element={<ShopPage />} />
+        <Route path="/notice" element={<NoticePage />} />
+        <Route path="/admin/notices" element={<AdminNoticePage />} />
+        <Route path="/notice/:id" element={<NoticeDetailPage />} />
       </Route>
       <Route element={<PrivateRoute permissionLevel="admin" />}>
         <Route path="/admin/product" element={<AdminProduct />} />

@@ -1,0 +1,39 @@
+/* NoticeDetailPage.style.css */
+
+.notice-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .notice-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  
+  .notice-item.title h2 {
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .notice-item.content p {
+    margin: 0;
+  }
+  
+  /* 버튼 스타일 */
+  .btn-primary {
+    background-color: #fff;
+    border: 1px solid #000;
+    color: #000;
+  }
+  
+  .btn-primary:hover {
+    background-color: #f1f1f1;
+    border-color: #000;
+  }
+  
