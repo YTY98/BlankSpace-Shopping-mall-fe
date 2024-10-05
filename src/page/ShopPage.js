@@ -22,6 +22,11 @@ const ShopPage = () => {
   }, [query, dispatch]);
 
   useEffect(() => {
+    console.log(productList);
+  }, [productList]);
+  
+
+  useEffect(() => {
     if (searchQuery.name) {
       setQuery(searchQuery);
     } else {

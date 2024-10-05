@@ -107,6 +107,11 @@ const ProductDetail = () => {
           </Button>
         </Col>
       </Row>
+      <Button variant="secondary" className="query-button" onClick={() =>{
+        navigate(`/product/${id}/Query`);
+      }}>
+            상품 문의
+      </Button>
     </Container>
   );
 };

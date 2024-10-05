@@ -290,3 +290,69 @@ body{
     width: 100%;
   }
 }
+
+.qnaBox {
+  width: 100%;
+  text-align: center;
+}
+
+.qnaBox h1 {
+  padding-bottom: 3rem;
+}
+
+.qnaTableHead {
+  font-size: 14px;
+  text-align: center;
+}
+
+.qnaBox .table td {
+  vertical-align: middle;
+}
+
+.qnaLockerImage {
+  width: 30%;
+  height: auto;
+}
+
+.qnaCheckMarkImage {
+  width: 30px;
+  height: auto;
+}
+
+.qnaBodyHeadText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;  
+}
+
+.qnaProductName {
+
+  font-weight: 1000;
+}
+
+.qnaProductName {
+  font-weight: 1000;
+  text-align: left;
+}
+
+.qnaTITLE {
+  text-align: left;
+}
+
+.qnaPagination {
+  display: flex;
+  justify-content: center; /* 가로 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  margin-top: 20px; /* 필요한 경우 상단 여백 */
+  margin-bottom: 5rem;
+}
+
+.qnaPagination .page-item.active .page-link {
+  color: black !important;
+}
+
+.query-button{
+  margin-top:20px;
+  width: 20%;
+}

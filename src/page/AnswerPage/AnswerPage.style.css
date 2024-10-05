@@ -1,0 +1,33 @@
+.spinnerStyle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
+
+.card {
+    transition: none; /* 호버 애니메이션 제거 */
+}
+
+.card:hover {
+    transform: none; /* 호버 시 이동/확대 효과 제거 */
+    box-shadow: none; /* 호버 시 그림자 효과 제거 */
+}
+
+.backButton {
+    background-color: white !important;
+    color: #3B3A3A !important;
+    margin-Bottom: 1rem !important;
+}
+
+.queryContentBox {
+    border: 1px solid grey; /* 테두리 설정 */
+    border-radius: 8px; /* 모서리를 둥글게 */
+    padding: 15px; /* 패딩 추가로 여백 설정 */
+}
+
+.AnswerSpinner{
+    width: 5rem;
+    height: 5rem;
+    animation-Duration: 4s;
+}

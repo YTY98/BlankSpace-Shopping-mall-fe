@@ -25,23 +25,35 @@ const Sidebar = () => {
             }}
           />
         </Link>
-        <div className="sidebar-item">Admin Account</div>
 
+        <div className="sidebar-item"
+        onClick={()=>handleSelectMenu("/admin/management?page=1")}
+        >
+          Management
+          </div>
+      
         <div
           className="sidebar-item"
           onClick={() => handleSelectMenu("/admin/product?page=1")}
         >
-          product
+          Product
         </div>
         <div
           className="sidebar-item"
           onClick={() => handleSelectMenu("/admin/order?page=1")}
         >
-          order
+          Order
+        </div>
+        <div
+          className="sidebar-item"
+          onClick={() => handleSelectMenu("/admin/notices")}
+        >
+          Notice
         </div>
       </div>
     );
   };
+
 
   return (
     <>
