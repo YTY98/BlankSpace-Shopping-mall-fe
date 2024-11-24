@@ -454,6 +454,66 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const fetchUserInfo = createAsyncThunk(
+  "user/fetchUserInfo",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = sessionStorage.getItem("token"); // 토큰 가져오기
+      if (!token) throw new Error("Authentication token is missing");
+
+      const response = await api.get("/user/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return response.data.user; // API에서 반환된 사용자 데이터
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  "user/deleteUser",
+  async ({ currentPassword }, { rejectWithValue }) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) throw new Error("Authentication token is missing");
+
+      await api.delete("/user/delete", {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { currentPassword },
+      });
+
+      sessionStorage.removeItem("token"); // 토큰 삭제
+      return null;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+  }
+);
+
+export const updateUserInfo = createAsyncThunk(
+  "user/updateUserInfo",
+  async ({ name, newPassword, currentPassword }, { rejectWithValue }) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) throw new Error("Authentication token is missing");
+
+      const response = await api.put(
+        "/user/update",
+        { name, newPassword, currentPassword },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return response.data.user; // 업데이트된 사용자 정보 반환
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+  }
+);
+
 // Slice 생성
 const userSlice = createSlice({
   name: "user",
@@ -531,6 +591,42 @@ const userSlice = createSlice({
         state.userList = action.payload;
       })
       .addCase(getUserList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchUserInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(fetchUserInfo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteUser.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUserInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload; // 상태 업데이트
+      })
+      .addCase(updateUserInfo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -24,6 +24,7 @@
     border: 1px solid grey; /* 테두리 설정 */
     border-radius: 8px; /* 모서리를 둥글게 */
     padding: 15px; /* 패딩 추가로 여백 설정 */
+    background-color: white;
 }
 
 .AnswerSpinner{

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faBars, faBox, faSearch, faShoppingBag } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faBars, faBox, faSearch, faShoppingBag, faAngleLeft, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/user/userSlice";
@@ -84,7 +84,7 @@ const Navbar = ({ user }) => {
         </Link>
       )}
 
-      <div className="nav-header">
+<div className="nav-header">
         <div className="burger-menu hide">
           <FontAwesomeIcon icon={faBars} onClick={openSidebar} />
         </div>
@@ -92,31 +92,41 @@ const Navbar = ({ user }) => {
         <div>
           <div className="display-flex">
             {user ? (
+              
               <div onClick={handleLogout} className="nav-icon">
-                <FontAwesomeIcon icon={faUser} />
+                <FontAwesomeIcon icon={faAngleLeft} />
                 {!isMobile && (
                   <span style={{ cursor: "pointer" }}>로그아웃</span>
                 )}
               </div>
             ) : (
               <div onClick={() => navigate("/login")} className="nav-icon">
-                <FontAwesomeIcon icon={faUser} />
+                <FontAwesomeIcon icon={faKey} />
                 {!isMobile && <span style={{ cursor: "pointer" }}>로그인</span>}
               </div>
             )}
+            {user ? (
+              <div onClick={() => navigate("/mypage")}className="nav-icon"> {/* 내 정ㅗ 추가 */}
+              <FontAwesomeIcon icon={faUser} />
+              {!isMobile && (
+                <span style={{ cursor: "pointer" }}>내 정보</span>
+              )}
+            </div>
+            ) : (<div></div>)}
+            
             <div onClick={() => navigate("/cart")} className="nav-icon">
               <FontAwesomeIcon icon={faShoppingBag} />
               {!isMobile && (
                 <span style={{ cursor: "pointer" }}>{`쇼핑백(${cartItemCount || 0})`}</span>
               )}
             </div>
-            <div
+            {/* <div
               onClick={() => navigate("/account/purchase")}
               className="nav-icon"
             >
               <FontAwesomeIcon icon={faBox} />
               {!isMobile && <span style={{ cursor: "pointer" }}>내 주문</span>}
-            </div>
+            </div> */}
             {/* {isMobile && (
               <div className="nav-icon" onClick={() => setShowSearchBox(true)}>
                 <FontAwesomeIcon icon={faSearch} />

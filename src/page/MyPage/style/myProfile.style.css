@@ -1,0 +1,54 @@
+
+.profileCard {
+    display: flex;
+    justify-self: center;
+    justify-items: center;
+    /* align-items: center; */
+    width: 40rem;
+    
+}
+
+.profileCardHeader {
+    border: 1px solid;
+    border-color: #e5e5e5;
+    background-color: #FFFFFF;
+}
+
+.profileListGroup {
+    border: 1px solid;
+    border-color: #e5e5e5;
+}
+
+.bluestar {
+    align-items: center;
+}
+
+.listText {
+    vertical-align: middle;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.listItemStyle {
+    background-color: #F8F9FA;
+}
+
+.listItemStyle:last-child{
+    border-bottom: 1px solid #e5e5e5!important;
+}
+
+.profileCardFooter {
+    background-color: #FAF9F8;
+}
+
+
+
+.periodButton {
+    border: 1px solid;
+    border-radius: 1px;
+    border-color: #8c8c8c;
+    margin-top: 3px;
+    margin-right: 5px;
+    width: 6.95rem;
+    font-size: 14px;
+}

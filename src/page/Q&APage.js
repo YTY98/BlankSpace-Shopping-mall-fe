@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { getQnAList } from "../features/qna/qnaSlice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock, faLockOpen } from "@fortawesome/free-solid-svg-icons";
 import { getProductDetail } from "../features/product/productSlice";
 import PasswordPromptModal from "../common/component/QnAauth";
 import Footer from "../common/component/Footer";
@@ -19,6 +21,7 @@ const Qna = () => {
   const qnaError = useSelector((state) => state.qna.error);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedQnA, setSelectedQnA] = useState(null);
+  const { user } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchQnAList = async () => {
@@ -64,8 +67,15 @@ const Qna = () => {
   };
 
   const handleOpenModal = (qna) => {
-    setSelectedQnA(qna);
-    setShowPasswordModal(true);
+    if (user?.level === "admin") {
+      navigate(`/qa/${qna._id}`);
+    }
+    else if(qna?.isSecret === false){
+      navigate(`/qa/${qna._id}`);
+    } else {
+      setSelectedQnA(qna);
+      setShowPasswordModal(true);
+    }
   };
 
   const handleCloseModal = () => {
@@ -156,8 +166,7 @@ const Qna = () => {
 const QnaRow = ({ qna, handleOpenModal }) => {
   // console.log("Qna Row Data: ", qna);
   // api 데이터의 송수신을 확인하려면 위에 주석풀고 확인 ㄱㄱ
-  const qnalock = "image/qna/qnalock.png";
-  const answeredImg = "image/qna/greenCheck.png";
+  const answeredImg = "image/qna/green-checkmark.png";
   const noAnswerdImg = "image/qna/grey-checkmark.png";
   const navigate = useNavigate();
   const navigateToProduct = () => {
@@ -169,14 +178,10 @@ const QnaRow = ({ qna, handleOpenModal }) => {
       <td>{qna.category}</td>
       <td>
         {qna.isSecret ? (
-          <img
-            src={qnalock}
-            alt={`qnalock`}
-            style={{ width: "20px", height: "auto" }}
-          />
-        ) : (
-          "🔓"
-        )}
+            <FontAwesomeIcon icon={faLock}/>
+          ) : (
+            <FontAwesomeIcon icon={faLockOpen}/>
+          )}
       </td>
       <td>
         {qna.product && qna.product.image ? ( // qna.product와 qna.product.image가 있는지 확인

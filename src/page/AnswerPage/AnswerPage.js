@@ -110,28 +110,29 @@ function AnswerPage() {
               <dd className="col-sm-9">
                 {new Date(qna?.createdAt).toLocaleDateString()}
               </dd>
-
-              <Card style={{ paddingTop: "2rem" }}>
+            </dl>
+              <Card style={{ paddingTop: "2rem", backgroundColor: "#FAF9F8"}}>
                 <Card.Body
                   className="queryContentBox"
                   dangerouslySetInnerHTML={cleanHTML(qna?.QueryContent)}
                 />
               </Card>
-            </dl>
           </Card.Body>
         </Card>
 
         {/* Answer Form */}
         <h3>답변</h3>
         {qna?.isAnswered ? (
-          <Card className="mb-4">
-            <Card>
-              <Card.Header as="h2">{qna?.AnswerTitle}</Card.Header>
+          <Card className="mb-4" style={{ background: "#FAF9F8" }}>
+            <Card.Body>
+            <Card style={{ paddingTop: "2rem", backgroundColor: "#FAF9F8"}}>
+              {/* <Card.Header as="h2">{qna?.AnswerTitle}</Card.Header> */}
               <Card.Body
                 className="queryContentBox"
                 dangerouslySetInnerHTML={cleanHTML(qna?.AnswerContent)} // 답변글 표시
               />
             </Card>
+            </Card.Body>
           </Card>
         ) : (
           <div>
@@ -142,7 +143,7 @@ function AnswerPage() {
                 role="status"
               />
             </div>
-            <Card className="mt-4">
+            <Card className="mt-4" style={{backgroundColor: "#FAF9F8"}}>
               <Card.Body style={{ textAlign: "center" }}>
                 신속하게 답변을 준비중 입니다. 잠시만 기다려주세요!
               </Card.Body>
