@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Offcanvas, Navbar, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { FaHome, FaThLarge, FaShoppingCart, FaClipboardList, FaInfoCircle } from "react-icons/fa"; 
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -20,40 +21,59 @@ const Sidebar = () => {
             alt="logo.png"
             style={{
               display: "block",
-              margin: "0px auto 20px auto",
-              width: "60%",
+              margin: "5px auto 20px auto",
+              width: "65%",
             }}
           />
         </Link>
 
-        <div className="sidebar-item"
-        onClick={()=>handleSelectMenu("/admin/management?page=1")}
+        <div
+          className="sidebar-item"
+          onClick={() => handleSelectMenu("/")}
+          style={{ display: "flex", alignItems: "center", padding: "10px 0" }}
         >
-          Management
-          </div>
-      
+          <FaHome style={{ marginRight: "30px", color: "#6c757d" }} /> 
+          <span style={{ color: "#000000" }}>Home</span>
+        </div>
+
+        <div
+          className="sidebar-item"
+          onClick={() => handleSelectMenu("/admin/management?page=1")}
+          style={{ display: "flex", alignItems: "center", padding: "10px 0" }}
+        >
+          <FaThLarge style={{ marginRight: "30px", color: "#6c757d" }} /> 
+          <span style={{ color: "#000000" }}>Dashboard</span>
+        </div>
+
         <div
           className="sidebar-item"
           onClick={() => handleSelectMenu("/admin/product?page=1")}
+          style={{ display: "flex", alignItems: "center", padding: "10px 0" }}
         >
-          Product
+          <FaShoppingCart style={{ marginRight: "30px", color: "#6c757d" }} /> 
+          <span style={{ color: "#000000" }}>Products</span>
         </div>
+
         <div
           className="sidebar-item"
           onClick={() => handleSelectMenu("/admin/order?page=1")}
+          style={{ display: "flex", alignItems: "center", padding: "10px 0" }}
         >
-          Order
+          <FaClipboardList style={{ marginRight: "30px", color: "#6c757d" }} /> 
+          <span style={{ color: "#000000" }}>Orders</span>
         </div>
+
         <div
           className="sidebar-item"
           onClick={() => handleSelectMenu("/admin/notices")}
+          style={{ display: "flex", alignItems: "center", padding: "10px 0" }}
         >
-          Notice
+          <FaInfoCircle style={{ marginRight: "30px", color: "#6c757d" }} /> 
+          <span style={{ color: "#000000" }}>Notices</span>
         </div>
       </div>
     );
   };
-
 
   return (
     <>

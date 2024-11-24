@@ -17,7 +17,7 @@ import NoticePage from "../page/NoticePage/NoticePage";
 import NoticeDetailPage from "../page/NoticeDetailPage/NoticeDetailPage";
 import WritePage from '../page/WritePage/WritePage';
 import AdminNoticePage from '../page/AdminNoticePage/AdminNoticePage';
-import AdminManagementPage from "../page/AdminManagementPage/AdminManagementPage";
+import AdminDashBoardPage from "../page/AdminDashBoardPage/AdminDashBoardPage";
 import QueryPage from "../page/QueryPage/QueryPage";
 import Qna from "../page/Q&APage";
 import AnswerPage from "../page/AnswerPage/AnswerPage";
@@ -44,7 +44,7 @@ const AppRouter = () => {
         <Route path="/product/:id/Query" element={<QueryPage />}/>
       </Route>
       <Route element={<PrivateRoute permissionLevel="admin" />}>
-        <Route path="/admin/management" element={<AdminManagementPage/>} />
+        <Route path="/admin/management" element={<AdminDashBoardPage/>} />
         <Route path="/admin/product" element={<AdminProduct />} />
         <Route path="/admin/order" element={<AdminOrderPage />} />
         <Route path="/admin/notices" element={<AdminNoticePage />} />
