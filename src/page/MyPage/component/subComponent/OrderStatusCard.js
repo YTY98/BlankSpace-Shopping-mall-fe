@@ -1,7 +1,8 @@
 import React from "react";
-import { Row, Col, Badge } from "react-bootstrap";
-import { badgeBg } from "../../../constants/order.constants";
-import { currencyFormat } from "../../../utils/number";
+import { Row, Col, Badge, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { badgeBg } from "../../../../constants/order.constants";
+import { currencyFormat } from "../../../../utils/number";
 
 const OrderStatusCard = ({ orderItem }) => {
   return (
@@ -30,6 +31,18 @@ const OrderStatusCard = ({ orderItem }) => {
         <Col md={2} className="vertical-middle">
           <div className="text-align-center text-12">주문상태</div>
           <Badge bg={badgeBg[orderItem.status]}>{orderItem.status}</Badge>
+
+          <div className="mt-1 text-align-center">
+            {orderItem.status === "delivered" ? (
+              <Link to={`/write-review/${orderItem.items[0]?.productId?._id}`}>
+                <Button variant="primary" size="sm" style={{ width: "97px" }}>
+                  리뷰 작성
+                </Button>
+              </Link>
+            ) : (
+              <div className="text-danger text-12"></div>
+            )}
+          </div>
         </Col>
       </Row>
     </div>

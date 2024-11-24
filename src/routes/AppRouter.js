@@ -4,7 +4,6 @@ import AdminOrderPage from "../page/AdminOrderPage/AdminOrderPage";
 import AdminProduct from "../page/AdminProductPage/AdminProductPage";
 import CartPage from "../page/CartPage/CartPage";
 import Login from "../page/LoginPage/LoginPage";
-import MyPage from "../page/MyPage/MyPage";
 import OrderCompletePage from "../page/OrderCompletePage/OrderCompletePage";
 import PaymentPage from "../page/PaymentPage/PaymentPage";
 import ProductAll from "../page/LandingPage/LandingPage";
@@ -21,6 +20,13 @@ import AdminDashBoardPage from "../page/AdminDashBoardPage/AdminDashBoardPage";
 import QueryPage from "../page/QueryPage/QueryPage";
 import Qna from "../page/Q&APage";
 import AnswerPage from "../page/AnswerPage/AnswerPage";
+import MyPage from "../page/MyPage/MyPage";
+import MyOrderPage from "../page/MyPage/component/MyOrderPage";
+import MyProfilePage from "../page/MyPage/component/MyProfilePage";
+import MyWishlistPage from "../page/MyPage/component/MyWishlistPage";
+import MyMileagePage from "../page/MyPage/component/MyMileagePage";
+import MyMembershipPage from "../page/MyPage/component/MyMembershipPage";
+import MyQnaPage from "../page/MyPage/component/MyQnaPage";
 
 const AppRouter = () => {
   return (
@@ -42,6 +48,13 @@ const AppRouter = () => {
         <Route path="/notice/:id" element={<NoticeDetailPage />} />
         <Route path="/write" element={<WritePage />} />
         <Route path="/product/:id/Query" element={<QueryPage />}/>
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/mypage/order" element={<MyOrderPage />} />
+        <Route path="/mypage/profile" element={<MyProfilePage />} />
+        <Route path="/mypage/wishlist" element={<MyWishlistPage />} />
+        <Route path="/mypage/mileage" element={<MyMileagePage />} />
+        <Route path="/mypage/membership" element={<MyMembershipPage />} />
+        <Route path="/mypage/qna" element={<MyQnaPage />} />
       </Route>
       <Route element={<PrivateRoute permissionLevel="admin" />}>
         <Route path="/admin/management" element={<AdminDashBoardPage/>} />

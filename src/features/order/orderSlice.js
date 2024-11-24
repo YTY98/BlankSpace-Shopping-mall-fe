@@ -12,6 +12,8 @@ const initialState = {
   error: "",
   loading: false,
   totalPageNum: 1,
+  dateFilter: "all",
+  statusFilter: "all", // 상태 필터 추가
 };
 
 // Async thunks
@@ -32,9 +34,11 @@ export const createOrder = createAsyncThunk(
 
 export const getOrder = createAsyncThunk(
   "order/getOrder",
-  async (_, { rejectWithValue, dispatch }) => {
+  async ({ dateFilter, statusFilter }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.get("/order/me");
+      const response = await api.get("/order/me", {
+        params: { dateFilter, statusFilter },
+      });
       if (response.status !== 200) throw new Error(response.error);
       return response.data;
     } catch (error) {
@@ -83,6 +87,12 @@ const orderSlice = createSlice({
   reducers: {
     setSelectedOrder: (state, action) => {
       state.selectedOrder = action.payload;
+    },
+    setDateFilter: (state, action) => {
+      state.dateFilter = action.payload;
+    },
+    setStatusFilter: (state, action) => {
+      state.statusFilter = action.payload; // 상태 필터 업데이트
     },
   },
   extraReducers: (builder) => {
@@ -136,5 +146,5 @@ const orderSlice = createSlice({
   },
 });
 
-export const { setSelectedOrder } = orderSlice.actions;
+export const { setSelectedOrder, setDateFilter, setStatusFilter } = orderSlice.actions;
 export default orderSlice.reducer;

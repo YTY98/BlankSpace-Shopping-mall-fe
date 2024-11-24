@@ -1,0 +1,48 @@
+.cardHeader {
+    border-color: black;
+    
+    background-color: #FAF9F8;
+}
+
+.cardBody {
+    background-color: #FAF9F8;
+}
+
+.cardContent {
+    background-color: #FAF9F8;
+}
+
+.infoBox {
+    justify-content:center;
+}
+
+.cardContainer {
+    cursor: pointer;
+    border: 1px solid;
+    border-color: #c1c1c1;
+    height: 10rem;
+    padding-block: 10px;
+}
+
+
+.infoSection {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.infocardHead {
+    font-weight: bold;
+}
+
+.infocardBody {
+    color: #4c4c4c;
+    font-weight: 400;
+    font-size: smaller;
+}
+
+
+.orderBox {
+    border: 3rem solid;
+    width: 30rem;
+    justify-self: center;
+}
