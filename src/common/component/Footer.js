@@ -1,6 +1,46 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Footer = () => {
+
+  /* 모바일 코드 */
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // 화면 크기가 768px 이하일 경우 모바일로 간주
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // 컴포넌트가 마운트되었을 때 실행
+    handleResize();
+
+    // 리사이즈 이벤트 리스너 추가
+    window.addEventListener("resize", handleResize);
+
+    // 리사이즈 이벤트 리스너 제거 (컴포넌트 언마운트 시)
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  /* 랜딩페이지에서만 보이게 */
+  const location = useLocation();
+  const showScrollToTopButton = location.pathname === "/";
+
+  /* Scroll To Top 기능 */
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  
+  const menuList = [
+    { name: "이용 약관", link: "/term" },
+    { name: "개인정보 처리방침", link: "/per" },
+    { name: "이용 안내", link: "/service" },
+    { name: "배송/환불 규정", link: "/send" },
+    { name: "입점 문의", link: "/store" }
+  ];
+
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -13,15 +53,21 @@ const Footer = () => {
           />
           <div>
             <ul className="sns-area">
-              <li className="sns-icon">
-                <i className="fa-brands fa-twitter"></i>
-              </li>
-              <li className="sns-icon">
-                <i className="fa-brands fa-instagram"></i>
-              </li>
-              <li className="sns-icon last">
-                <i className="fa-brands fa-facebook"></i>
-              </li>
+              <a className="sns-link" href="https://www.naver.com" target="_blank" rel="noopener noreferrer">
+                <li className="sns-icon">
+                  <i className="fa-solid fa-n"></i>
+                </li>
+              </a>
+              <a className="sns-link" href="https://www.naver.com" target="_blank" rel="noopener noreferrer">
+                <li className="sns-icon">
+                  <i className="fa-brands fa-instagram"></i>
+                </li>
+              </a>
+              <a className="sns-link" href="https://www.naver.com" target="_blank" rel="noopener noreferrer">
+                <li className="sns-icon last">
+                  <i className="fa-brands fa-youtube"></i>
+                </li>
+              </a>
             </ul>
           </div>
         </div>
@@ -29,14 +75,14 @@ const Footer = () => {
         <div className="second-line">
           <div className="second-line-container">
             <ul className="menus">
-              <li>이용약관</li>
-              <li>개인정보 처리방침</li>
-              <li>서비스 이용약관</li>
-              <li>배송/환불 규정</li>
-              <li>입점 문의</li>
+              {menuList.map((menu, index) => (
+                <li key={index}>
+                  <Link to={menu.link}>{menu.name}</Link>
+                </li>
+              ))}
             </ul>
             <ul className="company-info">
-              <li>회사명: BLANKSPACE</li>
+              <li onclick>회사명: BLANKSPACE</li>
               <li>사업자등록번호: 220-11-1234</li>
             </ul>
             <div>주소: 경상북도 경산시 대학로 280</div>
@@ -75,6 +121,29 @@ const Footer = () => {
             </div>
           </div>
         </div>
+
+        {/* Scroll To Top Button */}
+        {isMobile && showScrollToTopButton && (
+          <div>
+            <i
+              className="fa-solid fa-arrow-up"
+              onClick={scrollToTop}
+              style={{
+                position: "absolute",
+                top: "10%",
+                right: "0%",
+                transform: "translate(-50%, -50%)",
+                padding: "8px 10px",
+                fontSize: "16px",
+                backgroundColor: "#000000",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer"
+              }}
+            ></i>
+          </div>
+        )}
       </div>
     </footer>
   );
