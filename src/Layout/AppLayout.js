@@ -7,10 +7,12 @@ import Navbar from "../common/component/Navbar";
 import ToastMessage from "../common/component/ToastMessage";
 import { loginWithToken } from "../features/user/userSlice";
 import { getCartQty } from "../features/cart/cartSlice";
+import LandingPageHeader from "../page/LandingPage/components/LandingPageHeader";
 
 const AppLayout = ({ children }) => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const isLandingPage = location.pathname === "/";
 
   const { user } = useSelector((state) => state.user);
   useEffect(() => {
@@ -37,7 +39,10 @@ const AppLayout = ({ children }) => {
         </Row>
       ) : (
         <>
-          <Navbar user={user} />
+          {/* 랜딩 페이지만 전용 헤더를 호출하도록 변경 */}
+          {isLandingPage ? <LandingPageHeader user={user} /> : <Navbar user={user} />}
+          {/* <Navbar user={user} /> */}
+          
           {children}
         </>
       )}
