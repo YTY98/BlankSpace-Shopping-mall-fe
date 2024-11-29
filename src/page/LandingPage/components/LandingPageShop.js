@@ -49,7 +49,7 @@ const LandingPageShop = () => {
         </FadeUp>
         <FadeUp>
         <div className='shop-inner-flex-3'>
-          <img className='shop-image-3' src='/image/LandingPage-shop-3.png' />
+          <img className='shop-image-3' src='/image/landingPageShop3.png' />
           <img className='shop-image-4' src='/image/landingpage-shop-5.png' />
         </div>
         </FadeUp>

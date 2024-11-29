@@ -7,7 +7,7 @@ const AboutPageBody3 = () => {
 
     return (
       <div>
-        <img className="body3-image1" src="/image/BS001.png" />
+        <video className="body3-image1" src="/image/about_video.mp4" autoPlay loop muted />
         <div className='body3-outer-flex'>
             <div className='body3-inner-left-flex'>
                 <FadeUp>

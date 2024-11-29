@@ -18,8 +18,9 @@ const AboutPageBody1 = () => {
               <FadeUp>
                 <hr className='body1-hr1'/>
 
+                <h3 className='body1-header1'>blankspace Info</h3><br />
                 <p className='body1-paragraph1'>
-                  <h3 className='body1-header1'>blankspace Info</h3><br />
+                  
 
                   <strong>OFFICE</strong><br />
                   280, Daehak-ro, Gyeongsan-si, Gyeongsangbuk-do, Republic of Korea<br /><br />

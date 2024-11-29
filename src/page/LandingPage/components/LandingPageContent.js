@@ -65,7 +65,7 @@ const LandingPageContent = () => {
                         <h2 className='content-header-3'>@BLANKSPACE</h2>
                     </div>
                     
-                    <div class="content-grid">
+                    <div className="content-grid">
                         {images.slice(0, visibleCount).map((src, index) => (
                             <img key={index} className="content-grid-item" src={src} alt={`Collection ${index + 1}`} />
                         ))}

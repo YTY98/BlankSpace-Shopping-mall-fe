@@ -85,14 +85,13 @@
 /* body3 */
 .body3-image1 {
     width: 100%;
-
-    
 }
 
 .body3-outer-flex {
     display: flex;
     
     height: 120vh;
+    margin-top: -10px;
     background-color: #2A2927;
 }
 
@@ -184,13 +183,14 @@
     align-items: center; /* 상하 가운데 정렬 */
     justify-content: center; /* 좌우 가운데 정렬 */
     color: white;
-    font-size: 18px;
+    font-size: 13px;
     background-color: rgba(0, 0, 0, 0.6); /* 반투명 검정 배경 */
-    padding: 10px;
+    padding: 25px;
     border-radius: 5px;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
-    text-align: center;
+    text-align: justify;
+
 }
 
 /* 마우스 올렸을 때 텍스트 표시 */

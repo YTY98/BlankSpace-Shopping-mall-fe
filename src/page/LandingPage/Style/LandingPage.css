@@ -72,9 +72,10 @@
 }
 
 .intro-image-1-1 {
-    width: 35vw;
+    width: 30vw;
     object-fit: contain;
     object-position: 0 0;
+    
 }
 
 .intro-image-1-2 {
@@ -280,6 +281,8 @@
 }
 
 .about-header-1 {
+    display: block;
+    margin-bottom: 10px;
     font-size: 1.2vw;
     font-family: "Inria Serif", serif;
 }

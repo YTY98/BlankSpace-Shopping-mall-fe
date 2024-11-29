@@ -82,7 +82,7 @@ const Footer = () => {
               ))}
             </ul>
             <ul className="company-info">
-              <li onclick>회사명: BLANKSPACE</li>
+              <li>회사명: BLANKSPACE</li>
               <li>사업자등록번호: 220-11-1234</li>
             </ul>
             <div>주소: 경상북도 경산시 대학로 280</div>

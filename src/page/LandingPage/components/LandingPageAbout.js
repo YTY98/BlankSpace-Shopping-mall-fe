@@ -15,7 +15,7 @@ const LandingPageAbout = () => {
       <FadeUp>
       <div className='about-flex-1'>
         <p className='about-paragraph-1'>
-          <h5 className='about-header-1'>About</h5> 
+          <span className='about-header-1'>About</span> 
           "BLANKSPACE is an online sanctuary celebrating minimalism and elegance. Curating simple, high-quality designs, it inspires a lifestyle where less is more."
           <br />
           <br />
