@@ -27,6 +27,12 @@ import MyWishlistPage from "../page/MyPage/component/MyWishlistPage";
 import MyMileagePage from "../page/MyPage/component/MyMileagePage";
 import MyMembershipPage from "../page/MyPage/component/MyMembershipPage";
 import MyQnaPage from "../page/MyPage/component/MyQnaPage";
+import ServicePage from "../common/component/FooterDetail/ServicePage";
+import PerPage from "../common/component/FooterDetail/PerPage";
+import SendPage from "../common/component/FooterDetail/SendPage";
+import StorePage from "../common/component/FooterDetail/StorePage";
+import TermPage from "../common/component/FooterDetail/TermPage";
+import AboutPage from "../page/AboutPage/AboutPage";
 
 const AppRouter = () => {
   return (
@@ -37,6 +43,12 @@ const AppRouter = () => {
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/qa" element={<Qna />} />
       <Route path="/qa/:id" element={<AnswerPage />} />
+      <Route path="/service" element={<ServicePage />} />
+      <Route path="/per" element={<PerPage />} />
+      <Route path="/send" element={<SendPage />} />
+      <Route path="/store" element={<StorePage />} />
+      <Route path="/term" element={<TermPage />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route element={<PrivateRoute permissionLevel="customer" />}>
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PaymentPage />} />

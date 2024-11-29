@@ -84,7 +84,7 @@ const Navbar = ({ user }) => {
         </Link>
       )}
 
-<div className="nav-header">
+      <div className="nav-header">
         <div className="burger-menu hide">
           <FontAwesomeIcon icon={faBars} onClick={openSidebar} />
         </div>
@@ -106,7 +106,7 @@ const Navbar = ({ user }) => {
               </div>
             )}
             {user ? (
-              <div onClick={() => navigate("/mypage")}className="nav-icon"> {/* 내 정ㅗ 추가 */}
+              <div onClick={() => navigate("/mypage")}className="nav-icon"> {/* 내 정보 추가 */}
               <FontAwesomeIcon icon={faUser} />
               {!isMobile && (
                 <span style={{ cursor: "pointer" }}>내 정보</span>
