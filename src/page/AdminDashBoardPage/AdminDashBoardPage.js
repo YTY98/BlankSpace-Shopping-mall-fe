@@ -14,6 +14,8 @@ import {
   Tabs,
   Tab,
   Badge,
+  Image,
+  Pagination,
 } from "react-bootstrap";
 import { Bar } from "react-chartjs-2";
 import {
@@ -27,8 +29,9 @@ import {
   Legend,
 } from "chart.js";
 import { getProductList } from "../../features/product/productSlice";
-import { getOrderList } from "../../features/order/orderSlice";
+import { getAdminOrderList } from "../../features/order/orderSlice";
 import { getUserList } from "../../features/user/userSlice";
+import { getQnAList } from "../../features/qna/qnaSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
@@ -36,11 +39,11 @@ import {
   faDollarSign,
   faExclamationTriangle,
   faExchangeAlt,
-  faSignOutAlt,
-  faUserCircle,
+  faBoxOpen,
+  faQuestionCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { ORDER_STATUS, badgeBg } from "../../constants/order.constants";
-
+const QnA_STATUS = ["completed", "preparing"];
 Chart.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const AdminDashBoardPage = () => {
@@ -49,6 +52,15 @@ const AdminDashBoardPage = () => {
   const productList = useSelector((state) => state.product.productList);
   const orderList = useSelector((state) => state.order.orderList);
   const userList = useSelector((state) => state.user.userList);
+   // const qnaList = useSelector((state) => state.qna.qnaList);
+  const qnaList = useSelector((state) => state.qna.qnaList) || [];
+
+  const [adminQnAList, setAdminQnAList] = useState([]);
+  const [filteredQnAList, setFilteredQnAList] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState("completed"); // 기본값: "답변 완료"
+  const [adminCurrentPage, setAdminCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+  const adminLimit = 20; // 페이지당 Q&A 개수
 
   const [userManagementModal, setUserManagementModal] = useState(false);
   const [userListState, setUserListState] = useState([]);
@@ -61,6 +73,9 @@ const AdminDashBoardPage = () => {
   const [dailySales, setDailySales] = useState({});
   const [statusCounts, setStatusCounts] = useState(
     ORDER_STATUS.reduce((acc, status) => ({ ...acc, [status]: 0 }), {})
+  );
+  const [qnaStatusCounts, setQnaStatusCounts] = useState(
+    QnA_STATUS.reduce((acc, status) => ({ ...acc, [status]: 0 }), {})
   );
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -87,13 +102,16 @@ const AdminDashBoardPage = () => {
   const cardHoverStyle = {
     transform: "scale(1.05)", // 크기 증가
   };
+
+  
   
 
 
   useEffect(() => {
     dispatch(getProductList());
-    dispatch(getOrderList());
+    dispatch(getAdminOrderList({ all: true }));
     dispatch(getUserList());
+    dispatch(getQnAList());
   }, [dispatch]);
 
   useEffect(() => {
@@ -103,8 +121,51 @@ const AdminDashBoardPage = () => {
   }, [userList]);
 
   useEffect(() => {
-    dispatch(getOrderList({ year: selectedYear, month: selectedMonth }));
+    dispatch(getAdminOrderList({ year: selectedYear, month: selectedMonth }));
   }, [dispatch, selectedYear, selectedMonth]);
+
+  useEffect(() => {
+    const fetchAdminQnAList = async () => {
+      const { data, totalPageNum } = await dispatch(
+        getQnAList({ page: adminCurrentPage, limit: adminLimit })
+      ).unwrap();
+      setTotalPages(totalPageNum);
+      setAdminQnAList(data);
+    };
+    fetchAdminQnAList();
+  }, [dispatch, adminCurrentPage]);
+
+  // 상태 필터링 함수: 답변 완료 및 미답변 필터링 기능 추가
+const handleStatusFilter = (status) => {
+  setSelectedStatus(status);
+  // qnaList가 배열인지 확인 후 필터링 수행
+  const filtered = Array.isArray(qnaList) ? qnaList.filter((qna) =>
+      status === "completed" ? qna.isAnswered : !qna.isAnswered
+  ) : [];
+  setAdminQnAList(filtered);
+};
+
+useEffect(() => {
+  if (Array.isArray(qnaList) && qnaList.length > 0) {
+    setAdminQnAList(qnaList);
+  }
+}, [qnaList]);
+
+  useEffect(() => {
+    // Q&A 데이터 로드
+    const fetchQnAList = async () => {
+      const { data } = await dispatch(getQnAList({})).unwrap();
+      setFilteredQnAList(data);
+    };
+
+    fetchQnAList();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (qnaList.length > 0) {
+      setAdminQnAList(qnaList);
+    }
+  }, [qnaList]);  
 
   useEffect(() => {
     if (productList.length > 0) {
@@ -261,13 +322,19 @@ const AdminDashBoardPage = () => {
   
 
 
-  const filteredOrderList = orderList.filter((order) => order.status === selectedTab);
+  const filteredOrderList = selectedTab
+  ? orderList.filter((order) => order.status === selectedTab)
+  : orderList; // selectedTab이 null이면 전체 주문 표시
+
+  // const filteredQnAList = qnaList.filter((qna) => !qna.isAnswered);
+
+  const qnaAdminData = useSelector((state) => state.qna.adminData);
 
   const todayTasks = {
     newOrders: orderList.filter((order) => order.status === "preparing").length,
     refundOrders: orderList.filter((order) => order.status === "refund").length,
     newSignUps: userList.filter(user => new Date(user.createdAt).toDateString() === new Date().toDateString()).length,
-    inquiries: orderList.filter(order => !order.isAnswered).length, 
+    inquiries: qnaAdminData ? qnaAdminData.filter((qna) => !qna.isAnswered).length : 0, 
   };
 
   const barDataMonthlySales = {
@@ -325,10 +392,10 @@ const AdminDashBoardPage = () => {
     </div>
 
 
-      {/* 4개의 카드가 들어갈 섹션 */}
+      {/* 6개의 카드가 들어갈 섹션 */}
       <Row className="mb-4" style={{ marginTop: "40px"}}>
         <Col md={6}>
-          <div className="p-3 shadow rounded" style={{...cardDefaultStyle, backgroundColor: "#f8f9fa", cursor: "pointer" }}
+          <div className="p-3 shadow rounded" style={{...cardDefaultStyle, backgroundColor: "#f8f9fa", cursor: "pointer", height: "570px" }}
       onMouseEnter={(e) => {
         Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
       }}
@@ -339,7 +406,7 @@ const AdminDashBoardPage = () => {
               <Col md={6}>
                 <Card
                   className="text-center"
-                  style={{ ...cardDefaultStyle, backgroundColor: "#4CAF50", color: "white", height: "128px", marginTop: "10px", cursor: "pointer" }}
+                  style={{ ...cardDefaultStyle, backgroundColor: "#4CAF50", color: "white", height: "128px", marginTop: "30px", cursor: "pointer" }}
 
       onMouseEnter={(e) => {
         Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
@@ -358,7 +425,7 @@ const AdminDashBoardPage = () => {
               <Col md={6}>
                 <Card
                   className="text-center"
-                  style={{ ...cardDefaultStyle ,backgroundColor: "#FFC107", color: "white", marginTop: "10px", cursor: "pointer" }}
+                  style={{ ...cardDefaultStyle ,backgroundColor: "#FFC107", color: "white", marginTop: "30px", cursor: "pointer" }}
                   
       onMouseEnter={(e) => {
         Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
@@ -408,7 +475,7 @@ const AdminDashBoardPage = () => {
               <Col md={6}>
                 <Card
                   className="text-center"
-                  style={{...cardDefaultStyle, backgroundColor: "#03A9F4", color: "white", cursor: "pointer" }}
+                  style={{...cardDefaultStyle, backgroundColor: "#03A9F4", color: "white", cursor: "pointer", marginTop: "20px" }}
                   
       onMouseEnter={(e) => {
         Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
@@ -459,7 +526,7 @@ const AdminDashBoardPage = () => {
               <Col md={6}>
                 <Card
                   className="text-center"
-                  style={{ ...cardDefaultStyle,backgroundColor: "#F44336", color: "white", height: "128px", cursor: "pointer" }}
+                  style={{ ...cardDefaultStyle,backgroundColor: "#F44336", color: "white", height: "128px", cursor: "pointer", marginTop: "20px" }}
                   
       onMouseEnter={(e) => {
         Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
@@ -478,13 +545,60 @@ const AdminDashBoardPage = () => {
                   </Card.Body>
                 </Card>
               </Col>
+              {/* 첫 번째 카드 추가 */}
+  <Col md={6}>
+    <Card
+      className="text-center shadow rounded"
+      style={{ ...cardDefaultStyle, backgroundColor: "#9C27B0", color: "white", cursor: "pointer", marginTop: "40px" }}
+      onMouseEnter={(e) => {
+        Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
+      }}
+    >
+      <Card.Body>
+        <FontAwesomeIcon icon={faQuestionCircle} size="2x" />
+        <Card.Title>
+          <strong>미확인 Q/A</strong>
+        </Card.Title>
+        <Card.Text>{todayTasks.inquiries}개</Card.Text>
+      </Card.Body>
+    </Card>
+  </Col>
+
+  {/* 두 번째 카드 추가 */}
+  <Col md={6}>
+    <Card
+      className="text-center shadow rounded"
+      style={{ ...cardDefaultStyle, backgroundColor: "#4DB6AC", color: "white", cursor: "pointer", marginTop: "40px" }}
+      onMouseEnter={(e) => {
+        Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
+      }}
+    >
+      <Card.Body>
+        <FontAwesomeIcon icon={faBoxOpen} size="2x" />
+        <Card.Title>
+          <strong>반품 요청</strong>
+        </Card.Title>
+        <Card.Text>{todayTasks.refundOrders}개</Card.Text>
+      </Card.Body>
+    </Card>
+  </Col>
             </Row>
           </div>
         </Col>
+        
+  
+
+
 
         {/* 월 매출 통계 */}
         <Col md={6}>
-  <div className="p-3 shadow rounded" style={{ ...cardDefaultStyle,backgroundColor: "#f8f9fa", padding: "1.5rem",cursor: "pointer" }}
+  <div className="p-3 shadow rounded" style={{ ...cardDefaultStyle,backgroundColor: "#f8f9fa", padding: "1.5rem",cursor: "pointer"}}
   onMouseEnter={(e) => {
     Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
   }}
@@ -530,7 +644,7 @@ const AdminDashBoardPage = () => {
             e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
           }}>
             <h4><strong>신규 가입 고객</strong></h4>
-            <div style={{ height: '405px' }}>
+            <div style={{ height: '501px' }}>
               <Bar data={barDataUserSignUps} options={{ responsive: true, maintainAspectRatio: false }} />
             </div>
           </div>
@@ -610,6 +724,7 @@ const AdminDashBoardPage = () => {
                     {status === "shipping" && "배송 중"}
                     {status === "delivered" && "배송 완료"}
                     {status === "refund" && "환불"}
+                    {status === "refunded" && "환불 완료"}
                     <Badge bg={badgeBg[status]} style={{ marginLeft: "8px" }}>
                       {statusCounts[status]}
                     </Badge>
@@ -643,6 +758,90 @@ const AdminDashBoardPage = () => {
         </Col>
       </Row>
 
+      <Row style={{ marginTop: "30px" }}>
+  <Col md={12}>
+  <div className="p-3 shadow rounded" style={{ ...cardDefaultStyle, backgroundColor: "#f8f9fa", boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", marginTop: "20px", cursor: "pointer" }}
+          onMouseEnter={(e) => {
+            Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
+          }}>
+      <h4>
+        <strong>Q&A 목록</strong>
+      </h4>
+     
+      <Tabs activeKey={selectedStatus} onSelect={handleStatusFilter} className="mb-3">
+  {QnA_STATUS.map((status) => (
+    <Tab eventKey={status} title={
+      <span>
+        {status === "completed" && "답변 완료"}
+        {status === "preparing" && "미답변"}
+        <Badge bg={status === "completed" ? "success" : "warning"} style={{ marginLeft: "8px" }}>
+          {Array.isArray(qnaList) 
+            ? qnaList.filter((qna) => status === "completed" ? qna.isAnswered : !qna.isAnswered).length
+            : 0}
+        </Badge>
+      </span>
+    } />
+  ))}
+</Tabs>
+
+            <Table responsive bordered striped hover className="shadow-sm">
+              <thead>
+                <tr>
+                  <th>분류</th>
+                  <th>상품</th>
+                  <th>제목</th>
+                  <th>작성자</th>
+                  <th>작성일</th>
+                  <th>답변 상태</th>
+                </tr>
+              </thead>
+              <tbody>
+  {Array.isArray(adminQnAList) && adminQnAList.length > 0 ? (
+    adminQnAList.map((qna) => (
+      <tr key={qna._id}>
+        <td>{qna.category}</td>
+        <td>
+          {qna.product?.image ? (
+            <Image
+              src={qna.product.image}
+              alt="Product"
+              style={{ width: "30px", height: "auto" }}
+            />
+          ) : (
+            <span>이미지 없음</span>
+          )}
+        </td>
+        <td>{qna.QueryTitle}</td>
+        <td>{qna.user?.name || "Unknown"}</td>
+        <td>{new Date(qna.createdAt).toLocaleDateString()}</td>
+        <td>
+          {qna.isAnswered ? (
+            <Badge bg="success">답변 완료</Badge>
+          ) : (
+            <Badge bg="warning">미답변</Badge>
+          )}
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="6" className="text-center">
+        Q&A 데이터가 없습니다.
+      </td>
+    </tr>
+  )}
+</tbody>
+
+
+            </Table>
+          </div>
+        </Col>
+</Row>
+
+
       {/* 재고 부족 상품 모달 */}
       <Modal show={showOutOfStockModal} onHide={handleCloseOutOfStockModal}>
         <Modal.Header closeButton>
@@ -671,7 +870,7 @@ const AdminDashBoardPage = () => {
   <Col md={6}>
     <Card
       className="d-flex justify-content-between align-item-center shadow rounded"
-      style={{ ...cardDefaultStyle,backgroundColor: "#f8f9fa", cursor: "pointer" }}
+      style={{ ...cardDefaultStyle,backgroundColor: "#f8f9fa", cursor: "pointer", marginBottom: "100px" }}
       onMouseEnter={(e) => {
         Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
       }}
@@ -695,7 +894,7 @@ const AdminDashBoardPage = () => {
   <Col md={6}>
     <Card
       className="d-flex justify-content-between align-item-center shadow rounded"
-      style={{...cardDefaultStyle, backgroundColor: "#f8f9fa", cursor: "pointer" }}
+      style={{...cardDefaultStyle, backgroundColor: "#f8f9fa", cursor: "pointer", marginBottom: "100px" }}
       onMouseEnter={(e) => {
         Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
       }}

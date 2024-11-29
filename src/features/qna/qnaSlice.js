@@ -8,16 +8,17 @@ export const getQnAList = createAsyncThunk(
   async (query, { rejectWithValue }) => {
     try {
       const response = await api.get("/qna", { params: { ...query } });
-      // console.log("API response data:", response.data);
 
       if (response.status !== 200 && response.status !== 201) {
         throw new Error(response.data?.error || "Failed to fetch Q&A list");
       }
 
       const data = response.data.data || [];
+      const adminData = response.data.adminData || [];
       const totalPageNum = response.data.totalPageNum || 1;
+      const totalItemNum = response.data.totalItemNum;
 
-      return { data, totalPageNum }; // 데이터와 전체 페이지 수를 반환
+      return { data, totalPageNum, totalItemNum, adminData }; // 데이터와 전체 페이지 수를 반환
     } catch (error) {
       console.error("Error fetching QnA list:", error.message);
       return rejectWithValue(error.message || "Unknown error");
@@ -112,8 +113,9 @@ const qnaSlice = createSlice({
       })
       .addCase(getQnAList.fulfilled, (state, action) => {
         state.loading = false;
-        // console.log("Fetched QnA list:", action.payload); // 데이터 확인
+        console.log("Fetched QnA list:", action.payload); // 데이터 확인
         state.qnaList = action.payload;
+        state.adminData = action.payload.adminData;
       })
       .addCase(getQnAList.rejected, (state, action) => {
         state.loading = false;

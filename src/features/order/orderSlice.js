@@ -48,11 +48,25 @@ export const getOrder = createAsyncThunk(
   }
 );
 
+export const getAdminOrderList = createAsyncThunk(
+  "order/getOrderList",
+  async (query, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.get("/order", { params: { ...query, all: true } });
+      if (response.status !== 200) throw new Error(response.error);
+      return response.data;
+    } catch (error) {
+      dispatch(showToastMessage({ message: error, status: "error" }));
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const getOrderList = createAsyncThunk(
   "order/getOrderList",
   async (query, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.get("/order", { params: query });
+      const response = await api.get("/order", { params: { ...query} });
       if (response.status !== 200) throw new Error(response.error);
       return response.data;
     } catch (error) {

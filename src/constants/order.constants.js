@@ -8,7 +8,7 @@ export const GET_ORDER_LIST_REQUEST = "GET_ORDER_LIST_REQUEST";
 export const GET_ORDER_LIST_SUCCESS = "GET_ORDER_LIST_SUCCESS";
 export const GET_ORDER_LIST_FAIL = "GET_ORDER_LIST_FAIL";
 export const SET_SELECTED_ORDER = "SET_SELECTED_ORDER";
-export const ORDER_STATUS = ["preparing", "shipping", "delivered", "refund"];
+export const ORDER_STATUS = ["preparing", "shipping", "delivered", "refund", "refunded"];
 export const UPDATE_ORDER_REQUEST = "UPDATE_ORDER_REQUEST";
 export const UPDATE_ORDER_SUCCESS = "UPDATE_ORDER_SUCCESS";
 export const UPDATE_ORDER_FAIL = "UPDATE_ORDER_FAIL";
@@ -17,4 +17,5 @@ export const badgeBg = {
   shipping: "warning",
   refund: "danger",
   delivered: "success",
+  refunded: "success",
 };
