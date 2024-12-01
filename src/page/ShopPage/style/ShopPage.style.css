@@ -1,0 +1,125 @@
+
+.search-box-right {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 1rem; /* 아래쪽 간격 */
+  }
+  
+  .category-nav mb-4 {
+    display: flex;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    gap: 10px; /* 카테고리 간 간격 */
+  }
+  .nav-link {
+    display: block;
+    padding: .5rem 1rem;
+    color: #000;
+    text-decoration: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+    font-size: 14px; /* 글자 크기를 작게 */
+  }
+  .nav-link.active {
+  color: #777; /* 선택된 카테고리: 선명한 검은색 */
+  }
+  
+  /* mt-4를 Container에 적용 */
+  .custom-container {
+  margin-top: 1.5rem; /* mt-4의 기본값과 동일한 값 (1.5rem) */
+  }
+  
+  /* 오른쪽 정렬을 위한 클래스 */
+  .right-align {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-bottom: 20px;
+  }
+  
+  .search-box-custom {
+  width: 100%;
+  max-width: 250px; /* 검색 박스의 최대 너비 제한 */
+  }
+  /* 전체 드롭다운 스타일 */
+  .custom-dropdown {
+  display: flex;
+  justify-content: flex-end;
+  }
+  
+  /* 버튼 스타일 수정 (드롭다운 버튼 포함) */
+  .custom-dropdown .dropdown-toggle {
+  background-color: white !important; 
+  color: #333 !important;       
+  border: 1px solid #ccc !important;  
+  padding: 10px 20px !important;   
+  font-size: 16px !important;     
+  max-width: 200px !important;    
+  width: auto !important;             
+  }
+  
+  /* 드롭다운 메뉴 최소 너비 설정 */
+  .custom-dropdown .dropdown-menu {
+  min-width: 160px !important;  /* 메뉴의 최소 너비 설정 */
+  }
+  
+  /* 버튼의 기본 스타일 */
+  .custom-dropdown .btn-secondary {
+  background-color: white !important; 
+  border-color: #ccc !important;  
+  color: #333 !important;     
+  }
+  
+  /* 드롭다운 버튼 스타일 수정 */
+  .custom-dropdown .dropdown-toggle {
+    background-color: white !important;   
+    color: #333 !important;           
+    border: 1px solid #ccc !important; 
+    padding: 10px 20px !important;     
+    font-size: 16px !important;     
+    max-width: 200px !important;        
+    width: auto !important;           
+  }
+  
+  /* 드롭다운 메뉴 스타일 */
+  .custom-dropdown .dropdown-menu {
+    background-color: #fff !important; 
+    border: 1px solid #000 !important; 
+    color: #000000 !important; 
+    text-align: right !important; 
+    min-width: 160px !important; 
+  }
+  
+  /* 드롭다운 메뉴 아이템 스타일 */
+  .custom-dropdown .dropdown-item {
+    color: #000 !important; /* 아이템 텍스트 색을 검정색으로 */
+    background-color: #fff !important; /* 아이템 배경색을 흰색으로 */
+    text-align: right !important; /* 드롭다운 아이템 텍스트 오른쪽 정렬 */
+  }
+  
+  /* 드롭다운 아이템에 hover 효과 */
+  .custom-dropdown .dropdown-item:hover {
+    background-color: #f8f9fa !important; 
+    color: #000 !important; 
+  }
+  
+  /* 버튼 스타일 */
+  .btn-secondary {
+    color: #000000 !important; 
+    background-color: #fff !important; 
+    border-color: #000 !important; 
+  }
+  
+  
+  .nav-link {
+    display: block;
+    padding: .4rem 0.6rem;
+    color: #000;
+    text-decoration: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+  }
+  
+  .card img{
+    width: 100%; 
+    height: auto; 
+    object-fit: cover; 
+  }
+  

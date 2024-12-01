@@ -12,7 +12,7 @@ export const PRODUCT_EDIT_REQUEST = "PRODUCT_EDIT_REQUEST";
 export const PRODUCT_EDIT_SUCCESS = "PRODUCT_EDIT_SUCCESS";
 export const PRODUCT_EDIT_FAIL = "PRODUCT_EDIT_FAIL";
 export const SET_FILTERED_LIST = "SET_FILTERED_LIST";
-export const CATEGORY = ["Outer","Top", "Pants","Bag","Shoes","Cap"];
+export const CATEGORY = ["Outer","Top", "Pants","Shoes","Acc"];
 export const STATUS = ["active", "disactive"];
 export const SIZE = ["XS", "S", "M", "L", "XL"];
 export const TOGGLE_ITEM_DIALOG = "TOGGLE_ITEM_DIALOG";
@@ -22,3 +22,26 @@ export const SEARCH_PRODUCT_FAIL = " SEARCH_PRODUCT_FAIL";
 export const GET_PRODUCT_DETAIL_REQUEST = "GET_PRODUCT_DETAIL_REQUEST";
 export const GET_PRODUCT_DETAIL_SUCCESS = "GET_PRODUCT_DETAIL_SUCCESS";
 export const GET_PRODUCT_DETAIL_FAIL = "GET_PRODUCT_DETAIL_FAIL";
+export const WASH_METHODS = [
+    {
+      label: "드라이클리닝",
+      value: "DryClean",
+    },
+    {
+      label: "손세탁",
+      value: "HandWash",
+    },
+    {
+      label: "표백제 사용 금지",
+      value: "DoNotBleach",
+    },
+    {
+      label: "뉘어서 건조",
+      value: "DryFlat",
+    },
+    {
+      label: "다림질 금지",
+      value: "DoNotIron",
+    },
+  ];
+  

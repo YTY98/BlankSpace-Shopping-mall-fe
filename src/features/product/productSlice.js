@@ -89,7 +89,13 @@ const productSlice = createSlice({
   name: "products",
   initialState: {
     productList: [],
-    selectedProduct: null,
+    selectedProduct: {
+      id: null,
+      name: "",
+      height: null, // height 추가
+      weight: null, // weight 추가
+      washingMethod: "", // 세탁방법 추가
+    },
     loading: false,
     error: "",
     totalPageNum: 1,
@@ -127,7 +133,12 @@ const productSlice = createSlice({
       })
       .addCase(getProductList.fulfilled, (state, action) => {
         state.loading = false;
-        state.productList = action.payload.data;
+        state.productList = action.payload.data.map((product) => ({
+          ...product,
+          height: product.height || null, // height 필드 추가
+          weight: product.weight || null, // weight 필드 추가
+          washingMethod: product.washingMethod || "", // 세탁방법 필드 추가
+        }));
         state.error = "";
         state.totalPageNum = action.payload.totalPageNum;
       })
@@ -153,7 +164,10 @@ const productSlice = createSlice({
         state.loading = true;
       })
       .addCase(getProductDetail.fulfilled, (state, action) => {
-        state.selectedProduct = action.payload;
+        state.selectedProduct = {
+          ...action.payload,
+          washingMethod: action.payload.washingMethod || "", // 세탁방법 추가
+        };
         state.loading = false;
         state.error = "";
       })
