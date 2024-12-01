@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Form, Modal, Button, Row, Col, Alert } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import CloudinaryUploadWidget from "../../../utils/CloudinaryUploadWidget";
-import { CATEGORY, STATUS, SIZE } from "../../../constants/product.constants";
+import {
+  CATEGORY,
+  STATUS,
+  SIZE,
+  WASH_METHODS,
+} from "../../../constants/product.constants";
 import "../style/adminProduct.style.css";
 import {
   clearError,
@@ -19,6 +24,9 @@ const InitialFormData = {
   category: [],
   status: "active",
   price: 0,
+  height: 0,
+  weight: 0,
+  washMethods: [], // 세탁 방법 필드 추가
 };
 
 const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
@@ -108,8 +116,16 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     });
   };
 
+  const handleWashMethodChange = (event) => {
+    const { value } = event.target;
+    const updatedWashMethods = formData.washMethods.includes(value)
+      ? formData.washMethods.filter((method) => method !== value)
+      : [...formData.washMethods, value];
+    setFormData({ ...formData, washMethods: updatedWashMethods });
+  };
+
   const uploadImage = (url) => {
-    setFormData({ ...formData, image: [...formData.image,url] });
+    setFormData({ ...formData, image: [...formData.image, url] });
   };
 
   return (
@@ -280,6 +296,50 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
             </Form.Select>
           </Form.Group>
         </Row>
+
+        <Form.Group as={Col} controlId="washMethod">
+          <Form.Label>Wash Method</Form.Label>
+          <Form.Select
+            value={formData.washMethod}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled hidden>
+              Please Choose...
+            </option>
+            {WASH_METHODS.map((method, idx) => (
+              <option key={idx} value={method.value}>
+                {method.label}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+
+        <Row className="mb-3">
+          <Form.Group as={Col} controlId="height">
+            <Form.Label>Height</Form.Label>
+            <Form.Control
+              onChange={handleChange}
+              type="number"
+              placeholder="Enter Height"
+              required
+              value={formData.height}
+            />
+          </Form.Group>
+
+          <Form.Group as={Col} controlId="weight">
+            <Form.Label>Weight</Form.Label>
+            <Form.Control
+              onChange={handleChange}
+              type="number"
+              placeholder="Enter Weight"
+              required
+              value={formData.weight}
+            />
+          </Form.Group>
+        </Row>
+
         {mode === "new" ? (
           <Button variant="primary" type="submit">
             Submit

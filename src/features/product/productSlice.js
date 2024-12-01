@@ -30,6 +30,23 @@ export const getProductDetail = createAsyncThunk(
   }
 );
 
+export const deleteProduct = createAsyncThunk(
+  "products/deleteProduct",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/product/${id}`);
+      if (response.status !== 200) throw new Error(response.error);
+      dispatch(
+        showToastMessage({ message: "상품 삭제 완료", status: "success" })
+      );
+      dispatch(getProductList({ page: 1 }));
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.error);
+    }
+  }
+);
 
 export const createProduct = createAsyncThunk(
   "products/createProduct",
@@ -49,29 +66,19 @@ export const createProduct = createAsyncThunk(
   }
 );
 
-export const deleteProduct = createAsyncThunk(
-  "products/deleteProduct",
-  async (id, { dispatch, rejectWithValue }) => {
-    try {
-      const response = await api.delete(`/product/${id}`);
-      if (response.status !== 200) throw new Error(response.error);
-      dispatch(
-        showToastMessage({ message: "상품 삭제 완료", status: "success" })
-      );
-      dispatch(getProductList({ page: 1 }));
-
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.error);
-    }
-  }
-);
-
 export const editProduct = createAsyncThunk(
   "products/editProduct",
-  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
+  async (
+    { id, height, weight, ...formData },
+    { dispatch, rejectWithValue }
+  ) => {
     try {
-      const response = await api.put(`/product/${id}`, formData);
+      // height와 weight가 formData에 포함된 상태로 PUT 요청 전송
+      const response = await api.put(`/product/${id}`, {
+        ...formData,
+        height,
+        weight,
+      });
       if (response.status !== 200) throw new Error(response.error);
       dispatch(
         showToastMessage({ message: "상품 수정 완료", status: "success" })
@@ -89,7 +96,13 @@ const productSlice = createSlice({
   name: "products",
   initialState: {
     productList: [],
-    selectedProduct: null,
+    selectedProduct: {
+      id: null,
+      name: "",
+      height: null, // height 추가
+      weight: null, // weight 추가
+      washingMethod: "", // 세탁방법 추가
+    },
     loading: false,
     error: "",
     totalPageNum: 1,
@@ -112,7 +125,7 @@ const productSlice = createSlice({
       .addCase(createProduct.pending, (state) => {
         state.loading = true;
       })
-      .addCase(createProduct.fulfilled, (state,dispatch) => {
+      .addCase(createProduct.fulfilled, (state, dispatch) => {
         state.loading = false;
         state.error = "";
         state.success = true; // 상품 생성을 성공? 다이얼로그를 닫는다. 상품 생성을 실패? 실패 메세지를 보여주고, 닫진 않음
@@ -127,7 +140,12 @@ const productSlice = createSlice({
       })
       .addCase(getProductList.fulfilled, (state, action) => {
         state.loading = false;
-        state.productList = action.payload.data;
+        state.productList = action.payload.data.map((product) => ({
+          ...product,
+          height: product.height || null, // height 필드 추가
+          weight: product.weight || null, // weight 필드 추가
+          washingMethod: product.washingMethod || "", // 세탁방법 필드 추가
+        }));
         state.error = "";
         state.totalPageNum = action.payload.totalPageNum;
       })
@@ -138,11 +156,10 @@ const productSlice = createSlice({
       .addCase(editProduct.pending, (state) => {
         state.loading = true;
       })
-      .addCase(editProduct.fulfilled, (state,dispatch) => {
+      .addCase(editProduct.fulfilled, (state, dispatch) => {
         state.loading = false;
         state.error = "";
         state.success = true;
-        
       })
       .addCase(editProduct.rejected, (state, action) => {
         state.loading = false;
@@ -153,7 +170,10 @@ const productSlice = createSlice({
         state.loading = true;
       })
       .addCase(getProductDetail.fulfilled, (state, action) => {
-        state.selectedProduct = action.payload;
+        state.selectedProduct = {
+          ...action.payload,
+          washingMethod: action.payload.washingMethod || "", // 세탁방법 추가
+        };
         state.loading = false;
         state.error = "";
       })
@@ -178,5 +198,3 @@ const productSlice = createSlice({
 export const { setSelectedProduct, setFilteredList, clearError } =
   productSlice.actions;
 export default productSlice.reducer;
-
-

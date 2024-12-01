@@ -23,14 +23,18 @@ const ProductTable = ({ header, data, deleteItem, openEditForm }) => {
                 <th style={{ minWidth: "100px" }}>{item.name}</th>
                 <th>{currencyFormat(item.price)}</th>
                 <th>
-                  {Object.keys(item.stock).map((size, index) => (
-                    <div key={index}>
+                  {Object.keys(item.stock).map((size, idx) => (
+                    <div key={idx}>
                       {size}:{item.stock[size]}
                     </div>
                   ))}
                 </th>
                 <th>
-                  <img src={item.image[0]} width={100} alt="image" />
+                  {item.image && item.image[0] ? (
+                    <img src={item.image[0]} width={100} alt="image" />
+                  ) : (
+                    <span>No Image</span>
+                  )}
                 </th>
                 <th>{item.status}</th>
                 <th style={{ minWidth: "100px" }}>
@@ -49,7 +53,11 @@ const ProductTable = ({ header, data, deleteItem, openEditForm }) => {
               </tr>
             ))
           ) : (
-            <tr>No Data to show</tr>
+            <tr>
+              <td colSpan={header.length} style={{ textAlign: "center" }}>
+                No Data to show
+              </td>
+            </tr>
           )}
         </tbody>
       </Table>
@@ -57,4 +65,3 @@ const ProductTable = ({ header, data, deleteItem, openEditForm }) => {
   );
 };
 export default ProductTable;
-
