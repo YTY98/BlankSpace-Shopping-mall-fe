@@ -22,6 +22,7 @@ const AdminProductPage = () => {
   const [searchQuery, setSearchQuery] = useState({
     page: query.get("page") || 1,
     name: query.get("name") || "",
+    admin: 1
   }); //검색 조건들을 저장하는 객체
 
   const [mode, setMode] = useState("new");
