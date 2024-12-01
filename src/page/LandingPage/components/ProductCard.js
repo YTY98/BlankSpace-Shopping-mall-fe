@@ -65,7 +65,7 @@ const ProductCard = ({ item }) => {
   };
 
   return (
-    <Card className="card" onClick={showProduct}>
+    <Card className="card" onClick={() => showProduct(item._id)}>
       <Card.Img
         variant="top"
         src={mainImage || item?.image[0]} // 이미지 변경 시 첫 번째 이미지 또는 선택된 이미지 표시
