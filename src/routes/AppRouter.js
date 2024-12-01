@@ -11,7 +11,7 @@ import ProductDetail from "../page/ProductDetailPage/ProductDetailPage";
 import RegisterPage from "../page/RegisterPage/RegisterPage";
 import PrivateRoute from "./PrivateRoute";
 import CollectionPage from "../page/CollectionPage";
-import ShopPage from "../page/ShopPage";
+import ShopPage from "../page/ShopPage/ShopPage";
 import NoticePage from "../page/NoticePage/NoticePage";
 import NoticeDetailPage from "../page/NoticeDetailPage/NoticeDetailPage";
 import WritePage from '../page/WritePage/WritePage';
@@ -33,6 +33,7 @@ import SendPage from "../common/component/FooterDetail/SendPage";
 import StorePage from "../common/component/FooterDetail/StorePage";
 import TermPage from "../common/component/FooterDetail/TermPage";
 import AboutPage from "../page/AboutPage/AboutPage";
+import ReviewWritePage from "../page/ReviewWritePage/ReviewWritePage";
 
 const AppRouter = () => {
   return (
@@ -67,6 +68,7 @@ const AppRouter = () => {
         <Route path="/mypage/mileage" element={<MyMileagePage />} />
         <Route path="/mypage/membership" element={<MyMembershipPage />} />
         <Route path="/mypage/qna" element={<MyQnaPage />} />
+        <Route path="/write-review/:productId" element={<ReviewWritePage />} />
       </Route>
       <Route element={<PrivateRoute permissionLevel="admin" />}>
         <Route path="/admin/management" element={<AdminDashBoardPage/>} />

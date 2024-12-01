@@ -1,0 +1,167 @@
+/* 페이지 전체를 중앙 정렬 */
+.write-review-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh; /* 화면 전체 높이에 맞추기 */
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .write-review-title {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  /* 폼 컨테이너 중앙 정렬 */
+  .write-review-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1000px; /* 폼의 최대 너비 설정 */
+  }
+  
+  /* 별점 부분 스타일 */
+  .write-review-rating-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .write-review-rating {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .write-review-star {
+    font-size: 40px;
+    cursor: pointer;
+  }
+  
+  .write-review-star.selected {
+    color: #ffcc00;
+  }
+  
+  /* 텍스트 입력 부분 스타일 */
+  .write-review-textarea-section {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  
+  .write-review-textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: none;
+  }
+  
+  .write-review-textarea:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  /* 이미지 업로드 부분 스타일 */
+  .write-review-image-upload-section {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  
+  .write-review-image-upload-section label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .write-review-image-upload-input {
+    width: 100%;
+  }
+  
+  .write-review-image-preview {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .write-review-image-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  /* 버튼 스타일 */
+  .write-review-submit-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+  }
+  
+  .write-review-btn-submit,
+  .write-review-btn-cancel {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .write-review-btn-submit {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .write-review-btn-submit:hover {
+    background-color: #0056b3;
+  }
+  
+  .write-review-btn-cancel {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .write-review-btn-cancel:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .write-review-divider {
+    margin: 10px 0; /* 밑줄과 버튼 간격 */
+    border: none;
+    border-top: 1px solid #ccc;
+  }
+  
+  .write-review-char-count {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+  }
+  
+  /* '작성 시 유의사항' 버튼을 왼쪽 정렬 */
+  .write-review-notice-button-container {
+    text-align: left; 
+    width: 100%; 
+  }
+  
+  /* '작성 시 유의사항' 버튼의 기본 스타일 유지 */
+  .write-review-notice-button-container .btn-link {
+    font-weight: 400;
+    color: #000;  
+    text-decoration: underline;  
+    padding-left: 0; 
+  }
+  
+  .modal-title {
+    color: #000; 
+  }
+  

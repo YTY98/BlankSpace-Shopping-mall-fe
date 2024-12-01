@@ -26,6 +26,25 @@ export const searchNotices = createAsyncThunk(
   }
 );
 
+// 관리자를 위한 검색된 공지사항 목록을 가져오는 비동기 작업
+export const adminsearchNotices = createAsyncThunk(
+  "notices/adminsearchNotices",
+  async ({ searchType = "title", keyword = "", page = 1, limit = 10 }) => {
+    // keyword가 객체인 경우 title 속성을 가져오고, 문자열인 경우 그대로 사용
+    const keywordValue =
+      typeof keyword === "string" ? keyword : keyword.title || "";
+
+    const response = await api.get("/notices", {
+      params: {
+        searchType,
+        keyword: keywordValue, // keyword를 문자열로 설정
+        page,
+        limit,
+      },
+    });
+    return response.data;
+  }
+);
 
 //공지사항 추가하는 비동기작업
 export const addNotice = createAsyncThunk(
@@ -100,6 +119,18 @@ const noticeSlice = createSlice({
       })
       .addCase(searchNotices.rejected, (state, action) => {
         state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(adminsearchNotices.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(adminsearchNotices.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.notices = action.payload.notices;
+        state.totalCount = action.payload.totalCount; // 전체 공지사항 수 업데이트
+      })
+      .addCase(adminsearchNotices.rejected, (state, action) => {
+        state.status = "failed";
         state.error = action.error.message;
       });
   },

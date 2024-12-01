@@ -14,6 +14,7 @@ const initialState = {
   totalPageNum: 1,
   dateFilter: "all",
   statusFilter: "all", // 상태 필터 추가
+  sortedProducts: [],
 };
 
 // Async thunks
@@ -94,6 +95,22 @@ export const updateOrder = createAsyncThunk(
   }
 );
 
+// 판매량순 정렬 데이터 가져오기 Thunk
+export const getProductsSortedBySales = createAsyncThunk(
+  "order/getProductsSortedBySales",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.get("/products-sorted-by-sales/"); // API 호출
+      if (response.status !== 200) throw new Error(response.error); // 상태 확인
+      console.log("work!");
+      return response.data; // 데이터 반환
+    } catch (error) {
+      dispatch(showToastMessage({ message: error.message, status: "error" })); // 에러 처리
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Order slice
 const orderSlice = createSlice({
   name: "order",
@@ -154,6 +171,17 @@ const orderSlice = createSlice({
         state.loading = false; 
       })
       .addCase(updateOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getProductsSortedBySales.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProductsSortedBySales.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sortedProducts = action.payload;
+      })
+      .addCase(getProductsSortedBySales.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
