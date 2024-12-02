@@ -1,19 +1,26 @@
 import React, { useState } from "react";
 import { Card, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { currencyFormat } from "../../../utils/number";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons"; // 속이 찬 하트
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons"; // 속이 빈 하트
+import { addToWishlist } from "../../../features/user/userSlice"; // Wishlist 추가/제거 Thunk 액션 추가
+
 const ProductCard = ({ item }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
   const [mainImage, setMainImage] = useState(item?.image[0] || "");
-  const [wishState, setWishState] = useState(false);
   const handleMouseEnter = () => {
     if (item?.image?.length > 1) {
       setMainImage(item.image[1]); // 마우스를 올리면 두 번째 이미지로 변경
     }
   };
+
+
+  const isWished = user?.wishlist?.includes(item._id);
 
   const handleMouseLeave = () => {
     setMainImage(item?.image[0] || ""); // 마우스를 떼면 첫 번째 이미지로 되돌리기
@@ -25,8 +32,14 @@ const ProductCard = ({ item }) => {
 
   const handleWishClick = (event) => {
     event.stopPropagation();
-    if (wishState === true) setWishState(false);
-    else setWishState(true);
+    if (!user) {
+      // 로그인하지 않은 사용자는 위시리스트 추가 불가
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    // Wishlist 추가 또는 제거 요청
+    dispatch(addToWishlist({ productId: item._id }));
   };
 
   return (
@@ -61,13 +74,12 @@ const ProductCard = ({ item }) => {
           padding: "0px",
         }}
       >
-        {wishState === true ? (
+        {isWished ? (
           <FontAwesomeIcon
             icon={solidHeart}
-            
             className="fa-bounce"
             size="2x"
-            style={{ color: "#ff0000", cursor: "pointer", width: "80%", animation: "fa-bounce 1s ease-in-out 1"  }}
+            style={{ color: "#ff0000", cursor: "pointer", width: "80%", animation: "fa-bounce 1s ease-in-out 1" }}
           />
         ) : (
           <FontAwesomeIcon icon={regularHeart} size="2x" style={{ cursor: "pointer", width: "80%" }} />
