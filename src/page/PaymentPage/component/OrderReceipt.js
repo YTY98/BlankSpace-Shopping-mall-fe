@@ -3,8 +3,8 @@ import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { useLocation } from "react-router-dom";
 import { currencyFormat } from "../../../utils/number";
-
-const OrderReceipt = ({cartList, totalPrice}) => {
+import { Row, Col } from "react-bootstrap";
+const OrderReceipt = ({ cartList, totalPrice }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -12,16 +12,22 @@ const OrderReceipt = ({cartList, totalPrice}) => {
     <div className="receipt-container">
       <h3 className="receipt-title">주문 내역</h3>
       <ul className="receipt-list">
-        {cartList.length > 0 &&
-          cartList.map((item, index) => (
-            <li key={index}>
-              <div className="display-flex space-between">
-                <div>{item.productId.name}</div>
-
-                <div>₩ {currencyFormat(item.productId.price * item.qty)}</div>
-              </div>
-            </li>
-          ))}
+        <Row>
+          {cartList.length > 0 &&
+            cartList.map((item, index) => (
+              <Row style={{paddingRight: "0px"}}>
+                <Col xs={8} sm={8} md={6} lg={8} style={{paddingRight: "0px"}}>
+                  <div>{item.productId.name}</div>
+                </Col>
+                <Col xs={1} sm={1} md={1} lg={1} style={{ textAlign: "right" }}>
+                  <div>₩</div>
+                </Col>
+                <Col xs={3} sm={3} md={4} lg={3} style={{ justifyContent: "flex-end", textAlign: "right", paddingRight: "0px"}}>
+                  <div>{currencyFormat(item.productId.price * item.qty)}</div>
+                </Col>
+                </Row>
+            ))}
+        </Row>
       </ul>
       <div className="display-flex space-between receipt-title">
         <div>
