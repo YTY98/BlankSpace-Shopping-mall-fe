@@ -77,12 +77,14 @@ const Navbar = ({ user }) => {
           ))}
         </div>
       </div>
-
+      
+      <div className="minwoobabo" style={{width: "100%", display: "flex", justifyContent: "right"}}>
       {user && user.level === "admin" && (
         <Link to="/admin/management?page=1" className="link-area">
           Admin page
         </Link>
       )}
+      </div>
 
       <div className="nav-header">
         <div className="burger-menu hide">
