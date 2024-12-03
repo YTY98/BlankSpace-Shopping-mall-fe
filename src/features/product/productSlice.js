@@ -3,19 +3,34 @@ import api from "../../utils/api";
 import { showToastMessage } from "../common/uiSlice";
 
 // 비동기 액션 생성
+// export const getProductList = createAsyncThunk(
+//   "products/getProductList",
+//   async (query, { rejectWithValue }) => {
+//     try {
+//       const response = await api.get("/product", { params: { ...query } });
+//       if (response.status !== 200) throw new Error(response.error);
+
+//       return response.data;
+//     } catch (error) {
+//       return rejectWithValue(error.error);
+//     }
+//   }
+// );
+
 export const getProductList = createAsyncThunk(
   "products/getProductList",
   async (query, { rejectWithValue }) => {
     try {
-      const response = await api.get("/product", { params: { ...query } });
+      const response = await api.get("/product", { params: query }); // 쿼리 파라미터로 전달
       if (response.status !== 200) throw new Error(response.error);
 
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.error);
+      return rejectWithValue(error.message); // error.message로 수정
     }
   }
 );
+
 
 export const getProductDetail = createAsyncThunk(
   "products/getProductDetail",

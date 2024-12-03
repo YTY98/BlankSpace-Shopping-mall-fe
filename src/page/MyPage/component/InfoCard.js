@@ -8,7 +8,6 @@ import "../style/infoCard.style.css";
 function InfoCard() {
     const navigate = useNavigate();
     const user = useSelector((state) => state.user.user);
-    console.log("user : ", user);
     return (
     <>
       {[

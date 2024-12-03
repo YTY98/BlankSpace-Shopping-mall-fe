@@ -78,7 +78,6 @@ const MyWishlistPage = () => {
             }
           );
 
-          console.log("위시리스트 제품 정보:", response.data.products); // 제품 정보 로그 출력
           setWishlistProducts(response.data.products); // 서버에서 받은 제품 목록 설정
         }
       } catch (error) {
