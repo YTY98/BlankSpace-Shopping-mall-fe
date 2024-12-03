@@ -5,38 +5,54 @@ import Footer from "../../common/component/Footer";
 import SearchBox from "../../common/component/SearchBox";
 import { getProductList } from "../../features/product/productSlice";
 import { getProductsSortedBySales } from "../../features/order/orderSlice";
-import "../../App.css";
+import "./style/ShopPage.style.css";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ShopPage = () => {
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
   const productList = useSelector((state) => state.product.productList);
-  const sortedSalesProducts = useSelector(
-    (state) => state.order.sortedProducts
-  );
-  const [query, setQuery] = useSearchParams();
-  const [category, setCategory] = useState(query.get("category") || "Outer");
-  const [searchQuery, setSearchQuery] = useState({
-    name: query.get("name") || "",
-  });
+  const sortedSalesProducts = useSelector((state) => state.order.sortedProducts);
+  
+  const navigate = useNavigate();
+
+  // 초기 상태 설정
+  const initialCategory = searchParams.get("category") || "All";
+  const initialSearchQuery = searchParams.get("name") || "";
+
+  const [category, setCategory] = useState(initialCategory);
+  const [searchQuery, setSearchQuery] = useState({ name: initialSearchQuery });
   const [sortOrder, setSortOrder] = useState(["createdAt", "desc"]);
   const [displayProducts, setDisplayProducts] = useState([]);
   const [hoveredImages, setHoveredImages] = useState({}); // 호버 이미지 관리
-  const navigate = useNavigate();
 
+
+  useEffect(() => {
+    const categoryFromParams = searchParams.get("category") || "All";
+    const nameFromParams = searchParams.get("name") || "";
+
+    // 상태가 동일한 경우 중복 업데이트 방지
+    if (category !== categoryFromParams || searchQuery.name !== nameFromParams) {
+      setCategory(categoryFromParams);
+      setSearchQuery({ name: nameFromParams });
+    }
+  }, [searchParams]);
+  
+  // 정렬 방식, 카테고리 또는 검색어 변경 시 API 호출
   useEffect(() => {
     if (sortOrder[0] === "sales") {
       dispatch(getProductsSortedBySales(category.toLowerCase()));
     } else {
       dispatch(
         getProductList({
-          name: searchQuery.name || "",
-          category: category.toLowerCase(),
+          name: searchQuery.name,
+          category: category.toLowerCase() === "all" ? "" : category.toLowerCase(),
+          // category: category.toLowerCase(),
         })
       );
     }
-  }, [dispatch, sortOrder, searchQuery, category]);
+  }, [dispatch, sortOrder, category, searchQuery]);
 
   useEffect(() => {
     if (sortOrder[0] === "sales" && sortedSalesProducts.length > 0) {
@@ -59,11 +75,24 @@ const ShopPage = () => {
     }
   }, [sortOrder, productList, sortedSalesProducts, category]);
 
+
+  useEffect(() => {
+    const params = {};
+    if (category) params.category = category;
+    if (searchQuery.name) params.name = searchQuery.name;
+    setSearchParams(params);
+  }, [category, searchQuery, setSearchParams]);
+  
+  
+  
   const handleCategoryClick = (cat) => {
-    setCategory(cat);
-    setSortOrder(["createdAt", "desc"]);
-    setQuery({ ...query, category: cat });
+    if (cat !== category) {
+      setCategory(cat);
+      setSortOrder(["createdAt", "desc"]);
+    }
   };
+  
+
 
   const handleSortChange = (option) => {
     const sortOptions = {
@@ -89,12 +118,12 @@ const ShopPage = () => {
 
 
   return (
-    <div>
+    <div>{/** TODO: Navbar 이쁘게 그리고 마우스 대면 밑줄이 생기게 */}
       <Container className="mt-4">
         <Nav className="category-nav mb-4">
-          {["Outer", "Top", "Bottom", "Shoes", "Acc"].map((cat) => (
+          {["All", "Outer", "Top", "Bottom", "Shoes", "Acc"].map((cat) => (
             <Nav.Item key={cat}>
-              <Nav.Link
+              <Nav.Link 
                 active={category.toLowerCase() === cat.toLowerCase()}
                 onClick={(e) => {
                   e.preventDefault();
@@ -109,21 +138,11 @@ const ShopPage = () => {
 
         {/* 검색박스와 정렬 기준을 오른쪽으로 정렬하기 위해 div를 사용 */}
         <div className="right-align d-flex justify-content-end mb-4">
-          {/* 검색 박스 */}
-          <div className="mr-3">
-            <SearchBox
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              placeholder="Search"
-              field="name"
-              className="search-box-custom"
-            />
-          </div>
 
           {/* 정렬 기준 드롭다운 */}
           <div>
             <Dropdown className="custom-dropdown">
-              <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+              <Dropdown.Toggle variant="light" id="dropdown-basic" style={{backgroundColor: "#FAF9F8"}}>
                 정렬 기준
               </Dropdown.Toggle>
               <Dropdown.Menu>
@@ -146,6 +165,18 @@ const ShopPage = () => {
               </Dropdown.Menu>
             </Dropdown>
           </div>
+
+          {/* 검색 박스 */}
+          <div className="mr-3">
+            <SearchBox
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              placeholder="Search"
+              field="name"
+              className="search-box-custom"
+            />
+          </div>
+
         </div>
 
         <div className="mt-4">
@@ -161,8 +192,10 @@ const ShopPage = () => {
               ))}
             </div>
           ) : (
-            <div className="text-align-center empty-bag">
-              <h2>{category}에 해당하는 상품이 없습니다!</h2>
+            <div className="text-align-center empty-bag"
+              style={{backgroundColor: "#FAF9F8", padding: "10rem"}}
+            >
+              <h2>{category}에 해당하는 상품이 없습니다.</h2>
             </div>
           )}
         </div>
