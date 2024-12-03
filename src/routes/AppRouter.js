@@ -10,7 +10,7 @@ import ProductAll from "../page/LandingPage/LandingPage";
 import ProductDetail from "../page/ProductDetailPage/ProductDetailPage";
 import RegisterPage from "../page/RegisterPage/RegisterPage";
 import PrivateRoute from "./PrivateRoute";
-import CollectionPage from "../page/CollectionPage";
+import CollectionPage from "../page/CollectionPage/CollectionPage";
 import ShopPage from "../page/ShopPage/ShopPage";
 import NoticePage from "../page/NoticePage/NoticePage";
 import NoticeDetailPage from "../page/NoticeDetailPage/NoticeDetailPage";

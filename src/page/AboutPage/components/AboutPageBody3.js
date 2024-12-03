@@ -12,7 +12,7 @@ const AboutPageBody3 = () => {
             <div className='body3-inner-left-flex'>
                 <FadeUp>
                   <img className="body3-image2" src="/image/Aboutbody3-1.png" />
-                  <img className="body3-image3" src="/image/AboutPage-body3-2.png" />
+                  <img className="body3-image3" src="/image/AboutPage-body3-3.png" />
                 </FadeUp>
             </div>
             <div className='body3-inner-right-flex'>  

@@ -7,6 +7,13 @@ const LandingPageShop = () => {
   const navigate = useNavigate();
 
   const gotoShop = () => {
+    // 스크롤을 최상단으로 이동
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant'
+    });
+
     navigate('/shop');
   };
 
