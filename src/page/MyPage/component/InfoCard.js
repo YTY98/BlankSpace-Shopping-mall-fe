@@ -3,6 +3,7 @@ import { Row, Col, Container } from 'react-bootstrap'
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import "../style/infoCard.style.css";
+import MembershipIcon from './subComponent/MembershipIcon';
 
 
 function InfoCard() {
@@ -22,7 +23,8 @@ function InfoCard() {
         >
           <Card.Header className="cardHeader">내 정보</Card.Header>
           <Card.Body className="cardBody">
-            <Card.Title> {user.name} 고객님 반갑습니다! </Card.Title>
+            <Card.Title> <MembershipIcon membership={user.membership}/>
+            <span>  </span>{user.name} 고객님 반갑습니다! </Card.Title>
             <Card.Text>
               <Card className="cardContent">
                 <div>

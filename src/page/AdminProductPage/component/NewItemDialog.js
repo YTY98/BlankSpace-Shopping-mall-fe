@@ -292,7 +292,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
           </Form.Group>
         </Row>
 
-        <Form.Group as={Col} controlId="washMethod">
+        {/* <Form.Group as={Col} controlId="washMethod">
           <Form.Label>Wash Method</Form.Label>
           <Form.Select
             value={formData.washMethod}
@@ -302,13 +302,13 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
             <option value="" disabled hidden>
               Please Choose...
             </option>
-            {WASH_METHODS.map((method, idx) => (
+            {formData.WASH_METHODS.map((method, idx) => (
               <option key={idx} value={method.value}>
                 {method.label}
               </option>
             ))}
           </Form.Select>
-        </Form.Group>
+        </Form.Group> */}
 
 
         <Row className="mb-3">
