@@ -214,7 +214,7 @@ const ProductDetail = () => {
 
           <Dropdown>
             <Dropdown.Toggle id="dropdown-basic-button">
-              {size ? `SIZE : ${size}` : "사이즈 선택"}
+              {size ? `SIZE : ${size.toUpperCase()}` : "사이즈 선택"}
             </Dropdown.Toggle>
             <Dropdown.Menu className="custom-dropdown-menu">
               {selectedProduct?.stock &&

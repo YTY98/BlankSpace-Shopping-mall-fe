@@ -20,7 +20,7 @@ const CartProductCard = ({ item }) => {
     <div className="product-card-cart">
       <Row>
         <Col md={2} xs={12}>
-          <img src={item.productId.image} width={112} alt="product" />
+          <img src={item.productId.image[0]} width={112} alt="product" />
         </Col>
         <Col md={10} xs={12}>
           <div className="display-flex space-between">

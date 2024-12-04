@@ -105,7 +105,6 @@ export const fetchUserInfo = createAsyncThunk(
       const response = await api.get("/user/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       return response.data.user; // API에서 반환된 사용자 데이터
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);

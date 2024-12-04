@@ -71,6 +71,7 @@ const AdminDashBoardPage = () => {
   const adminLimit = 20; // 페이지당 Q&A 개수
 
   const [userManagementModal, setUserManagementModal] = useState(false);
+  const [adminManagementModal, setAdminManagementModal] = useState(false);
   const [userListState, setUserListState] = useState([]);
   const [outOfStockCount, setOutOfStockCount] = useState(0);
   const [outOfStockProducts, setOutOfStockProducts] = useState([]);
@@ -294,11 +295,30 @@ const AdminDashBoardPage = () => {
     // setUpdatedRole("");
   };
 
+  // 사용자 관리 모달 열기
+  const handleAdminManagementModalOpen = () => {
+    setAdminManagementModal(true);
+  };
+
+  const handleAdminManagementModalClose = () => {
+    setAdminManagementModal(false);
+    // setSelectedUser(null);
+    // setUpdatedRole("");
+  };
+
   // 역할 변경을 위한 선택
   const handleRoleSelect = (userId, newRole) => {
     setUserListState((prev) =>
       prev.map((user) =>
         user._id === userId ? { ...user, level: newRole } : user
+      )
+    );
+  };
+
+  const handleMembershipSelect = (userId, newMembership) => {
+    setUserListState((prev) =>
+      prev.map((user) =>
+        user._id === userId ? { ...user, membership: newMembership } : user
       )
     );
   };
@@ -1092,7 +1112,7 @@ const AdminDashBoardPage = () => {
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
             }}
-            onClick={handleUserManagementModalOpen}
+            onClick={handleAdminManagementModalOpen}
           >
             <Card.Body>
               <Card.Title>
@@ -1121,6 +1141,7 @@ const AdminDashBoardPage = () => {
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
             }}
+            onClick={handleUserManagementModalOpen}
           >
             <Card.Body>
               <Card.Title>
@@ -1136,12 +1157,69 @@ const AdminDashBoardPage = () => {
 
       {/* Admin 관리 모달 */}
       <Modal
+        show={adminManagementModal}
+        onHide={handleAdminManagementModalClose}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Admin 권한 관리</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>역할</th>
+                <th>작업</th>
+              </tr>
+            </thead>
+            <tbody>
+              {userListState.map((user) => (
+                <tr key={user._id}>
+                  <td>{user._id}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    <select
+                      value={user.level}
+                      onChange={(e) =>
+                        handleRoleSelect(user._id, e.target.value)
+                      } // 드롭다운 변경 시 상태 갱신
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="customer">Customer</option>
+                    </select>
+                  </td>
+                  <td>
+                    <Button
+                      variant="primary"
+                      onClick={() => handleRoleUpdate(user._id)} // 해당 사용자 업데이트
+                    >
+                      확인
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleAdminManagementModalClose}>
+            닫기
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* 멤버십 관리 모달 */}
+      <Modal
         show={userManagementModal}
         onHide={handleUserManagementModalClose}
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Admin 권한 관리</Modal.Title>
+          <Modal.Title>User 멤버십 권한 관리</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Table striped bordered hover>
