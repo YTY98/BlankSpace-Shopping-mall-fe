@@ -11,7 +11,7 @@ const AboutPageBody1 = () => {
 
               <FadeUp>
                 <span className="body1-firsttext">
-                  very man possesses unique beauty, and Blankspace aims to accentuate<br></br> that beauty by offering a variety of products that allow men to freely express their style.<br></br> Our store goes beyond merely selling products; we prioritize communication<br></br> and empathy with our customers. At Blankspace, we want you to enjoy shopping in a comfortable atmosphere and strive to make your special moments even more extraordinary.
+                  very man possesses unique beauty, and Blankspace aims to accentuate that beauty by offering a variety of products that allow men to freely express their style. Our store goes beyond merely selling products; we prioritize communication and empathy with our customers. At Blankspace, we want you to enjoy shopping in a comfortable atmosphere and strive to make your special moments even more extraordinary.
                 </span>
               </FadeUp>
 

@@ -2,46 +2,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Caramel&family=Cormorant+SC:wght@300;400;500;600;700&family=Encode+Sans+SC:wght@100..900&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Jim+Nightshade&family=Libre+Bodoni:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 /* title */
-.title-area {
-    position: relative;
-    height: 200vh;
-}
-
 .title-image {
-    position: relative; 
-    width: 100%;
-    height: 200vh;
-    object-fit: cover;
+    background-image: url('../../../../public/image/LandingPage-background.png');
+    background-size: cover;
+    background-position: center;
+    height: 1080px;
 }
 
 .logo-image { /* 로고 크기와 위치 설정 */
-    position: absolute;
-    top: 5%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20%;
-}
-
-.logo-paragraph-area { /* 로고 글자 위치 설정 */
-    position: absolute;
-    top: 60%;
-    left: 30%;
-    transform: translate(-50%, -50%);
-}
-
-.logo-paragraph { /* 로고 글자 설정 */
-    font-size: 100px;
-    color: white;
-    font-family: "Inria Serif", serif;
-    line-height: 1;
-}
-
-.title-paragraph-area {
-    position: absolute;
-    top: 25%;
-    left: 70%;
-    transform: translate(-50%, -50%); 
-    width: 40%;
+    position: relative;
+    display: block;
+    margin: 0 auto 0 auto;
+    width: calc(150px + (250 * ((100vw - 500px) / 1420)));
+    max-width: 400px; /* 최대값 설정 */
+    min-width: 150px; /* 최소값 설정 */
 }
 
 .title-paragraph {
@@ -50,6 +24,17 @@
     font-family: "Inria Serif", serif;
     text-align: left;
     line-height: 1.5;
+
+    margin-top: 50px;
+}
+
+.logo-paragraph { /* 로고 글자 설정 */
+    font-size: 100px;
+    color: white;
+    font-family: "Inria Serif", serif;
+    line-height: 1;
+
+    margin-top: 200px;
 }
 
 /* intro */
@@ -91,7 +76,7 @@
 
 .intro-image-2-2 {
     width: 25vw;
-    margin-left: 10vw;
+    margin-left: 20px;
     object-fit: contain;
     object-position: 0 0;
 }
@@ -345,6 +330,8 @@
 .about-image-1 {
     margin-left: 10vw;
     width: 40vw;
+    object-fit: contain;
+    object-position: 0 0;
 }
 
 /* content */
@@ -478,41 +465,23 @@
     transform: translateY(0);
 }
 
-/* 반응형 - 태블릿(가로) */
-@media (max-width: 1200px) {
-
-    /* title */
-    .title-area {
-        height: 120vh;
-    }
-
-    .title-image {
-        height: 120vh;
-    }
-
-    .logo-image { /* 로고 크기와 위치 설정 */
-        top: 5%;
-    }
-
-    .logo-paragraph-area {
-        top: 65%;
-    }
-
-    .title-paragraph-area {
-        top: 35%;
+@media (max-width: 576px) {
+    .logo-paragraph { /* 로고 글자 설정 */
+        font-size: 80px;
+        text-align: center;
     }
 }
 
-/* 반응형 - 태블릿(세로) */
+@media (max-width: 768px) {
+    .logo-paragraph {
+        text-align: center;
+    }
+}
+
+/****************************
+* 여기부터는 옛날 @media 코드 *
+****************************/
 @media (max-width: 900px) {
-    .title-area {
-        height: 80vh;
-    }
-
-    .title-image {
-        height: 80vh; 
-    }
-
     .shop-span-1 {
         margin-top: 30px;
         font-size: 20px;
@@ -540,7 +509,7 @@
     }
 
     .about-paragraph-1 {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .about-span-1 {
@@ -564,98 +533,133 @@
     }
 
     .content-header-2 {
-        font-size: 14px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .logo-image {
+        padding-top: 50px;
     }
 }
 
 @media (max-width: 700px) {
-
-
-    /* title */
-    .title-area {
-        width:177vh;
-        height: 150vh;
+    .intro-header-1, .intro-header-2 {
+        font-size: 24px;
     }
-
-    .title-image {
-        width:177vh;
-        height: 150vh;
-    }
-
-    .logo-image { /* 로고 크기와 위치 설정 */
-        top: 7%;
-        width: 130px;
-    }
-
-    .logo-paragraph-area {
-        top: 80%;
-        left: 50%;
-    }
-    
-    .logo-paragraph {
-        width: 100%;
-        font-size: 65px;
-    }
-    
-    .title-paragraph-area {
-        top: 40%;
-        left: 50%;
-        width: 90%;
-    }
-    
-    .title-paragraph {
-        font-size: 16px;
-    }
-
     .intro-header-2 {
         margin-bottom: 10px;
+    }
+
+    .intro-paragraph-1, .intro-paragraph-2 {
+        font-size: 13px;
     }
 
     .intro-image-2-1 {
         margin-top: 0px;
     }
-}
 
-
-/* 반응형 - 휴대폰 */
-@media (max-width: 400px) {
-
-    /* title */
-    .title-area {
-        height: 90vh;
-        width:100%;
+    /* shop */
+    .shop-outer-flex {
+        margin-bottom: 0px;
     }
 
-    .title-image {
-        height: 90vh;
-        width:100%;
-    }
-
-    .logo-image { /* 로고 크기와 위치 설정 */
-        top: 14%;
-        width: 130px;
-    }
-
-    .logo-paragraph-area {
-        top: 80%;
-        left: 50%;
+    .shop-inner-flex-1 {
+        flex-direction: column;
     }
     
-    .logo-paragraph {
-        width: 100%;
-        font-size: 65px;
+    .shop-inner-flex-2 {
+        flex-direction: column;
     }
-    
-    .title-paragraph-area {
-        top: 40%;
-        left: 50%;
-        width: 90%;
+
+    .shop-header-1 {
+        font-size: 44px;
     }
-    
-    .title-paragraph {
+
+    .shop-span-1 {
+        font-size: 20px;
+
+        width: 80%;
+        margin-top: 2vh;
+    }
+
+    .shop-paragraph-1 {
+        width: 60%;
+
         font-size: 16px;
     }
 
+    .shop-span-2 {
+        display: none;
+    }
+
+    .shop-span-2-flex-media {
+        display: flex;
+        justify-content: center;
+
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .shop-span-2-media {
+        display: block;
+
+        font-size: 24px;
+        text-align: center;
+        width: 80%;
+    }
+
+    .shop-image-1 {
+        width: 100%;
+    }
+
+    .shop-image-2 {
+        width: 100%;
+    }
+
+    /* about */
+    .about-span-2, .about-span-3, .about-span-4 {
+        width: 60%;
+    }
+}
+
+@media (max-width: 600px) {
+    .content-inner-flex-2 {
+        flex-direction: column;
+    }
+
+    .content-header-3 {
+        font-size: 48px;
+    }
+
+    .content-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 1fr;
+        gap: 10px;
+        width: 100%;
+    
+        margin-left: 0px;
+        margin-bottom: 20px;
+    }
+
+    .content-image-show-more-button {
+        display: block;
+
+        width: 80px;
+        height: 40px;
+        border-radius: 15vw;
+        margin: 0 auto 0 auto; /* 좌우 중앙 위치 */
+        
+        font-size: 12px;
+        font-family: inter;
+        color: white;
+    
+        background-color: #333333;
+    }
+}
+
+/* 반응형 - 휴대폰 */
+@media (max-width: 400px) {
     /* intro */
     .intro-outer-flex-1 {
         margin-bottom: 5vh;
@@ -698,16 +702,11 @@
     }
     
     /* shop */
-    .shop-outer-flex {
-        margin-bottom: 0px;
-    }
+    .shop-span-1 {
+        font-size: 14px;
 
-    .shop-inner-flex-1 {
-        flex-direction: column;
-    }
-    
-    .shop-inner-flex-2 {
-        flex-direction: column;
+        width: 80%;
+        margin-top: 2vh;
     }
 
     .shop-inner-flex-3 {
@@ -730,25 +729,6 @@
         font-size: 16px;
     }
 
-    .shop-span-1 {
-        font-size: 14px;
-
-        width: 80%;
-        margin-top: 2vh;
-    }
-
-    .shop-span-2 {
-        display: none;
-    }
-
-    .shop-span-2-flex-media {
-        display: flex;
-        justify-content: center;
-
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-
     .shop-span-2-media {
         display: block;
 
@@ -757,13 +737,6 @@
         width: 80%;
     }
 
-    .shop-image-1 {
-        width: 100%;
-    }
-
-    .shop-image-2 {
-        width: 100%;
-    }
 
     .shop-image-3 {
         width: 60%;
@@ -838,10 +811,6 @@
         margin-bottom: 4vw;
     }
 
-    .content-inner-flex-2 {
-        flex-direction: column;
-    }
-
     .content-header-1 {
         font-size: 40px;
     }
@@ -851,7 +820,7 @@
     }
 
     .content-header-3 {
-        font-size: 48px;
+        font-size: 12vw;
         margin-top: 10px;
         margin-bottom: 40px;
     }
@@ -869,31 +838,6 @@
         margin-bottom: 2vw;
     }
 
-    .content-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: 1fr;
-        gap: 10px;
-        width: 100%;
-    
-        margin-left: 0px;
-        margin-bottom: 20px;
-    }
-
-    .content-image-show-more-button {
-        display: block;
-
-        width: 80px;
-        height: 40px;
-        border-radius: 15vw;
-        margin: 0 auto 0 auto; /* 좌우 중앙 위치 */
-        
-        font-size: 12px;
-        font-family: inter;
-        color: white;
-    
-        background-color: #333333;
-    }
-
     /* outro */
     .outro-paragraph-1 {
         top: 60%;
@@ -908,5 +852,15 @@
         left: 65%;
         width: 60%;
         font-size: 2.3vw;
+    }
+}
+
+@media (max-width: 340px) {
+    .logo-image {
+        padding-top: 100px;
+    }
+
+    .logo-paragraph {
+        margin-top: 150px;
     }
 }
