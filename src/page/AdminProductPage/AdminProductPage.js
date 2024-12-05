@@ -36,7 +36,7 @@ const AdminProductPage = () => {
     "Stock",
     "Image",
     "Status",
-    "",
+    "Actions",
   ];
 
   //상품리스트 가져오기 (url쿼리 맞춰서)
