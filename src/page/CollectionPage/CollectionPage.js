@@ -84,15 +84,19 @@ const CollectionPage = () => {
       <div className="collection-grid2">
         <img src="/image/Collection2-1.jpg" className="collection-grid2-item" />
         <img src="/image/Collection2-2.jpg" className="collection-grid2-item" />
-        <p className="collection-grid2-item">
-        BLANKSPACE COLLECTION<br></br><br></br>
+        <div className="collection-grid2-item">
+          <h4 className='collection-header-1'>
+          BLANKSPACE COLLECTION<br /><br />
+          </h4>
 
-        WE FOCUSED OUR ATTENTION ON THE DETAILS,<br></br> 
-        THE STORYTELLING, AND THE NUANCES.<br></br> 
-        EACH ITEM IN OUR LINEUP FOLLOWS A UNIQUE NARRATIVE,<br></br> 
-        CRAFTED TO TELL ITS OWN STORY,<br></br> 
-        WHILE EMBODYING OUR DISTINCTIVE STYLE AND VIBE.<br></br>
-        </p>
+          <p className='collection-paragraph-1'>
+          WE FOCUSED OUR ATTENTION ON THE DETAILS,<br />
+          THE STORYTELLING, AND THE NUANCES.<br />
+          EACH ITEM IN OUR LINEUP FOLLOWS A UNIQUE NARRATIVE,<br />
+          CRAFTED TO TELL ITS OWN STORY,<br />
+          WHILE EMBODYING OUR DISTINCTIVE STYLE AND VIBE.
+          </p>
+        </div>
         <img src="/image/Collection2-3.jpg" className="collection-grid2-item" />
         <img src="/image/Collection2-4.jpg" className="collection-grid2-item" />
         <img src="/image/Collection2-5.jpg" className="collection-grid2-item" />

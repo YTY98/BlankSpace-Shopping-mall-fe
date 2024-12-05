@@ -54,17 +54,17 @@ const Footer = () => {
           />
           <div>
             <ul className="sns-area">
-              <a className="sns-link" href="https://blog.naver.com/xlxks12" target="_blank" rel="noopener noreferrer">
+              <a className="sns-link" href="https://www.naver.com/" target="_blank" rel="noopener noreferrer">
                 <li className="sns-icon">
                   <i className="fa-solid fa-n"></i>
                 </li>
               </a>
-              <a className="sns-link" href="https://www.instagram.com/kmw3637/" target="_blank" rel="noopener noreferrer">
+              <a className="sns-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
                 <li className="sns-icon">
                   <i className="fa-brands fa-instagram"></i>
                 </li>
               </a>
-              <a className="sns-link" href="https://studio.youtube.com/channel/UCBjhZtMcc1hSIQ_M7UufUSQ/editing/profile" target="_blank" rel="noopener noreferrer">
+              <a className="sns-link" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
                 <li className="sns-icon last">
                   <i className="fa-brands fa-youtube"></i>
                 </li>

@@ -90,7 +90,7 @@
 .body3-outer-flex {
     display: flex;
     
-    height: 120vh;
+    height: 800px;
     margin-top: -10px;
     background-color: #2A2927;
 }
@@ -100,7 +100,7 @@
     flex-direction: column;
 
     width: 50%;
-    margin-top: 50vh;
+    margin-top: 300px;
 }
 
 .body3-inner-right-flex {
@@ -108,7 +108,7 @@
     flex-direction: column;
 
     width: 50%;
-    margin-top: 20vh;
+    margin-top: 80px;
 }
 
 .body3-header1 {
@@ -190,10 +190,81 @@
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     text-align: justify;
-
 }
 
 /* 마우스 올렸을 때 텍스트 표시 */
 .image-container:hover .hover-text {
     opacity: 1;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .body1-outer-flex {
+        flex-direction: column;
+
+        margin-top: 0px;
+        margin-bottom: 10px;
+    }
+
+    .body1-inner-left-flex, .body1-inner-right-flex {
+        width: 100%;
+
+        margin-top: 30px;
+    }
+
+    .body1-firsttext {
+        font-size: 16px;
+    }
+
+    .body1-hr1 {
+        margin-top: 30px;
+    }
+
+    .body1-image2 {
+        width: 80%;
+        display: block;
+        margin: 0 auto 0 auto;
+    }
+
+    .image-container:hover .hover-text {
+        opacity: 0;
+    }
+
+    .body2-flex {
+        margin: 20px;
+        gap: 15px;
+    }
+
+    .body3-outer-flex {
+        flex-direction: column;
+
+        height: 1000px;
+    }
+
+    .body3-inner-left-flex, .body3-inner-right-flex{
+        flex-direction: row;
+        width: 90%;
+        margin-top: 30px;
+        margin-left: 20px;
+    }
+
+    .body3-inner-left-flex {
+        order: 2;
+    }
+
+    .body3-inner-right-flex {
+        order: 1;
+    }
+}
+
+@media (max-width: 400px) {
+    .body3-paragraph1 {
+        width: 85%;
+
+        font-size: 16px;
+    }
+
+    .body3-paragraph2 {
+        font-size: 14px;
+    }
 }
