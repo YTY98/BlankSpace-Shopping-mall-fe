@@ -172,6 +172,7 @@
     grid-column-end: 5;
     text-align: center; /* 가로 방향 정렬 */
     display: flex; /* 플렉스 박스 활성화 */
+    flex-direction: column;
     justify-content: center; /* 가로 방향에서 중앙 정렬 */
     align-items: center; /* 세로 방향에서 중앙 정렬 */
     height: 100%; /* 부모 요소의 높이를 차지하도록 설정 */
@@ -217,4 +218,86 @@
 .collection-grid2-item:nth-child(11) {
     grid-column-start: 4;
     grid-column-end: 5;
+}
+
+.collection-header-1 {
+    font-weight: bold;
+    font-size: 3vw;
+}
+
+.collection-paragraph-1 {
+    font-size: 1.3vw;
+}
+
+@media (max-width: 576px){
+    .collection-grid2 {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 0.6fr;
+    }
+
+    .collection-grid2-item:nth-child(1) {
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
+    
+    .collection-grid2-item:nth-child(2) {
+        grid-column-start: 2;
+        grid-column-end: 3;
+    }
+    
+    .collection-grid2-item:nth-child(3) {
+        grid-column-start: 1;
+        grid-column-end: 3;
+        order: -1;
+
+        height: 300px;
+    }
+    .collection-grid2-item:nth-child(4) {
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
+    
+    .collection-grid2-item:nth-child(5) {
+        grid-column-start: 2;
+        grid-column-end: 3;
+    }
+    
+    .collection-grid2-item:nth-child(6) {
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
+    
+    .collection-grid2-item:nth-child(7) {
+        grid-column-start: 2;
+        grid-column-end: 3;
+    }
+    
+    .collection-grid2-item:nth-child(8) {
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
+    
+    .collection-grid2-item:nth-child(9) {
+        grid-column-start: 2;
+        grid-column-end: 3;
+    }
+    
+    .collection-grid2-item:nth-child(10) {
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
+    
+    .collection-grid2-item:nth-child(11) {
+        grid-column-start: 2;
+        grid-column-end: 3;
+    }
+
+    .collection-header-1 {
+        font-size: 6vw;
+    }
+    
+    .collection-paragraph-1 {
+        font-size: 3vw;
+    }
+    
 }
