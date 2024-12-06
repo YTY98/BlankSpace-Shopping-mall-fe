@@ -114,7 +114,7 @@ const ShopPage = () => {
     <div>
       <Container className="mt-4" style ={{marginBottom: "100px"}}>
         <Nav className="category-nav mb-4">
-          {["All", "Outer", "Top", "Bottom", "Shoes", "Acc"].map((cat) => (
+          {["All", "Outer", "Top", "Pants", "Shoes", "Acc"].map((cat) => (
             <Nav.Item key={cat}>
               <Nav.Link
                 active={category.toLowerCase() === cat.toLowerCase()}

@@ -73,7 +73,7 @@ function AnswerPage() {
             {/* 방어적인 코드를 추가하여 qna?.product가 존재하는지 확인 */}
             {qna?.product ? (
               <Card.Img
-                src={qna.product.image}
+                src={qna.product.image[0]}
                 alt="qnaProduct"
                 onError={(e) => {
                   e.target.src = "//img.echosting.cafe24.com/thumb/75x75.gif";
