@@ -32,10 +32,10 @@ const NoticeDetailPage = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <><h1 className="mt-4">{notice.title}</h1>
-      <Container className="text-center mb-4" style = {{marginBottom: "100px"}}>
+    <><h1 className="mt-4 text-center" style ={{marginBottom: "40px"}}>{notice.title}</h1>
+      <Container className="text-center mb-4">
         {notice && (
-          <div className="notice-detail">
+          <div className="notice-detail" style = {{marginBottom: "100px"}}>
             <div className="notice-item content">
               <div dangerouslySetInnerHTML={{ __html: notice.content }}></div> {/* HTML 내용 렌더링 */}
             </div>

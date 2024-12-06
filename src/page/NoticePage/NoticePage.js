@@ -131,28 +131,35 @@ const NoticePage = () => {
             </tr>
           </thead>
           <tbody>
-            {notices.length > 0 ? (
-              notices.map((notice, index) => (
-                <tr
-                  key={notice._id}
-                  onClick={() => navigate(`/notice/${notice._id}`)}
-                >
-                  <td className="notice-number-column">{(currentPage - 1) * noticesPerPage + index + 1}</td>
-                  {/* 번호 표시 */}
-                  <td className="notice-title-column">{notice.title}</td>
-                  <td className="notice-date-column">
-                    {new Date(notice.date).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="text-center">
-                  검색 결과가 없습니다.
-                </td>
-              </tr>
-            )}
-          </tbody>
+  {notices.length > 0 ? (
+    notices
+      .slice()
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // 날짜를 기준으로 역순 정렬
+      .map((notice, index) => (
+        <tr key={notice._id}>
+          <td className="notice-number-column">{(currentPage - 1) * noticesPerPage + index + 1}</td>
+          <td className="notice-title-column text-start">
+            <span
+              className="hover-pointer"
+              onClick={() => navigate(`/notice/${notice._id}`)}
+            >
+              {notice.title}
+            </span>
+          </td>
+          <td className="notice-date-column">
+            {new Date(notice.date).toLocaleDateString()}
+          </td>
+        </tr>
+      ))
+  ) : (
+    <tr>
+      <td colSpan="3" className="text-center">
+        검색 결과가 없습니다.
+      </td>
+    </tr>
+  )}
+</tbody>
+
         </Table>
 
         {/* 페이지네이션 UI */}

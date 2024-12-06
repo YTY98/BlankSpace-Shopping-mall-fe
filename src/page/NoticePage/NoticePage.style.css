@@ -86,3 +86,17 @@
   button:hover {
     background-color: #f0f0f0; /* 버튼 호버 배경색 */
   }
+
+  .notice-title-column {
+    text-align: left; /* 제목을 왼쪽 정렬 */
+    padding: 8px 100px 8px 100px !important;
+  }
+  
+  .notice-title-column > span {
+    display: inline-block; /* 블록 요소로 변경하여 padding 적용 가능 */
+    cursor: pointer; /* 호버 시 커서를 포인터로 변경 */
+  }
+  
+  .notice-title-column > span:hover {
+    text-decoration: none; 
+  }
