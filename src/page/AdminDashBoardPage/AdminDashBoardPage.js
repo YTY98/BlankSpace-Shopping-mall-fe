@@ -83,7 +83,7 @@ const AdminDashBoardPage = () => {
   const [statusCounts, setStatusCounts] = useState(
     ORDER_STATUS.reduce((acc, status) => ({ ...acc, [status]: 0 }), {})
   );
-  const [qnaStatusCounts, setQnaStatusCounts] = useState(
+  const [qnaStatusCounts, setQnaStatusCounts] = useState( 
     QnA_STATUS.reduce((acc, status) => ({ ...acc, [status]: 0 }), {})
   );
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -159,16 +159,29 @@ const AdminDashBoardPage = () => {
   // }, [qnaList]);
 
   useEffect(() => {
-    if (Array.isArray(qnaList) && qnaList.length > 0) {
-      const completedCount = qnaList.filter((qna) => qna.isAnswered).length;
-      const preparingCount = qnaList.length - completedCount;
-
-      setQnaStatusCounts({
-        completed: completedCount,
-        preparing: preparingCount,
-      });
+    if (!qnaList || !Array.isArray(qnaList.data)) {
+      // qnaList가 없거나, data가 배열이 아닌 경우 초기화
+      setQnaStatusCounts({ completed: 0, preparing: 0 });
+      return;
     }
+  
+    const completedCount = qnaList.data.filter((qna) => qna.isAnswered).length;
+    const preparingCount = qnaList.data.length - completedCount;
+  
+    setQnaStatusCounts((prevCounts) => {
+      if (
+        prevCounts.completed !== completedCount ||
+        prevCounts.preparing !== preparingCount
+      ) {
+        return {
+          completed: completedCount,
+          preparing: preparingCount,
+        };
+      }
+      return prevCounts; // 상태 변경이 없으면 이전 상태 유지
+    });
   }, [qnaList]);
+  
 
   useEffect(() => {
     // Q&A 데이터 로드
@@ -206,50 +219,6 @@ const AdminDashBoardPage = () => {
       setOutOfStockProducts(outOfStockProductsWithSizes);
     }
   }, [productList]);
-
-  // useEffect(() => {
-  //   if (orderList.length > 0) {
-  //     const sales = orderList.reduce(
-  //       (total, order) => total + order.totalPrice,
-  //       0
-  //     );
-  //     setTotalSales(sales);
-  //     setPurchaseCount(orderList.length);
-
-  //     const newMonthlySales = Array(12).fill(0);
-  //     const newDailySales = {};
-  //     const newStatusCounts = ORDER_STATUS.reduce(
-  //       (acc, status) => ({ ...acc, [status]: 0 }),
-  //       {}
-  //     );
-
-  //     orderList.forEach((order) => {
-  //       const date = new Date(order.createdAt);
-  //       const today = new Date().toISOString().split("T")[0];
-  //       const orderYear = date.getFullYear();
-  //       const orderMonth = date.getMonth();
-  //       const day = date.toISOString().split("T")[0];
-
-
-  //       if (orderYear === selectedYear) {
-  //         newMonthlySales[orderMonth] += order.totalPrice;
-
-  //         if (selectedMonth && orderMonth + 1 === selectedMonth) {
-  //           newDailySales[day] = newDailySales[day]
-  //             ? newDailySales[day] + order.totalPrice
-  //             : order.totalPrice;
-  //         }
-
-  //       }
-
-  //       newStatusCounts[order.status] += 1;
-  //     });
-
-  //     setMonthlySales(newMonthlySales);
-  //     setDailySales(newDailySales);
-  //     setStatusCounts(newStatusCounts);
-  //   }
-  // }, [orderList, selectedYear, selectedMonth]);
 
   useEffect(() => {
     if (orderList.length > 0) {
@@ -296,11 +265,6 @@ const AdminDashBoardPage = () => {
       setStatusCounts(newStatusCounts);
     }
   }, [orderList, selectedYear]);
-
-  // useEffect(() => {
-  //   console.log("dailySales:", dailySales);
-  //   console.log("Today:", new Date().toISOString().split("T")[0]);
-  // }, [dailySales]);
 
   useEffect(() => {
     setUserCount(userList.length);
@@ -414,6 +378,45 @@ const AdminDashBoardPage = () => {
       alert("역할 업데이트 중 오류가 발생했습니다.");
     }
   };
+
+  const handleMembershipUpdate = async (userId) => {
+    const userToUpdate = userListState.find((user) => user._id === userId);
+
+    if (!userToUpdate) {
+      alert("사용자가 선택되지 않았습니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/users/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ membership : userToUpdate.membership }), // 변경할 level 값 전송
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const updatedUser = data.user;
+
+      setUserListState((prev) =>
+        prev.map((user) => (user._id === updatedUser._id ? updatedUser : user))
+      );
+
+      alert("사용자 역할이 성공적으로 업데이트되었습니다.");
+    } catch (error) {
+      console.error("역할 업데이트 실패:", error.message);
+      alert("역할 업데이트 중 오류가 발생했습니다.");
+    }
+  };
+
 
   const filteredOrderList = selectedTab
     ? orderList.filter((order) => order.status === selectedTab)
@@ -1070,7 +1073,7 @@ const AdminDashBoardPage = () => {
                         bg={status === "completed" ? "success" : "warning"}
                         style={{ marginLeft: "8px" }}
                       >
-                        {qnaStatusCounts[status]}
+                        {qnaStatusCounts[status]} {/* TODO: 이거 고쳐야함. qna 갯수 세기 */}
                       </Badge>
                     </span>
                   }
@@ -1097,7 +1100,7 @@ const AdminDashBoardPage = () => {
                       <td>
                         {qna.product?.image ? (
                           <Image
-                            src={qna.product.image}
+                            src={qna.product.image[0]}
                             alt="Product"
                             style={{ width: "30px", height: "auto" }}
                           />
@@ -1299,19 +1302,22 @@ const AdminDashBoardPage = () => {
                   <td>{user.email}</td>
                   <td>
                     <select
-                      value={user.level}
+                      value={user.membership}
                       onChange={(e) =>
-                        handleRoleSelect(user._id, e.target.value)
+                        handleMembershipSelect(user._id, e.target.value)
                       } // 드롭다운 변경 시 상태 갱신
                     >
-                      <option value="admin">Admin</option>
-                      <option value="customer">Customer</option>
+                      <option value="bronze">Bronze</option>
+                      <option value="silver">Silver</option>
+                      <option value="gold">Gold</option>
+                      <option value="platinum">Platinum</option>
+                      <option value="diamond">Diamond</option>
                     </select>
                   </td>
                   <td>
                     <Button
                       variant="primary"
-                      onClick={() => handleRoleUpdate(user._id)} // 해당 사용자 업데이트
+                      onClick={() => handleMembershipUpdate(user._id)} // 해당 사용자 업데이트
                     >
                       확인
                     </Button>
