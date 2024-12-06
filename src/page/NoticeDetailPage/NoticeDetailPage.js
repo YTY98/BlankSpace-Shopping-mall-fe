@@ -32,8 +32,8 @@ const NoticeDetailPage = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <><h1 className="text-center mb-4">{notice.title}</h1>
-      <Container className="mt-4">
+    <><h1 className="mt-4">{notice.title}</h1>
+      <Container className="text-center mb-4" style = {{marginBottom: "100px"}}>
         {notice && (
           <div className="notice-detail">
             <div className="notice-item content">
@@ -51,7 +51,7 @@ const NoticeDetailPage = () => {
       </Container>
 
       {/* Footer 컴포넌트를 하단에 추가 */}
-      <Footer />
+      <Footer/>
     </>
   );
 };

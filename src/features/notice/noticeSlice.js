@@ -87,9 +87,11 @@ const noticeSlice = createSlice({
       })
       .addCase(fetchNotices.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.notices = action.payload.notices; // 서버에서 받은 공지사항 목록
-        state.totalCount = action.payload.totalPageNum * 10; // 전체 공지사항 수 (총 페이지 수 * 페이지당 공지사항 수)
+        state.notices = action.payload.notices; // 공지사항 리스트
+        state.totalPageNum = action.payload.totalPageNum || 1; // 최소 1페이지 보장
+        state.currentPage = action.payload.currentPage || 1; // 현재 페이지 업데이트
       })
+      
       .addCase(fetchNotices.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
@@ -115,7 +117,8 @@ const noticeSlice = createSlice({
       .addCase(searchNotices.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.notices = action.payload.notices;
-        state.totalPageNum = action.payload.totalPageNum;
+        state.totalPageNum = action.payload.totalPageNum || 0; // totalPageNum이 없을 경우 기본값 설정
+        state.currentPage = action.payload.currentPage || 1; // 현재 페이지도 업데이트
       })
       .addCase(searchNotices.rejected, (state, action) => {
         state.status = 'failed';
