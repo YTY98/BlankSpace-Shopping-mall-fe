@@ -160,14 +160,62 @@
 .collection-grid2-item:nth-child(1) {
     grid-column-start: 1;
     grid-column-end: 2;
+    order: -1;
 }
 
 .collection-grid2-item:nth-child(2) {
     grid-column-start: 2;
     grid-column-end: 3;
+    order: -1;
 }
 
 .collection-grid2-item:nth-child(3) {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    
+}
+
+.collection-grid2-item:nth-child(4) {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+
+.collection-grid2-item:nth-child(5) {
+    grid-column-start: 3;
+    grid-column-end: 4;
+}
+
+.collection-grid2-item:nth-child(6) {
+    grid-column-start: 4;
+    grid-column-end: 5;
+}
+
+.collection-grid2-item:nth-child(7) {
+    grid-column-start: 1;
+    grid-column-end: 2;
+}
+
+.collection-grid2-item:nth-child(8) {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+
+.collection-grid2-item:nth-child(9) {
+    grid-column-start: 3;
+    grid-column-end: 4;
+}
+
+.collection-grid2-item:nth-child(10) {
+    grid-column-start: 4;
+    grid-column-end: 5;
+}
+
+.collection-grid2-paragraph {  /* 텍스트 */
+    aspect-ratio: 3 / 4;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
     grid-column-start: 3;
     grid-column-end: 5;
     text-align: center; /* 가로 방향 정렬 */
@@ -177,47 +225,7 @@
     align-items: center; /* 세로 방향에서 중앙 정렬 */
     height: 100%; /* 부모 요소의 높이를 차지하도록 설정 */
     aspect-ratio: 4 / 1;
-}
-
-.collection-grid2-item:nth-child(4) {
-    grid-column-start: 1;
-    grid-column-end: 2;
-    
-}
-
-.collection-grid2-item:nth-child(5) {
-    grid-column-start: 2;
-    grid-column-end: 3;
-}
-
-.collection-grid2-item:nth-child(6) {
-    grid-column-start: 3;
-    grid-column-end: 4;
-}
-
-.collection-grid2-item:nth-child(7) {
-    grid-column-start: 4;
-    grid-column-end: 5;
-}
-
-.collection-grid2-item:nth-child(8) {
-    grid-column-start: 1;
-    grid-column-end: 2;
-}
-
-.collection-grid2-item:nth-child(9) {
-    grid-column-start: 2;
-    grid-column-end: 3;
-}
-
-.collection-grid2-item:nth-child(10) {
-    grid-column-start: 3;
-    grid-column-end: 4;
-}
-
-.collection-grid2-item:nth-child(11) {
-    grid-column-start: 4;
-    grid-column-end: 5;
+    order: -1;
 }
 
 .collection-header-1 {
@@ -232,64 +240,67 @@
 @media (max-width: 576px){
     .collection-grid2 {
         grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: 0.6fr;
+        grid-auto-rows: 0.7fr;
     }
 
     .collection-grid2-item:nth-child(1) {
         grid-column-start: 1;
         grid-column-end: 2;
+        order: 0;
     }
     
     .collection-grid2-item:nth-child(2) {
         grid-column-start: 2;
         grid-column-end: 3;
+        order: 0;
     }
     
+
     .collection-grid2-item:nth-child(3) {
         grid-column-start: 1;
-        grid-column-end: 3;
-        order: -1;
-
-        height: 300px;
-    }
-    .collection-grid2-item:nth-child(4) {
-        grid-column-start: 1;
         grid-column-end: 2;
+    }
+    
+    .collection-grid2-item:nth-child(4) {
+        grid-column-start: 2;
+        grid-column-end: 3;
     }
     
     .collection-grid2-item:nth-child(5) {
-        grid-column-start: 2;
-        grid-column-end: 3;
+        grid-column-start: 1;
+        grid-column-end: 2;
     }
     
     .collection-grid2-item:nth-child(6) {
-        grid-column-start: 1;
-        grid-column-end: 2;
+        grid-column-start: 2;
+        grid-column-end: 3;
     }
     
     .collection-grid2-item:nth-child(7) {
-        grid-column-start: 2;
-        grid-column-end: 3;
+        grid-column-start: 1;
+        grid-column-end: 2;
     }
     
     .collection-grid2-item:nth-child(8) {
-        grid-column-start: 1;
-        grid-column-end: 2;
+        grid-column-start: 2;
+        grid-column-end: 3;
     }
     
     .collection-grid2-item:nth-child(9) {
-        grid-column-start: 2;
-        grid-column-end: 3;
-    }
-    
-    .collection-grid2-item:nth-child(10) {
         grid-column-start: 1;
         grid-column-end: 2;
     }
     
-    .collection-grid2-item:nth-child(11) {
+    .collection-grid2-item:nth-child(10) {
         grid-column-start: 2;
         grid-column-end: 3;
+    }
+
+    .collection-grid2-paragraph { /* 텍스트 */
+        grid-column-start: 1;
+        grid-column-end: 3;
+
+        height: 300px;
     }
 
     .collection-header-1 {
