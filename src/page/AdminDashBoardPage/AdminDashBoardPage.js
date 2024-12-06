@@ -207,6 +207,50 @@ const AdminDashBoardPage = () => {
     }
   }, [productList]);
 
+  // useEffect(() => {
+  //   if (orderList.length > 0) {
+  //     const sales = orderList.reduce(
+  //       (total, order) => total + order.totalPrice,
+  //       0
+  //     );
+  //     setTotalSales(sales);
+  //     setPurchaseCount(orderList.length);
+
+  //     const newMonthlySales = Array(12).fill(0);
+  //     const newDailySales = {};
+  //     const newStatusCounts = ORDER_STATUS.reduce(
+  //       (acc, status) => ({ ...acc, [status]: 0 }),
+  //       {}
+  //     );
+
+  //     orderList.forEach((order) => {
+  //       const date = new Date(order.createdAt);
+  //       const today = new Date().toISOString().split("T")[0];
+  //       const orderYear = date.getFullYear();
+  //       const orderMonth = date.getMonth();
+  //       const day = date.toISOString().split("T")[0];
+
+
+  //       if (orderYear === selectedYear) {
+  //         newMonthlySales[orderMonth] += order.totalPrice;
+
+  //         if (selectedMonth && orderMonth + 1 === selectedMonth) {
+  //           newDailySales[day] = newDailySales[day]
+  //             ? newDailySales[day] + order.totalPrice
+  //             : order.totalPrice;
+  //         }
+
+  //       }
+
+  //       newStatusCounts[order.status] += 1;
+  //     });
+
+  //     setMonthlySales(newMonthlySales);
+  //     setDailySales(newDailySales);
+  //     setStatusCounts(newStatusCounts);
+  //   }
+  // }, [orderList, selectedYear, selectedMonth]);
+
   useEffect(() => {
     if (orderList.length > 0) {
       const sales = orderList.reduce(
@@ -215,38 +259,48 @@ const AdminDashBoardPage = () => {
       );
       setTotalSales(sales);
       setPurchaseCount(orderList.length);
-
+  
       const newMonthlySales = Array(12).fill(0);
       const newDailySales = {};
+      const today = new Date().toISOString().split("T")[0]; // 오늘 날짜
       const newStatusCounts = ORDER_STATUS.reduce(
         (acc, status) => ({ ...acc, [status]: 0 }),
         {}
       );
-
+  
       orderList.forEach((order) => {
         const date = new Date(order.createdAt);
         const orderYear = date.getFullYear();
         const orderMonth = date.getMonth();
         const day = date.toISOString().split("T")[0];
-
+  
         if (orderYear === selectedYear) {
+          // 월별 매출
           newMonthlySales[orderMonth] += order.totalPrice;
-
-          if (selectedMonth && orderMonth + 1 === selectedMonth) {
-            newDailySales[day] = newDailySales[day]
-              ? newDailySales[day] + order.totalPrice
-              : order.totalPrice;
-          }
+  
+          // 날짜별 매출
+          newDailySales[day] = (newDailySales[day] || 0) + order.totalPrice;
         }
-
+  
+        // 주문 상태별 카운트
         newStatusCounts[order.status] += 1;
       });
-
+  
+      // 오늘 날짜를 기본값으로 추가
+      if (!newDailySales[today]) {
+        newDailySales[today] = 0;
+      }
+  
       setMonthlySales(newMonthlySales);
       setDailySales(newDailySales);
       setStatusCounts(newStatusCounts);
     }
-  }, [orderList, selectedYear, selectedMonth]);
+  }, [orderList, selectedYear]);
+
+  // useEffect(() => {
+  //   console.log("dailySales:", dailySales);
+  //   console.log("Today:", new Date().toISOString().split("T")[0]);
+  // }, [dailySales]);
 
   useEffect(() => {
     setUserCount(userList.length);
@@ -479,7 +533,7 @@ const AdminDashBoardPage = () => {
 
       {/* 6개의 카드가 들어갈 섹션 */}
       <Row className="mb-4" style={{ marginTop: "40px" }}>
-        <Col md={6}>
+        <Col sm={12} md={6}>
           <div
             className="p-3 shadow rounded"
             style={{
@@ -572,7 +626,7 @@ const AdminDashBoardPage = () => {
                         {isDailyMode.sales
                           ? dailySales[
                               new Date().toISOString().split("T")[0]
-                            ]?.toLocaleString() || "0원"
+                            ]?.toLocaleString() + "원" || "0원"
                           : totalSales.toLocaleString() + "원"}
                       </Card.Text>
                     </div>
@@ -731,7 +785,7 @@ const AdminDashBoardPage = () => {
         </Col>
 
         {/* 월 매출 통계 */}
-        <Col md={6}>
+        <Col xs={12} sm={12} md={6}>
           <div
             className="p-3 shadow rounded"
             style={{
@@ -739,6 +793,7 @@ const AdminDashBoardPage = () => {
               backgroundColor: "#f8f9fa",
               padding: "1.5rem",
               cursor: "pointer",
+              height: "570px",
             }}
             onMouseEnter={(e) => {
               Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
@@ -799,6 +854,7 @@ const AdminDashBoardPage = () => {
               boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
               marginTop: "20px",
               cursor: "pointer",
+              height: "600px",
             }}
             onMouseEnter={(e) => {
               Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
@@ -818,6 +874,8 @@ const AdminDashBoardPage = () => {
             </div>
           </div>
         </Col>
+
+        {/* 월별 매출액 */}
         <Col md={6}>
           <div
             className="p-3 shadow rounded"
@@ -827,6 +885,7 @@ const AdminDashBoardPage = () => {
               boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
               marginTop: "20px",
               cursor: "pointer",
+              height: "600px",
             }}
             onMouseEnter={(e) => {
               Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
@@ -856,7 +915,7 @@ const AdminDashBoardPage = () => {
                   variant="light"
                   onSelect={handleYearSelect}
                 >
-                  <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                  <div style={{ overflowY: "auto" }}>
                     {availableYears.map((year) => (
                       <Dropdown.Item key={year} eventKey={year}>
                         {year}년
@@ -880,8 +939,8 @@ const AdminDashBoardPage = () => {
                 )}
               </div>
             </div>
-            <div style={{ marginTop: 60 }}>
-              <Bar data={barDataMonthlySales} />
+            <div style={{ height: "501px" }}>
+              <Bar data={barDataMonthlySales} options={{ responsive: true, maintainAspectRatio: false }} />
             </div>
           </div>
         </Col>
