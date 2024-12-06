@@ -32,7 +32,9 @@ const ProductDetail = () => {
   const [mainImage, setMainImage] = useState("");
   const [startIndex, setStartIndex] = useState(0);
   const thumbnailsPerPage = 6;
-  const reviews = useSelector((state) => state.reviews?.reviews || []);
+  const reviews = useSelector((state) => state.reviews.reviews);
+
+  console.log("reviews sayyod: ", reviews);
   const [showReviews, setShowReviews] = useState(false);
 
   const getRatingCounts = () => {
@@ -74,6 +76,7 @@ const ProductDetail = () => {
   const ratingCounts = getRatingCounts();
   const totalReviews = reviews.length;
 
+  console.log("reviews: ", reviews);
   useEffect(() => {
     dispatch(getProductDetail(id));
     dispatch(getReviews(id));
@@ -331,13 +334,45 @@ const ProductDetail = () => {
               </div>
 
               {/* 별점별 리뷰 통계 */}
-              <div className="rating-statistics">
+              <Row>
+                <Col sm={3} md={3}>
+                  <div className="rating-statistics">
+                    {ratingCounts.map((count, index) => (
+                      <div key={index} className="rating-row">
+                        <div className="rating-bar-label">
+                          {renderStars(5 - index)}
+                        </div>{" "}
+                        {/* 별점 5, 4, 3 등 */}
+                        <div className="rating-bar">
+                          <div
+                            className="rating-bar-filled"
+                            style={{
+                              width: `${(count / totalReviews) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="rating-bar-count">{count} 리뷰</div>
+                      </div>
+                    ))}
+                  </div>
+                </Col>
+                <Col sm={8} md={8}>
+                  {reviews.map((review) => (
+                    <div key={review.id} className="review">
+                      <p>{review.author}</p>
+                      <p>{renderStars(review.rating)}</p>
+                      <p>{review.text}</p>
+                    </div>
+                  ))}
+                </Col>
+              </Row>
+              {/* <div className="rating-statistics">
                 {ratingCounts.map((count, index) => (
                   <div key={index} className="rating-row">
                     <div className="rating-bar-label">
                       {renderStars(5 - index)}
                     </div>{" "}
-                    {/* 별점 5, 4, 3 등 */}
+                    
                     <div className="rating-bar">
                       <div
                         className="rating-bar-filled"
@@ -347,17 +382,17 @@ const ProductDetail = () => {
                     <div className="rating-bar-count">{count} 리뷰</div>
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             {/* 개별 리뷰 목록 */}
-            {reviews.map((review) => (
+            {/* {reviews.map((review) => (
               <div key={review.id} className="review">
                 <p>{review.author}</p>
                 <p>{renderStars(review.rating)}</p>
                 <p>{review.text}</p>
               </div>
-            ))}
+            ))} */}
           </div>
         )}
       </Container>

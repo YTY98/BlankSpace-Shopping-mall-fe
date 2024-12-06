@@ -7,7 +7,8 @@ export const getReviews = createAsyncThunk(
   async (productId, { rejectWithValue }) => {
     try {
       const response = await api.get(`/reviews/${productId}`);
-      return response.data.data || []; // 리뷰 데이터 반환, 없으면 빈 배열
+      console.log("response: ", response.data)
+      return response.data ; // 리뷰 데이터 반환, 없으면 빈 배열
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch reviews"
@@ -19,7 +20,8 @@ export const getReviews = createAsyncThunk(
 // 리뷰 작성
 export const createReview = createAsyncThunk(
   "reviews/createReview",
-  async ({ productId, formData }, { rejectWithValue }) => {
+  async ({productId, ...formData}, { rejectWithValue }) => {
+  
     try {
       const response = await api.post(`/reviews`, { productId, ...formData });
       if (response.status !== 200 && response.status !== 201) {
@@ -35,11 +37,15 @@ export const createReview = createAsyncThunk(
 const reviewSlice = createSlice({
   name: "reviews",
   initialState: {
-    reviews: [],
+    reviews: [
+     
+    ],
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+   
+  },
   extraReducers: (builder) => {
     builder
       // 리뷰 가져오기

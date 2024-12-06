@@ -33,9 +33,10 @@ const OrderStatusCard = ({ orderItem }) => {
           <Badge bg={badgeBg[orderItem.status]}>{orderItem.status}</Badge>
 
           <div className="mt-1 text-align-center">
-            {orderItem.status === "delivered" ? (
+            {orderItem.status === "delivered" ? 
+              orderItem.isReviewed === true ? (<span style={{ fontSize: "12px"}}>리뷰 작성 완료</span>) : (
               <Link to={`/write-review/${orderItem.items[0]?.productId?._id}`}>
-                <Button variant="primary" size="sm" style={{ width: "97px" }}>
+                <Button variant="primary" size="sm" >
                   리뷰 작성
                 </Button>
               </Link>
