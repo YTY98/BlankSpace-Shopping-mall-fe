@@ -121,7 +121,7 @@ const Query = () => {
             <div className="product-container">
               <div className="product-img-container">
                 <Card.Img
-                  src={selectedProduct.image}
+                  src={selectedProduct.image[0]}
                   alt={selectedProduct.name}
                   onError={(e) => {
                     e.target.src = "//img.echosting.cafe24.com/thumb/75x75.gif";

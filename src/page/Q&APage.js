@@ -44,10 +44,10 @@ const Qna = () => {
 
         const images = {};
         products.forEach((product) => {
-          images[product._id] = product.image;
+          images[product._id] = product.image[0];
         });
 
-        setProductImages(images);
+        setProductImages(images[0]);
 
         // console.log("Total Pages from server: ", totalPageNum);
         setTotalPages(totalPageNum); // 전체 페이지 수 설정

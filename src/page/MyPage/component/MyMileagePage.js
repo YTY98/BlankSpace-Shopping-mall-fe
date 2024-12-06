@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Card from "react-bootstrap/Card";
 import { Row, Col, Container, ListGroup } from "react-bootstrap";
-
+import { fetchUserInfo } from "../../../features/user/userSlice";
 
 import "../style/myMileage.style.css";
 
@@ -14,13 +14,19 @@ const MyMileagePage = () => {
   const [availableMileage, setAvailableMileage] = useState(); // 사용가능 마일리지
   const [usedMileage, setUsedMileage] = useState(); // 사용된 마일리지
 
+
+  useEffect(() => {
+    dispatch(fetchUserInfo()); // 최신 사용자 정보 요청
+  }, [dispatch]);
   useEffect(() => {
     if (user) {
       setTotalMileage(user.mileage || 0);
       setAvailableMileage(user.mileage - user.usedMileage || 0);
       setUsedMileage(user.usedMileage || 0);
     }
-  });
+  }, [user]);
+
+  
 
   return (
     <Row style={{justifyContent: "center"}}>
