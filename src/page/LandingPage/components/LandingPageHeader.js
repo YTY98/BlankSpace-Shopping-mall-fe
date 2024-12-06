@@ -70,7 +70,7 @@ const LandingPageHeader = ({ user }) => {
 
   return (
     <div className="landing-page-header">
-      <div className="side-menu" style={{ width: width }}>
+      <div className="side-menu" style={{ width: width, border: "0px solid"}}>
         <button className="closebtn" onClick={closeSidebar}>
           &times;
         </button>
@@ -134,12 +134,13 @@ const LandingPageHeader = ({ user }) => {
       </div>
 
       {/* admin link */}
+      <div className="minwoobabo" style={{width: "100%", display: "flex", justifyContent: "right"}}>
       {user && user.level === "admin" && (
         <Link to="/admin/management?page=1" className="admin-page-link">
           Admin page
         </Link>
       )}
-
+      </div>
     </div>
   );
 };

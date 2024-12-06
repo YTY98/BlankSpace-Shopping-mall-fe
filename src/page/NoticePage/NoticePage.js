@@ -24,9 +24,18 @@ const NoticePage = () => {
   // Redux state
   const { notices, totalPageNum } = useSelector((state) => state.notice);
 
-  // 기본 공지사항 목록을 가져옴 (검색모드가 아닐 때)
+  // 공지사항 목록을 가져옴 (검색 모드 여부에 따라 다르게 동작)
   useEffect(() => {
-    if (!searchMode) {
+    if (searchMode) {
+      dispatch(
+        searchNotices({
+          page: currentPage,
+          searchType,
+          keyword: searchText,
+          limit: noticesPerPage,
+        })
+      );
+    } else {
       dispatch(
         fetchNotices({
           page: currentPage,
@@ -36,21 +45,13 @@ const NoticePage = () => {
         })
       );
     }
-  }, [dispatch, currentPage, searchMode]);
+  }, [dispatch, currentPage, searchMode, searchText, searchType, noticesPerPage]);
 
   // 검색 시 실행
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setCurrentPage(1); // 검색 시 페이지를 1로 설정
     setSearchMode(true); // 검색 모드 활성화
-    dispatch(
-      searchNotices({
-        page: 1,
-        searchType,
-        keyword: searchText,
-        limit: noticesPerPage,
-      })
-    );
   };
 
   // 검색어와 검색 옵션 변경 핸들러
@@ -62,13 +63,15 @@ const NoticePage = () => {
     setSearchType(e.target.value);
   };
 
-  // 페이지 클릭 시 실행
   const handlePageClick = ({ selected }) => {
-    setCurrentPage(selected + 1);
+    const newPage = selected + 1; // ReactPaginate는 0부터 시작
+    console.log("New Page:", newPage); // 확인용 콘솔
+    setCurrentPage(newPage);
+  
     if (searchMode) {
       dispatch(
-        fetchNotices({
-          page: selected + 1,
+        searchNotices({
+          page: newPage,
           searchType,
           keyword: searchText,
           limit: noticesPerPage,
@@ -77,7 +80,7 @@ const NoticePage = () => {
     } else {
       dispatch(
         fetchNotices({
-          page: selected + 1,
+          page: newPage,
           searchType: "",
           keyword: "",
           limit: noticesPerPage,
@@ -85,10 +88,10 @@ const NoticePage = () => {
       );
     }
   };
-
+  
   return (
     <>
-      <Container className="mt-4">
+      <Container className="mt-4" style= {{marginBottom:"100px"}}>
         <h1 className="text-center mb-4">Notice</h1>
         <Form method="get" onSubmit={handleSearchSubmit} className="mb-4">
           <Row className="align-items-center">
@@ -99,7 +102,7 @@ const NoticePage = () => {
                 <option value="title+content">제목+내용</option>
               </Form.Select>
             </Col>
-            <Col xs={6}>
+            <Col xs={8}>
               <Form.Control
                 type="text"
                 name="searchText"
@@ -108,7 +111,7 @@ const NoticePage = () => {
                 placeholder="검색어를 입력하세요"
               />
             </Col>
-            <Col xs={3} className="text-end">
+            <Col xs={1} className="text-center">
               <Cbutton type="submit">검색</Cbutton>
             </Col>
           </Row>
@@ -128,53 +131,61 @@ const NoticePage = () => {
             </tr>
           </thead>
           <tbody>
-            {notices.length > 0 ? (
-              notices.map((notice, index) => (
-                <tr
-                  key={notice._id}
-                  onClick={() => navigate(`/notice/${notice._id}`)}
-                >
-                  <td className="notice-number-column">{(currentPage - 1) * noticesPerPage + index + 1}</td>
-                  {/* 번호 표시 */}
-                  <td className="notice-title-column">{notice.title}</td>
-                  <td className="notice-date-column">
-                    {new Date(notice.date).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="text-center">
-                  검색 결과가 없습니다.
-                </td>
-              </tr>
-            )}
-          </tbody>
+  {notices.length > 0 ? (
+    notices
+      .slice()
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // 날짜를 기준으로 역순 정렬
+      .map((notice, index) => (
+        <tr key={notice._id}>
+          <td className="notice-number-column">{(currentPage - 1) * noticesPerPage + index + 1}</td>
+          <td className="notice-title-column text-start">
+            <span
+              className="hover-pointer"
+              onClick={() => navigate(`/notice/${notice._id}`)}
+            >
+              {notice.title}
+            </span>
+          </td>
+          <td className="notice-date-column">
+            {new Date(notice.date).toLocaleDateString()}
+          </td>
+        </tr>
+      ))
+  ) : (
+    <tr>
+      <td colSpan="3" className="text-center">
+        검색 결과가 없습니다.
+      </td>
+    </tr>
+  )}
+</tbody>
+
         </Table>
 
         {/* 페이지네이션 UI */}
         <ReactPaginate
-          previousLabel={"< 이전"}
-          nextLabel={"다음 >"}
-          breakLabel={"..."}
-          pageCount={totalPageNum} // 전체 페이지 수를 사용
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination justify-content-center"}
-          pageClassName={"page-item"}
-          pageLinkClassName={"page-link"}
-          previousClassName={"page-item"}
-          previousLinkClassName={"page-link"}
-          nextClassName={"page-item"}
-          nextLinkClassName={"page-link"}
-          breakClassName={"page-item"}
-          breakLinkClassName={"page-link"}
-          activeClassName={"active"}
-          forcePage={currentPage - 1}
-        />
-      </Container>
+  previousLabel={"<"}
+  nextLabel={">"}
+  breakLabel={"..."}
+  pageCount={totalPageNum || 0}
+  marginPagesDisplayed={2}
+  pageRangeDisplayed={5}
+  onPageChange={handlePageClick}
+  containerClassName={"pagination justify-content-center"}
+  pageClassName={"page-item"}
+  pageLinkClassName={"page-link"}
+  previousClassName={"page-item"}
+  previousLinkClassName={"page-link"}
+  nextClassName={"page-item"}
+  nextLinkClassName={"page-link"}
+  breakClassName={"page-item"}
+  breakLinkClassName={"page-link"}
+  activeClassName={"active"}
+  forcePage={currentPage - 1}
+/>
 
+      </Container>
+      
       <Footer />
     </>
   );

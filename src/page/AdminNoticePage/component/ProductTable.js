@@ -21,12 +21,15 @@ const ProductTable = ({ header, data, deleteItem, openEditForm }) => {
             <td>{item.title}</td>
             <td>{new Date(item.date).toLocaleDateString()}</td>
             <td>
-              <Button variant="warning" onClick={() => openEditForm(item)}>
-                Edit
-              </Button>
-              <Button variant="danger" onClick={() => deleteItem(item._id)}>
+            <th style={{ minWidth: "100px" }}>
+            <Button size="sm" variant="danger" onClick={() => deleteItem(item._id)} className="mr-1">
                 Delete
               </Button>
+              <Button size="sm" onClick={() => openEditForm(item)}>
+              
+                Edit
+              </Button>
+             </th>
             </td>
           </tr>
         ))}

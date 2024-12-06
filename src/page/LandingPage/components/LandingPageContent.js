@@ -25,7 +25,7 @@ const LandingPageContent = () => {
 
     // 창 크기에 따라 보여줄 사진 개수
     const updateVisibleCount = () => {
-        if (window.innerWidth < 600) { // 모바일. 768px
+        if (window.innerWidth < 600) { // 모바일. 600px.
             setVisibleCount(6);
         } else { // 태블릿, 데스크탑
             setVisibleCount(12);

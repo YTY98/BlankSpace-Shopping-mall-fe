@@ -7,9 +7,12 @@ import PaymentForm from "./component/PaymentForm";
 import "./style/paymentPage.style.css";
 import { cc_expires_format } from "../../utils/number";
 import { createOrder } from "../../features/order/orderSlice";
+import { fetchUserInfo } from "../../features/user/userSlice";
 
 const PaymentPage = () => {
   const dispatch = useDispatch();
+  
+  const { user } = useSelector((state) => state.user);
   const { cartList, totalPrice } = useSelector((state) => state.cart);
   const { orderNum, error } = useSelector((state) => state.order);
   const [cardValue, setCardValue] = useState({
@@ -29,9 +32,20 @@ const PaymentPage = () => {
     city: "",
     zip: "",
   });
+  const currentMileage = user.mileage;
+  const [useMileage, setUseMileage] = useState(0);
+
+
 
   useEffect(() => {
-    if (firstLoading) { // useEffect가 처음에 호출될 때 오더 성공페이지로 넘어가는 것을 막기 위해서
+    if (user?.mileage !== undefined) {
+      setUseMileage(user.mileage); // user 객체가 로드되면 mileage 값 설정
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (firstLoading) {
+      // useEffect가 처음에 호출될 때 오더 성공페이지로 넘어가는 것을 막기 위해서
       setFirstLoading(false);
     } else {
       if (orderNum !== "") {
@@ -47,6 +61,8 @@ const PaymentPage = () => {
     dispatch(
       createOrder({
         totalPrice,
+        useMileage,
+        currentMileage,
         shipTo: { address, city, zip },
         contact: { contact, lastName, firstName },
         orderList: cartList.map((item) => {
@@ -58,12 +74,36 @@ const PaymentPage = () => {
           };
         }),
       })
+      
     );
   };
-
+  
   const handleFormChange = (event) => {
     const { name, value } = event.target;
     setShipInfo({ ...shipInfo, [name]: value });
+  };
+
+  const handleUseMileage = (event) => {
+    const { value } = event.target;
+
+    if (value === "") {
+      // 입력값이 비어있을 때는 빈 문자열로 설정
+      setUseMileage("");
+      return;
+    }
+
+    const inputMileage = parseInt(value, 10); // 입력값을 정수로 변환
+    if (
+      isNaN(inputMileage) ||
+      inputMileage > user.mileage ||
+      inputMileage < 0
+    ) {
+      // 유효하지 않거나 사용 가능한 마일리지보다 크면 제한
+      setUseMileage(user.mileage);
+    } else {
+      // 유효한 값만 설정
+      setUseMileage(inputMileage);
+    }
   };
 
   const handlePaymentInfoChange = (event) => {
@@ -151,6 +191,17 @@ const PaymentPage = () => {
                       name="zip"
                     />
                   </Form.Group>
+
+                  <Form.Group as={Col} controlId="formGridMileage">
+                    <Form.Label>마일리지</Form.Label>
+                    <Form.Control
+                      type="number" // 숫자만 입력 가능
+                      placeholder={`${user.mileage} 사용가능`} // 사용 가능한 마일리지 표시
+                      value={useMileage} // mileage 상태와 연동
+                      onChange={handleUseMileage} // 입력값 제한 함수 연결
+                      name="mileage"
+                    />
+                  </Form.Group>
                 </Row>
                 <div className="mobile-receipt-area">
                   <OrderReceipt cartList={cartList} totalPrice={totalPrice} />
@@ -176,7 +227,7 @@ const PaymentPage = () => {
           </div>
         </Col>
         <Col lg={5} className="receipt-area">
-          <OrderReceipt cartList={cartList} totalPrice={totalPrice} />
+          <OrderReceipt cartList={cartList} totalPrice={totalPrice} mileage={useMileage} />
         </Col>
       </Row>
     </Container>

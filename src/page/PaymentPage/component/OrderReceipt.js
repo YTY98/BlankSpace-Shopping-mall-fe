@@ -4,9 +4,11 @@ import { useNavigate } from "react-router";
 import { useLocation } from "react-router-dom";
 import { currencyFormat } from "../../../utils/number";
 import { Row, Col } from "react-bootstrap";
-const OrderReceipt = ({ cartList, totalPrice }) => {
+const OrderReceipt = ({ cartList, totalPrice, mileage }) => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  console.log(totalPrice, mileage);
 
   return (
     <div className="receipt-container">
@@ -34,8 +36,25 @@ const OrderReceipt = ({ cartList, totalPrice }) => {
           <strong>Total:</strong>
         </div>
         <div>
-          <strong>₩ {currencyFormat(totalPrice)}</strong>
+      {location.pathname.includes("/cart") ? (
+        // "/cart" 페이지에서는 마일리지 관련 표시 안 함
+        <strong>₩ {currencyFormat(totalPrice)}</strong>
+      ) : (
+        // 다른 페이지 (예: "/payment")에서 마일리지 조건에 따라 표시
+        <div>
+          {mileage !== 0 ? (
+            <>
+              <strong style={{ textDecoration: "line-through" }}>
+                ₩ {currencyFormat(totalPrice)}
+              </strong>
+              <strong> ₩ {currencyFormat(totalPrice - mileage)}</strong>
+            </>
+          ) : (
+            <strong>₩ {currencyFormat(totalPrice)}</strong>
+          )}
         </div>
+      )}
+    </div>
       </div>
       {location.pathname.includes("/cart") && cartList.length > 0 && (
         <Button

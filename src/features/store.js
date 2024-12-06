@@ -6,11 +6,12 @@ import cartSlice from "./cart/cartSlice";
 import orderSlice from "./order/orderSlice";
 import noticeReducer from './notice/noticeSlice'; 
 import qnaSlice from "./qna/qnaSlice";
-
+import reviewSlice from './Review/ReviewSlice'
 const store = configureStore({
   reducer: {
     user: userSlice,
     product: productSlice,
+    reviews: reviewSlice, 
     cart: cartSlice,
     ui: uiSlice,
     order: orderSlice,

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Container, Row, Col } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Footer = () => {
@@ -53,17 +54,17 @@ const Footer = () => {
           />
           <div>
             <ul className="sns-area">
-              <a className="sns-link" href="https://www.naver.com" target="_blank" rel="noopener noreferrer">
+              <a className="sns-link" href="https://www.naver.com/" target="_blank" rel="noopener noreferrer">
                 <li className="sns-icon">
                   <i className="fa-solid fa-n"></i>
                 </li>
               </a>
-              <a className="sns-link" href="https://www.naver.com" target="_blank" rel="noopener noreferrer">
+              <a className="sns-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
                 <li className="sns-icon">
                   <i className="fa-brands fa-instagram"></i>
                 </li>
               </a>
-              <a className="sns-link" href="https://www.naver.com" target="_blank" rel="noopener noreferrer">
+              <a className="sns-link" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
                 <li className="sns-icon last">
                   <i className="fa-brands fa-youtube"></i>
                 </li>
@@ -74,6 +75,15 @@ const Footer = () => {
 
         <div className="second-line">
           <div className="second-line-container">
+            {/* <Container style={{textAlign: "left"}}>
+              <Row>
+                {menuList.map((menu, index) => (
+                  <Col className="menus" style={{ textAlign: "left" }}>
+                    <Link to={menu.link}>{menu.name}</Link>
+                  </Col>
+                ))}
+              </Row>
+            </Container> */}
             <ul className="menus">
               {menuList.map((menu, index) => (
                 <li key={index}>
@@ -116,7 +126,7 @@ const Footer = () => {
                 <span>점심</span> 오후 12시 ~ 오후 2시
               </div>
               <div>
-                <span>평일</span> 주말/공휴일
+                <span>휴일</span> 주말/공휴일
               </div>
             </div>
           </div>

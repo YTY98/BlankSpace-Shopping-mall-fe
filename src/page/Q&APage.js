@@ -44,7 +44,7 @@ const Qna = () => {
 
         const images = {};
         products.forEach((product) => {
-          images[product._id] = product.image;
+          images[product._id] = product.image[0];
         });
 
         setProductImages(images);
@@ -186,7 +186,7 @@ const QnaRow = ({ qna, handleOpenModal }) => {
       <td>
         {qna.product && qna.product.image ? ( // qna.product와 qna.product.image가 있는지 확인
           <Image
-            src={qna.product.image} // product.image가 있으면 사용
+            src={qna.product.image[0]} // product.image가 있으면 사용
             alt="Product"
             style={{ width: "30px", height: "auto" }}
           />

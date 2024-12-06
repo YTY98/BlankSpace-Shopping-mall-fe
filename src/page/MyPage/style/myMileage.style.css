@@ -1,0 +1,39 @@
+
+
+.MileageBox {
+    width: 100%;
+    justify-self: center;
+
+}
+
+.MileageHeader {
+    padding: 0px;
+    border: 0px solid;
+    /* background-color: #ffffff;
+    height: 3rem;
+    border: 1px solid;
+    border-color: #e5e5e5;
+    font-size: small;
+    font-weight: 500;
+    align-content: center;
+    text-align: center; */
+    
+}
+
+.MileageBody {
+    border: 1px solid;
+    border-color: #e5e5e5;
+}
+
+.listMileage {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.listMileageCash {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    justify-content: flex-end;
+    
+}
