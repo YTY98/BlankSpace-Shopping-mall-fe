@@ -34,7 +34,6 @@ const ProductDetail = () => {
   const thumbnailsPerPage = 6;
   const reviews = useSelector((state) => state.reviews.reviews);
 
-  console.log("reviews sayyod: ", reviews);
   const [showReviews, setShowReviews] = useState(false);
 
   const getRatingCounts = () => {
@@ -76,7 +75,6 @@ const ProductDetail = () => {
   const ratingCounts = getRatingCounts();
   const totalReviews = reviews.length;
 
-  console.log("reviews: ", reviews);
   useEffect(() => {
     dispatch(getProductDetail(id));
     dispatch(getReviews(id));
