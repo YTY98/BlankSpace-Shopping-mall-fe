@@ -41,6 +41,21 @@ const ShopPage = () => {
     }
   }, [searchParams]);
 
+  // 정렬 방식, 카테고리 또는 검색어 변경 시 API 호출
+  useEffect(() => {
+    if (sortOrder[0] === "sales") {
+      dispatch(getProductsSortedBySales(category.toLowerCase()));
+    } else {
+      dispatch(
+        getProductList({
+          name: searchQuery.name,
+          category: category.toLowerCase() === "all" ? "" : category.toLowerCase(),
+          // category: category.toLowerCase(),
+        })
+      );
+    }
+  }, [dispatch, sortOrder, category, searchQuery]);
+
   // 상품 목록 가져오기
   useEffect(() => {
     dispatch(
@@ -59,6 +74,16 @@ const ShopPage = () => {
         .filter((group) => group._id.toLowerCase() === category.toLowerCase())
         .flatMap((group) => group.products.map((product) => product));
       setDisplayProducts(filtered);
+    } else if (productList.length > 0) {
+      const [key, direction] = sortOrder;
+      const sorted = [...productList].sort((a, b) => {
+        if (direction === "asc") {
+          return a[key] > b[key] ? 1 : -1;
+        } else {
+          return a[key] > b[key] ? -1 : 1;
+        }
+      });
+      setDisplayProducts(sorted);
     } else {
       setDisplayProducts(productList);
     }
@@ -156,7 +181,7 @@ const ShopPage = () => {
               <div className="row">
                 {displayProducts.map((item) => (
                   <div className="col-md-3 col-sm-6 mb-4" key={item.productId || item._id}>
-                    <ProductCard item={item} />
+                    <ProductCard item={item.productDetails || item} />
                   </div>
                 ))}
               </div>

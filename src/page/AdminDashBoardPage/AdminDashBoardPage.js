@@ -824,12 +824,12 @@ const AdminDashBoardPage = () => {
                       marginBottom: "10px",
                     }}
                   >
-                    {monthlySales[7].toLocaleString()}원
+                    {monthlySales[11].toLocaleString()}원
                   </div>
                   <GaugeChart
                     id="monthly-goal-gauge"
                     nrOfLevels={30}
-                    percent={monthlySales[7] / 10000000}
+                    percent={monthlySales[11] / 10000000}
                     arcPadding={0.02}
                     colors={["#2caeba", "#f0f0f0"]}
                     needleColor="#000"
