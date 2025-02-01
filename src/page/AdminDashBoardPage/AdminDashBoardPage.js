@@ -65,6 +65,7 @@ const AdminDashBoardPage = () => {
 
   const [adminQnAList, setAdminQnAList] = useState([]);
   const [filteredQnAList, setFilteredQnAList] = useState([]);
+  const [selectedQnATab, setSelectedQnATab] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("completed"); // 기본값: "답변 완료"
   const [adminCurrentPage, setAdminCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
@@ -130,34 +131,33 @@ const AdminDashBoardPage = () => {
   }, [dispatch, selectedYear, selectedMonth]);
 
   useEffect(() => {
-    const fetchAdminQnAList = async () => {
-      const { data, totalPageNum } = await dispatch(
-        getQnAList({ page: adminCurrentPage, limit: adminLimit })
-      ).unwrap();
-      setTotalPages(totalPageNum);
-      setAdminQnAList(data);
-    };
-    fetchAdminQnAList();
-  }, [dispatch, adminCurrentPage]);
+    if (selectedQnATab === "all") {
+      setFilteredQnAList(qnaList);
+    } else {
+      const isAnswered = selectedQnATab === "completed";
+      setFilteredQnAList(qnaList.filter((qna) => qna.isAnswered === isAnswered));
+    }
+  }, [selectedQnATab, qnaList]);
 
-  // 상태 필터링 함수: 답변 완료 및 미답변 필터링 기능 추가
+  console.log(qnaList);
+  
   const handleStatusFilter = (status) => {
     setSelectedStatus(status);
-    // qnaList가 배열인지 확인 후 필터링 수행
-    const filtered = Array.isArray(qnaList)
-      ? qnaList.filter((qna) =>
-          status === "completed" ? qna.isAnswered : !qna.isAnswered
-        )
-      : [];
-    setAdminQnAList(filtered);
   };
-
-  // useEffect(() => {
-  //   if (Array.isArray(qnaList) && qnaList.length > 0) {
-  //     setAdminQnAList(qnaList);
-  //   }
-  // }, [qnaList]);
-
+  
+  useEffect(() => {
+    // qnaList.data가 배열인지 확인 후 필터링 수행
+    if (qnaList?.data && Array.isArray(qnaList.data)) {
+      const filtered = qnaList.data.filter((qna) =>
+        selectedStatus === "completed" ? qna.isAnswered : !qna.isAnswered
+      );
+      setAdminQnAList(filtered); // 필터링된 결과를 상태로 저장
+    } else {
+      setAdminQnAList([]); // 유효한 데이터가 없으면 빈 배열 설정
+    }
+  }, [qnaList, selectedStatus]);
+  
+  console.log(adminQnAList);
   useEffect(() => {
     if (!qnaList || !Array.isArray(qnaList.data)) {
       // qnaList가 없거나, data가 배열이 아닌 경우 초기화
@@ -193,11 +193,6 @@ const AdminDashBoardPage = () => {
     fetchQnAList();
   }, [dispatch]);
 
-  useEffect(() => {
-    if (qnaList.length > 0) {
-      setAdminQnAList(qnaList);
-    }
-  }, [qnaList]);
 
   useEffect(() => {
     if (productList.length > 0) {
@@ -309,8 +304,6 @@ const AdminDashBoardPage = () => {
 
   const handleUserManagementModalClose = () => {
     setUserManagementModal(false);
-    // setSelectedUser(null);
-    // setUpdatedRole("");
   };
 
   // 사용자 관리 모달 열기
@@ -320,8 +313,6 @@ const AdminDashBoardPage = () => {
 
   const handleAdminManagementModalClose = () => {
     setAdminManagementModal(false);
-    // setSelectedUser(null);
-    // setUpdatedRole("");
   };
 
   // 역할 변경을 위한 선택
@@ -1031,107 +1022,102 @@ const AdminDashBoardPage = () => {
       </Row>
 
       <Row style={{ marginTop: "30px" }}>
-        <Col md={12}>
-          <div
-            className="p-3 shadow rounded"
-            style={{
-              ...cardDefaultStyle,
-              backgroundColor: "#f8f9fa",
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-              marginTop: "20px",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
-            }}
-          >
-            <h4>
-              <strong>Q&A 목록</strong>
-            </h4>
+  <Col md={12}>
+    <div
+      className="p-3 shadow rounded"
+      style={{
+        ...cardDefaultStyle,
+        backgroundColor: "#f8f9fa",
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+        marginTop: "20px",
+        cursor: "pointer",
+      }}
+      onMouseEnter={(e) => {
+        Object.assign(e.currentTarget.style, cardHoverStyle); // hover 시 크기 증가
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "scale(1)"; // hover 해제 시 원래 크기로
+      }}
+    >
+      <h4>
+        <strong>Q&A 목록</strong>
+      </h4>
 
-            <Tabs
-              activeKey={selectedStatus}
-              onSelect={handleStatusFilter}
-              className="mb-3"
-            >
-              {QnA_STATUS.map((status) => (
-                <Tab
-                  eventKey={status}
-                  title={
-                    <span>
-                      {status === "completed" && "답변 완료"}
-                      {status === "preparing" && "미답변"}
-                      {/* <Badge bg={status === "completed" ? "success" : "warning"} style={{ marginLeft: "8px" }}>
-          {Array.isArray(qnaList) 
-            ? qnaList.filter((qna) => status === "completed" ? qna.isAnswered : !qna.isAnswered).length
-            : 0}
-        </Badge> */}
-                      <Badge
-                        bg={status === "completed" ? "success" : "warning"}
-                        style={{ marginLeft: "8px" }}
-                      >
-                        {qnaStatusCounts[status]} {/* TODO: 이거 고쳐야함. qna 갯수 세기 */}
-                      </Badge>
-                    </span>
-                  }
-                />
-              ))}
-            </Tabs>
+      <Tabs
+        activeKey={selectedStatus}
+        onSelect={handleStatusFilter}
+        className="mb-3"
+      >
+        {QnA_STATUS.map((status) => (
+          <Tab
+            eventKey={status}
+            title={
+              <span>
+                {status === "completed" && "답변 완료"}
+                {status === "preparing" && "미답변"}
+                <Badge
+                  bg={status === "completed" ? "success" : "warning"}
+                  style={{ marginLeft: "8px" }}
+                >
+                  {qnaStatusCounts[status]}
+                </Badge>
+              </span>
+            }
+          />
+        ))}
+      </Tabs>
 
-            <Table responsive bordered striped hover className="shadow-sm">
-              <thead>
-                <tr>
-                  <th>분류</th>
-                  <th>상품</th>
-                  <th>제목</th>
-                  <th>작성자</th>
-                  <th>작성일</th>
-                  <th>답변 상태</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(adminQnAList) && adminQnAList.length > 0 ? (
-                  adminQnAList.map((qna) => (
-                    <tr key={qna._id}>
-                      <td>{qna.category}</td>
-                      <td>
-                        {qna.product?.image ? (
-                          <Image
-                            src={qna.product.image[0]}
-                            alt="Product"
-                            style={{ width: "30px", height: "auto" }}
-                          />
-                        ) : (
-                          <span>이미지 없음</span>
-                        )}
-                      </td>
-                      <td>{qna.QueryTitle}</td>
-                      <td>{qna.user?.name || "Unknown"}</td>
-                      <td>{new Date(qna.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        {qna.isAnswered ? (
-                          <Badge bg="success">답변 완료</Badge>
-                        ) : (
-                          <Badge bg="warning">미답변</Badge>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="text-center">
-                      Q&A 데이터가 없습니다.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
-        </Col>
-      </Row>
+      <Table responsive bordered striped hover className="shadow-sm">
+        <thead>
+          <tr>
+            <th>분류</th>
+            <th>상품</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+            <th>답변 상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.isArray(adminQnAList) && adminQnAList.length > 0 ? (
+            adminQnAList.map((qna) => (
+              <tr key={qna._id}>
+                <td>{qna.category}</td>
+                <td>
+                  {qna.product?.image ? (
+                    <Image
+                      src={qna.product.image[0]}
+                      alt="Product"
+                      style={{ width: "30px", height: "auto" }}
+                    />
+                  ) : (
+                    <span>이미지 없음</span>
+                  )}
+                </td>
+                <td>{qna.QueryTitle}</td>
+                <td>{qna.user?.name || "Unknown"}</td>
+                <td>{new Date(qna.createdAt).toLocaleDateString()}</td>
+                <td>
+                  {qna.isAnswered ? (
+                    <Badge bg="success">답변 완료</Badge>
+                  ) : (
+                    <Badge bg="warning">미답변</Badge>
+                  )}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="text-center">
+                Q&A 데이터가 없습니다.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </div>
+  </Col>
+</Row>
 
       {/* 재고 부족 상품 모달 */}
       <Modal show={showOutOfStockModal} onHide={handleCloseOutOfStockModal}>

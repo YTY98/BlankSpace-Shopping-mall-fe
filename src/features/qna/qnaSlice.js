@@ -93,15 +93,50 @@ export const addAnswer = createAsyncThunk(
   }
 );
 
+
+export const getUserQnAList = createAsyncThunk(
+  "qna/getUserQnAList",
+  async ({ userId, page, limit }, { rejectWithValue }) => {
+    try {
+      // userId를 URL에 포함하여 요청
+      const response = await api.get(`/qna/user/${userId}`, {
+        params: { page, limit },
+      });
+
+      if (response.status !== 200) {
+        throw new Error(response.data.error || "Failed to fetch user Q&A list");
+      }
+
+      return response.data; // 필터링된 데이터 반환
+    } catch (error) {
+      return rejectWithValue(error.message || "Unknown error");
+    }
+  }
+);
+
+
+
+
 const qnaSlice = createSlice({
   name: "qna",
   initialState: {
-    qnaList: [],
+    qnaList: {
+      data: [],
+      totalItemNum: 0,
+      totalPageNum: 1,
+    },
     qnaDetail: null,
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    resetState: (state) => {
+      state.qnaList = { data: [], totalItemNum: 0, totalPageNum: 1 };
+      state.qnaDetail = null;
+      state.loading = false;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
 
@@ -113,9 +148,12 @@ const qnaSlice = createSlice({
       })
       .addCase(getQnAList.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("Fetched QnA list:", action.payload); // 데이터 확인
-        state.qnaList = action.payload;
-        state.adminData = action.payload.adminData;
+        state.qnaList = {
+          data: Array.isArray(action.payload.data) ? action.payload.data : [],
+          totalItemNum: action.payload.totalItemNum || 0,
+          totalPageNum: action.payload.totalPageNum || 1,
+        };
+        state.adminData = action.payload.adminData || [];
       })
       .addCase(getQnAList.rejected, (state, action) => {
         state.loading = false;
@@ -174,9 +212,31 @@ const qnaSlice = createSlice({
       .addCase(addAnswer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      /************************** */
+      .addCase(getUserQnAList.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUserQnAList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.qnaList = {
+          data: Array.isArray(action.payload.data) ? action.payload.data : [],
+          totalItemNum: action.payload.totalItemNum || 0,
+          totalPageNum: action.payload.totalPageNum || 1,
+        };
+      })
+      
+      .addCase(getUserQnAList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
 
   },
 });
+
+
+export const { resetState } = qnaSlice.actions;
 
 export default qnaSlice.reducer;
