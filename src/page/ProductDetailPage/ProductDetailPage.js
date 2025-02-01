@@ -7,6 +7,8 @@ import {
   Button,
   Dropdown,
   Accordion,
+  Table,
+  ProgressBar,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { ColorRing } from "react-loader-spinner";
@@ -320,20 +322,24 @@ const ProductDetail = () => {
           >
             <h2>리뷰 ({totalReviews})</h2>
 
-            <div className="review-container">
+            <Row className="review-container">
               {/* 평균 별점 */}
-              <div className="average-rating-section">
-                <div className="rating-stars">
-                  {renderStars(calculateAverageRating())}{" "}
-                  {/* 평균 평점에 맞는 별을 렌더링 */}
-                </div>
-                <div className="rating-score">{calculateAverageRating()}</div>
-                <div className="rating-label">평균 별점</div>
-              </div>
 
               {/* 별점별 리뷰 통계 */}
               <Row>
-                <Col sm={3} md={3}>
+                <Col sm={4} className="ReviewOverall">
+                  {/* TODO: 질문 헤드 */}
+                  <div className="ReviewAverage">
+                    <span style={{ fontSize: "50px" }}>
+                      {renderStars(calculateAverageRating())}
+                    </span>
+                    <span className="averageContent">
+                      <br />
+                      평균 별점 {calculateAverageRating()}
+                    </span>
+                  </div>
+                </Col>
+                <Col sm={8}>
                   <div className="rating-statistics">
                     {ratingCounts.map((count, index) => (
                       <div key={index} className="rating-row">
@@ -347,23 +353,47 @@ const ProductDetail = () => {
                             style={{
                               width: `${(count / totalReviews) * 100}%`,
                             }}
-                          ></div>
+                          >
+                            <ProgressBar striped variant="success" now={100} />
+                          </div>
                         </div>
                         <div className="rating-bar-count">{count} 리뷰</div>
                       </div>
                     ))}
                   </div>
                 </Col>
-                <Col sm={8} md={8}>
-                  {reviews.map((review) => (
-                    <div key={review.id} className="review">
-                      <p>{review.author}</p>
-                      <p>{renderStars(review.rating)}</p>
-                      <p>{review.text}</p>
-                    </div>
-                  ))}
-                </Col>
               </Row>
+              <Row sm={8} md={8}>
+                {console.log("Reviews: ", reviews)}
+                <Table responsive style={{ 
+                  tableLayout: "fixed", 
+                  marginTop: "4rem",
+                  
+                  }}>
+                  <colgroup>
+                    <col style={{ width: "4%" }} />
+                    <col style={{ width: "64%" }} />
+                    <col style={{ width: "30%" }} />
+                  </colgroup>
+                  <thead>
+                    <tr className="qnaTableHead">
+                      <th>별점</th>
+                      <th>내용</th>
+                      <th>작성자</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reviews.map((review) => (
+                      <tr key={review.id} className="review">
+                        <td style={{ textAlign: "center" }}>{renderStars(review.rating)}</td>
+                        <td style={{ textAlign: "center" }}>{review.text}</td>
+                        <td style={{ textAlign: "center"}}>{review.name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Row>
+
               {/* <div className="rating-statistics">
                 {ratingCounts.map((count, index) => (
                   <div key={index} className="rating-row">
@@ -381,7 +411,7 @@ const ProductDetail = () => {
                   </div>
                 ))}
               </div> */}
-            </div>
+            </Row>
 
             {/* 개별 리뷰 목록 */}
             {/* {reviews.map((review) => (

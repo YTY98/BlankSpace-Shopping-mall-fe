@@ -9,7 +9,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const MembershipIcon = ({ membership }) => {
-    console.log(membership);
   if (membership === "bronze") {
     return (
       <FontAwesomeIcon

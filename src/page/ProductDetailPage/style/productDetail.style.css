@@ -123,3 +123,25 @@
 .product-detail-card {
   margin-bottom: 20rem;
 }
+
+.ReviewOverall {
+  justify-items: center;
+}
+
+.ReviewAverage {
+  justify-self: center;
+}
+
+.averageContent {
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.review {
+  padding-top: 3rem;
+}
+
+.ReviewTableHead {
+  font-size: 14px;
+  text-align: center;
+}
