@@ -7,6 +7,8 @@ import {
   Button,
   Dropdown,
   Accordion,
+  Table,
+  ProgressBar,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { ColorRing } from "react-loader-spinner";
@@ -17,6 +19,8 @@ import { addToCart } from "../../features/cart/cartSlice";
 import SizeGuideModal from "./components/SizeGuideModal";
 import { getReviews } from "../../features/Review/ReviewSlice";
 import Footer from "../../common/component/Footer";
+import TryOnModal from "./components/TryOnModal";
+import { FaTshirt } from "react-icons/fa";
 
 const ProductDetail = () => {
   const dispatch = useDispatch();
@@ -34,8 +38,9 @@ const ProductDetail = () => {
   const thumbnailsPerPage = 6;
   const reviews = useSelector((state) => state.reviews.reviews);
 
-  console.log("reviews sayyod: ", reviews);
   const [showReviews, setShowReviews] = useState(false);
+  const [showTryOn, setShowTryOn] = useState(false);
+  const apiKey = process.env.REACT_APP_FASHN_API_KEY;
 
   const getRatingCounts = () => {
     const counts = [0, 0, 0, 0, 0]; // 별 1~5점에 대한 카운트
@@ -76,7 +81,6 @@ const ProductDetail = () => {
   const ratingCounts = getRatingCounts();
   const totalReviews = reviews.length;
 
-  console.log("reviews: ", reviews);
   useEffect(() => {
     dispatch(getProductDetail(id));
     dispatch(getReviews(id));
@@ -202,8 +206,17 @@ const ProductDetail = () => {
           </Col>
 
           <Col className="product-info-area" sm={4}>
-            <div className="product-info-header">
+            <div className="product-info-header" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {selectedProduct.name || "상품명 없음"}
+              <Button
+                variant="outline-secondary"
+                style={{ borderRadius: '50%', width: 40, height: 40, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Virtual try on"
+                onClick={() => setShowTryOn(true)}
+              >
+                <FaTshirt size={20} />
+              </Button>
+              <span style={{ fontSize: 12, marginLeft: 4 }}>Virtual try on</span>
             </div>
             <div className="product-info-price">
               ₩ {currencyFormat(selectedProduct.price || 0)}
@@ -322,20 +335,24 @@ const ProductDetail = () => {
           >
             <h2>리뷰 ({totalReviews})</h2>
 
-            <div className="review-container">
+            <Row className="review-container">
               {/* 평균 별점 */}
-              <div className="average-rating-section">
-                <div className="rating-stars">
-                  {renderStars(calculateAverageRating())}{" "}
-                  {/* 평균 평점에 맞는 별을 렌더링 */}
-                </div>
-                <div className="rating-score">{calculateAverageRating()}</div>
-                <div className="rating-label">평균 별점</div>
-              </div>
 
               {/* 별점별 리뷰 통계 */}
               <Row>
-                <Col sm={3} md={3}>
+                <Col sm={4} className="ReviewOverall">
+                  {/* TODO: 질문 헤드 */}
+                  <div className="ReviewAverage">
+                    <span style={{ fontSize: "50px" }}>
+                      {renderStars(calculateAverageRating())}
+                    </span>
+                    <span className="averageContent">
+                      <br />
+                      평균 별점 {calculateAverageRating()}
+                    </span>
+                  </div>
+                </Col>
+                <Col sm={8}>
                   <div className="rating-statistics">
                     {ratingCounts.map((count, index) => (
                       <div key={index} className="rating-row">
@@ -349,23 +366,47 @@ const ProductDetail = () => {
                             style={{
                               width: `${(count / totalReviews) * 100}%`,
                             }}
-                          ></div>
+                          >
+                            <ProgressBar striped variant="success" now={100} />
+                          </div>
                         </div>
                         <div className="rating-bar-count">{count} 리뷰</div>
                       </div>
                     ))}
                   </div>
                 </Col>
-                <Col sm={8} md={8}>
-                  {reviews.map((review) => (
-                    <div key={review.id} className="review">
-                      <p>{review.author}</p>
-                      <p>{renderStars(review.rating)}</p>
-                      <p>{review.text}</p>
-                    </div>
-                  ))}
-                </Col>
               </Row>
+              <Row sm={8} md={8}>
+                {console.log("Reviews: ", reviews)}
+                <Table responsive style={{ 
+                  tableLayout: "fixed", 
+                  marginTop: "4rem",
+                  
+                  }}>
+                  <colgroup>
+                    <col style={{ width: "4%" }} />
+                    <col style={{ width: "64%" }} />
+                    <col style={{ width: "30%" }} />
+                  </colgroup>
+                  <thead>
+                    <tr className="qnaTableHead">
+                      <th>별점</th>
+                      <th>내용</th>
+                      <th>작성자</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reviews.map((review) => (
+                      <tr key={review.id} className="review">
+                        <td style={{ textAlign: "center" }}>{renderStars(review.rating)}</td>
+                        <td style={{ textAlign: "center" }}>{review.text}</td>
+                        <td style={{ textAlign: "center"}}>{review.name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Row>
+
               {/* <div className="rating-statistics">
                 {ratingCounts.map((count, index) => (
                   <div key={index} className="rating-row">
@@ -383,7 +424,7 @@ const ProductDetail = () => {
                   </div>
                 ))}
               </div> */}
-            </div>
+            </Row>
 
             {/* 개별 리뷰 목록 */}
             {/* {reviews.map((review) => (
@@ -397,6 +438,13 @@ const ProductDetail = () => {
         )}
       </Container>
       <Footer />
+      <TryOnModal
+        show={showTryOn}
+        onClose={() => setShowTryOn(false)}
+        clothImageUrl={mainImage || selectedProduct.image?.[0] || ""}
+        clothImageUrl2={selectedProduct.image?.[1] || ""}
+        apiKey={apiKey}
+      />
     </div>
   );
 };
