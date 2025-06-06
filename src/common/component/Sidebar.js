@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Offcanvas, Navbar, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { FaHome, FaThLarge, FaShoppingCart, FaClipboardList, FaInfoCircle } from "react-icons/fa"; 
+import { FaHome, FaThLarge, FaShoppingCart, FaClipboardList, FaInfoCircle, FaStar } from "react-icons/fa"; 
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -71,6 +71,16 @@ const Sidebar = () => {
           <FaInfoCircle style={{ marginRight: "30px", color: "#6c757d" }} /> 
           <span style={{ color: "#000000" }}>Notices</span>
         </div>
+
+        <div
+          className="sidebar-item"
+          onClick={() => handleSelectMenu("/admin/review")}
+          style={{ display: "flex", alignItems: "center", padding: "10px 0" }}
+        >
+          <FaStar style={{ marginRight: "30px", color: "#6c757d" }} /> 
+          <span style={{ color: "#000000" }}>Reviews</span>
+        </div>
+
       </div>
     );
   };

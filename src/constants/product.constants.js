@@ -23,25 +23,29 @@ export const GET_PRODUCT_DETAIL_REQUEST = "GET_PRODUCT_DETAIL_REQUEST";
 export const GET_PRODUCT_DETAIL_SUCCESS = "GET_PRODUCT_DETAIL_SUCCESS";
 export const GET_PRODUCT_DETAIL_FAIL = "GET_PRODUCT_DETAIL_FAIL";
 export const WASH_METHODS = [
-    {
-      label: "드라이클리닝",
-      value: "DryClean",
-    },
-    {
-      label: "손세탁",
-      value: "HandWash",
-    },
-    {
-      label: "표백제 사용 금지",
-      value: "DoNotBleach",
-    },
-    {
-      label: "뉘어서 건조",
-      value: "DryFlat",
-    },
-    {
-      label: "다림질 금지",
-      value: "DoNotIron",
-    },
-  ];
-  
+  {
+    label: "드라이클리닝",
+    value: "DryClean",
+    image: "/image/DryClean.png",
+  },
+  {
+    label: "손세탁",
+    value: "HandWash",
+    image: "/image/HandWash.png",
+  },
+  {
+    label: "표백제 사용 금지",
+    value: "DoNotBleach",
+    image: "/image/NotBleach.png",
+  },
+  {
+    label: "뉘어서 건조",
+    value: "DryFlat",
+    image: "/image/DoNot.png",
+  },
+  {
+    label: "다림질 금지",
+    value: "DoNotIron",
+    image: "/image/NoIron.png",
+  },
+];

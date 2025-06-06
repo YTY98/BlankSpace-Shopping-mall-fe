@@ -34,6 +34,7 @@ import StorePage from "../common/component/FooterDetail/StorePage";
 import TermPage from "../common/component/FooterDetail/TermPage";
 import AboutPage from "../page/AboutPage/AboutPage";
 import ReviewWritePage from "../page/ReviewWritePage/ReviewWritePage";
+import AdminReviewPage from "../page/AdminReviewPage/AdminReviewPage";
 
 const AppRouter = () => {
   return (
@@ -75,10 +76,10 @@ const AppRouter = () => {
         <Route path="/admin/product" element={<AdminProduct />} />
         <Route path="/admin/order" element={<AdminOrderPage />} />
         <Route path="/admin/notices" element={<AdminNoticePage />} />
+        <Route path="/admin/review" element={<AdminReviewPage/>} />
       </Route>
     </Routes>
   );
 };
 
 export default AppRouter;
-
