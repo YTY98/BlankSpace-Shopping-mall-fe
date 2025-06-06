@@ -22,6 +22,8 @@ import Footer from "../../common/component/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { WASH_METHODS } from "../../constants/product.constants"; //
+import TryOnModal from "./components/TryOnModal";
+import { FaTshirt } from "react-icons/fa";
 
 
 const ProductDetail = () => {
@@ -39,6 +41,7 @@ const ProductDetail = () => {
   const [startIndex, setStartIndex] = useState(0);
   const thumbnailsPerPage = 6;
   const reviews = useSelector((state) => state.reviews.reviews);
+
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
 
@@ -52,6 +55,9 @@ const ProductDetail = () => {
   const [selectedReview, setSelectedReview] = useState(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
 
+  const [showTryOn, setShowTryOn] = useState(false);
+  const apiKey = process.env.REACT_APP_FASHN_API_KEY;
+
   const getRatingCounts = () => {
     const counts = [0, 0, 0, 0, 0]; // 별 1~5점에 대한 카운트
     reviews.forEach((review) => {
@@ -63,7 +69,7 @@ const ProductDetail = () => {
   };
 
   const calculateAverageRating = () => {
-    if (reviews.length === 0) return 0; // 여기서 0이 반환되면, 아래서도 문제 발생 가능
+    if (reviews.length === 0) return 0; //리뷰 평균 길이
     const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
     return (totalRating / reviews.length || 0).toFixed(1); // NaN 방지
   };
@@ -152,7 +158,7 @@ const ProductDetail = () => {
     }
   };
 
-  // 추가: 페이지네이션을 위한 상태
+  // 페이지네이션
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 6;
 
@@ -163,14 +169,14 @@ const ProductDetail = () => {
     );
   }, [searchKeyword, sortedReviews]);  
   
-  // 현재 페이지에 해당하는 리뷰만 잘라서 보여줌
+  // 해당 리뷰만 보여줌
   const currentReviews = useMemo(() => {
     const indexOfLastReview = currentPage * reviewsPerPage;
     const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
     return filteredReviews.slice(indexOfFirstReview, indexOfLastReview);
   }, [filteredReviews, currentPage]);
 
-  // 1. 리뷰 전체 이미지 리스트 생성
+  // 리뷰 전체 이미지 리스트 생성
   const allReviewImages = useMemo(() => {
     const images = [];
     reviews.forEach((review) => {
@@ -313,8 +319,17 @@ const ProductDetail = () => {
           </Col>
 
           <Col className="product-info-area" sm={4}>
-            <div className="product-info-header">
+            <div className="product-info-header" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {selectedProduct.name || "상품명 없음"}
+              <Button
+                variant="outline-secondary"
+                style={{ borderRadius: '50%', width: 40, height: 40, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Virtual try on"
+                onClick={() => setShowTryOn(true)}
+              >
+                <FaTshirt size={20} />
+              </Button>
+              <span style={{ fontSize: 12, marginLeft: 4 }}>Virtual try on</span>
             </div>
             <div className="product-info-price">
               ₩ {currencyFormat(selectedProduct.price || 0)}
@@ -443,10 +458,8 @@ const ProductDetail = () => {
               {/* 별점별 리뷰 통계 */}
               <Row>
                 <Col sm={4} className="ReviewOverall">
-                  {/* TODO: 질문 헤드 */}
                   <div className="ReviewAverage">
                     <span style={{ fontSize: "50px" }}>
-                      {/* 큰 별 하나와 평균 평점 숫자 */}
                       <span className="rating-star"> </span>
                       <span className="rating-score">{calculateAverageRating()}</span>
                     </span>
@@ -514,7 +527,7 @@ const ProductDetail = () => {
                     </div>
                   </Col>
 
-                  {/* 썸네일 이미지들 */}
+                  {/* 리뷰 이미지들 */}
                   <Col xs={12}>
                     <div className="review-image-wrapper">
                       {reviews.map((review) =>
@@ -684,11 +697,12 @@ const ProductDetail = () => {
           </div>
         )}
       </Container>
+
       {isGalleryModalOpen && currentImage?.url && (
         <div className="review-gallery-modal-overlay" onClick={() => setIsGalleryModalOpen(false)}>
           <div className="review-gallery-modal" onClick={(e) => e.stopPropagation()}>
 
-            {/* 왼쪽: 전체 썸네일 목록 */}
+            {/* 왼쪽: 전체 리뷰이미지 목록 */}
             <div className="review-gallery-left">
               {galleryImages.map((img, idx) => (
                 <img
@@ -736,7 +750,7 @@ const ProductDetail = () => {
         }}>
           <div className="review-detail-modal" onClick={(e) => e.stopPropagation()}>
 
-            {/* 좌측: 메인 이미지 + 썸네일 */}
+            {/* 왼쪽: 메인 이미지 + 썸네일 */}
             <div className="review-detail-left" style={{ flexDirection: 'column' }}>
               <img
                 src={selectedImageUrl}
@@ -744,7 +758,7 @@ const ProductDetail = () => {
                 className="main-image"
               />
 
-              {/*  해당 리뷰의 이미지 썸네일들 */}
+              {/*  해당 리뷰의 이미지들 */}
               {selectedReview.imageUrls?.length > 1 && (
                 <div className="review-sub-thumbnail-list">
                   {selectedReview.imageUrls.map((url, idx) => (
@@ -763,7 +777,7 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* 우측: 리뷰 정보 + 다른 리뷰 썸네일 */}
+            {/* 오른쪽: 리뷰 정보 + 다른 리뷰 썸네일 */}
             <div className="review-detail-right">
               <button className="review-gallery-close-button" onClick={() => {
                 setSelectedReview(null);
@@ -806,6 +820,13 @@ const ProductDetail = () => {
         </div>
       )}
       <Footer />
+      <TryOnModal
+        show={showTryOn}
+        onClose={() => setShowTryOn(false)}
+        clothImageUrl={mainImage || selectedProduct.image?.[0] || ""}
+        clothImageUrl2={selectedProduct.image?.[1] || ""}
+        apiKey={apiKey}
+      />
     </div>
   );
 };

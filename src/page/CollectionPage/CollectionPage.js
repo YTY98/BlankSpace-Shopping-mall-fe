@@ -30,6 +30,17 @@ const CollectionPage = () => {
     "/image/Collection1-20.png",
     "/image/Collection1-21.png",
     "/image/Collection1-22.png",
+
+    "/image/Collection2-1.jpg",
+    "/image/Collection2-2.jpg",
+    "/image/Collection2-3.jpg",
+    "/image/Collection2-4.jpg",
+    "/image/Collection2-5.jpg",
+    "/image/Collection2-6.jpg",
+    "/image/Collection2-7.jpg",
+    "/image/Collection2-8.jpg",
+    "/image/Collection2-9.jpg",
+    "/image/Collection2-10.jpg",
   ];
 
   const handleClose = () => setShowModal(false);
@@ -70,7 +81,7 @@ const CollectionPage = () => {
         </Row>
       </Container> */}
       <div className="collection-grid1">
-          {images.map((image, index) => (
+          {images.slice(0, 22).map((image, index) => (
             <img 
               src={image} 
               alt={`Product ${index + 1}`}
@@ -82,29 +93,27 @@ const CollectionPage = () => {
       </div>
 
       <div className="collection-grid2">
-        <img src="/image/Collection2-1.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-2.jpg" className="collection-grid2-item" />
-        <div className="collection-grid2-item">
-          <h4 className='collection-header-1'>
-          BLANKSPACE COLLECTION<br /><br />
+        {images.slice(22, 32).map((image, index) => (
+          <img 
+            src={image} 
+            alt={`Product ${index + 1}`}
+            className="collection-grid2-item"
+            onClick={() => handleShow(index + 22)}
+            style={{ cursor: 'pointer' }}
+          />
+        ))}
+        <div className="collection-grid2-paragraph">
+          <h4 className="collection-header-1">
+            BLANKSPACE COLLECTION<br /><br />
           </h4>
-
-          <p className='collection-paragraph-1'>
-          WE FOCUSED OUR ATTENTION ON THE DETAILS,<br />
-          THE STORYTELLING, AND THE NUANCES.<br />
-          EACH ITEM IN OUR LINEUP FOLLOWS A UNIQUE NARRATIVE,<br />
-          CRAFTED TO TELL ITS OWN STORY,<br />
-          WHILE EMBODYING OUR DISTINCTIVE STYLE AND VIBE.
+          <p className="collection-paragraph-1">
+            WE FOCUSED OUR ATTENTION ON THE DETAILS,<br />
+            THE STORYTELLING, AND THE NUANCES.<br />
+            EACH ITEM IN OUR LINEUP FOLLOWS A UNIQUE NARRATIVE,<br />
+            CRAFTED TO TELL ITS OWN STORY,<br />
+            WHILE EMBODYING OUR DISTINCTIVE STYLE AND VIBE.
           </p>
         </div>
-        <img src="/image/Collection2-3.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-4.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-5.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-6.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-5.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-6.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-7.jpg" className="collection-grid2-item" />
-        <img src="/image/Collection2-8.jpg" className="collection-grid2-item" />
       </div>
 
       

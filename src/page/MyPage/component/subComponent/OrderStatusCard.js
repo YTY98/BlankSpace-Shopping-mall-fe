@@ -35,6 +35,7 @@ const OrderStatusCard = ({ orderItem }) => {
           <div className="mt-1 text-align-center">
             {orderItem.status === "delivered" ? 
               orderItem.isReviewed === true ? (<span style={{ fontSize: "12px"}}>리뷰 작성 완료</span>) : (
+
               <Link to={`/write-review/${orderItem.items[0]?.productId?._id}`}
               state={{
                 orderId: orderItem._id, // 주문 ID

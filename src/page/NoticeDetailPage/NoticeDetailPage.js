@@ -33,7 +33,7 @@ const NoticeDetailPage = () => {
 
   return (
     <><h1 className="mt-4 text-center" style ={{marginBottom: "40px"}}>{notice.title}</h1>
-      <Container className="text-center mb-4">
+      <Container className="text-left mb-4">
         {notice && (
           <div className="notice-detail" style = {{marginBottom: "100px"}}>
             <div className="notice-item content">

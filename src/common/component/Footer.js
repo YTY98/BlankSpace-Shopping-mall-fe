@@ -126,7 +126,7 @@ const Footer = () => {
                 <span>점심</span> 오후 12시 ~ 오후 2시
               </div>
               <div>
-                <span>평일</span> 주말/공휴일
+                <span>휴일</span> 주말/공휴일
               </div>
             </div>
           </div>
