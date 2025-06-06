@@ -41,7 +41,6 @@ const ReviewWritePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
     // 주문 ID를 포함한 데이터 생성
     const formData = {
       productId,
