@@ -5,6 +5,8 @@ import { badgeBg } from "../../../../constants/order.constants";
 import { currencyFormat } from "../../../../utils/number";
 
 const OrderStatusCard = ({ orderItem }) => {
+  const hasReviewed = orderItem.isReviewed === true;
+  console.log("🔍 주문 아이템:", orderItem.items);
   return (
     <div>
       <Row className="status-card">
@@ -34,7 +36,7 @@ const OrderStatusCard = ({ orderItem }) => {
 
           <div className="mt-1 text-align-center">
             {orderItem.status === "delivered" ? 
-              orderItem.isReviewed === true ? (<span style={{ fontSize: "12px"}}>리뷰 작성 완료</span>) : (
+              hasReviewed ?(<span style={{ fontSize: "12px"}}>리뷰 작성 완료</span>) : (
 
               <Link to={`/write-review/${orderItem.items[0]?.productId?._id}`}
               state={{
@@ -59,4 +61,4 @@ const OrderStatusCard = ({ orderItem }) => {
   );
 };
 
-export default OrderStatusCard;
+export default OrderStatusCard; 

@@ -59,19 +59,24 @@ const ProductDetail = () => {
   const apiKey = process.env.REACT_APP_FASHN_API_KEY;
 
   const getRatingCounts = () => {
-    const counts = [0, 0, 0, 0, 0]; // 별 1~5점에 대한 카운트
+    const counts = [0, 0, 0, 0, 0]; // 별점별 카운트 초기화
     reviews.forEach((review) => {
-      if (review.rating >= 1 && review.rating <= 5) {
+      if (review && typeof review.rating === "number" && review.rating >= 1 && review.rating <= 5) {
         counts[review.rating - 1]++;
       }
     });
     return counts;
-  };
+  };  
 
   const calculateAverageRating = () => {
-    if (reviews.length === 0) return 0; //리뷰 평균 길이
-    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-    return (totalRating / reviews.length || 0).toFixed(1); // NaN 방지
+    const validReviews = reviews.filter(
+      (review) => review && typeof review.rating === "number"
+    );
+  
+    if (validReviews.length === 0) return 0;
+  
+    const totalRating = validReviews.reduce((acc, review) => acc + review.rating, 0);
+    return (totalRating / validReviews.length).toFixed(1);
   };
 
   const [selectedSort, setSelectedSort] = useState("recent");
@@ -180,11 +185,9 @@ const ProductDetail = () => {
   const allReviewImages = useMemo(() => {
     const images = [];
     reviews.forEach((review) => {
-      if (Array.isArray(review.imageUrls)) {
+      if (review?.imageUrls && Array.isArray(review.imageUrls)) {
         review.imageUrls.forEach((url) => {
-          if (url) {
-            images.push({ review, url });
-          }
+          if (url) images.push({ review, url });
         });
       }
     });
@@ -241,11 +244,15 @@ const ProductDetail = () => {
 
   const maxCount = Math.max(...ratingCounts);
 
+  const maskName = (name) => {
+    if (!name || typeof name !== 'string') return '익명';
+    return name[0] + '*'.repeat(name.length - 1);
+  };
+  
   useEffect(() => {
     setCurrentPage(1); // 정렬 기준이 바뀔 때 첫 페이지로 초기화
   }, [selectedSort, reviews]);
   
-
   if (loading || !selectedProduct) {
     return (
       <ColorRing
@@ -577,7 +584,7 @@ const ProductDetail = () => {
                         별점순
                       </span>
                     </div>
-                    <Col xs={12} md={6}>
+                    <Col xs={12} md={6} className="d-flex justify-content-end">
                       <div className="review-search-icon-wrapper">
                         <FontAwesomeIcon icon={faSearch} className="search-icon" />
                         <input
@@ -625,7 +632,7 @@ const ProductDetail = () => {
                             : "날짜 없음"}
                         </div>
                         <div className="review-name">
-                          <strong>{review.name}</strong>님의 리뷰입니다.
+                          <strong>{maskName(review.name)}</strong>님의 리뷰입니다.
                         </div>
                       </Col>
                     </Row>
@@ -729,7 +736,7 @@ const ProductDetail = () => {
                   {getRatingLabel(currentImage.review?.rating)}
                 </span>
               </div>
-              <div className="review-gallery-name">{currentImage.review?.name || "이름 없음"}</div>
+              <div className="review-gallery-name">{maskName(currentImage.review?.name) || "이름 없음"}</div>
               <div className="review-gallery-text">{currentImage.review?.text || "내용 없음"}</div>
               <div className="review-gallery-date">
                 {currentImage.review?.createdAt
@@ -791,7 +798,7 @@ const ProductDetail = () => {
                   {getRatingLabel(selectedReview.rating)}
                 </span>
               </div>
-              <div className="review-gallery-name">{selectedReview.name || "이름 없음"}</div>
+              <div className="review-gallery-name">{maskName(selectedReview.name) || "이름 없음"}</div>
               <div className="review-gallery-text">{selectedReview.text || "내용 없음"}</div>
               <div className="review-gallery-date">
                 {selectedReview.createdAt
