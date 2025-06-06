@@ -30,6 +30,7 @@ export const getReviews = createAsyncThunk(
 );
 
 // 리뷰 작성
+//확인용 콘솔
 export const createReview = createAsyncThunk(
   "reviews/createNewReview",
   async (formData, { rejectWithValue }) => {
