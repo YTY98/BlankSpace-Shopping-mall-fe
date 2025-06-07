@@ -35,6 +35,8 @@ import TermPage from "../common/component/FooterDetail/TermPage";
 import AboutPage from "../page/AboutPage/AboutPage";
 import ReviewWritePage from "../page/ReviewWritePage/ReviewWritePage";
 import AdminReviewPage from "../page/AdminReviewPage/AdminReviewPage";
+import FindAccountPage from "../page/FindAccountPage/FindAccountPage";
+import ResetPasswordPage from "../page/ResetPasswordPage/ResetPasswordPage";
 
 const AppRouter = () => {
   return (
@@ -42,6 +44,8 @@ const AppRouter = () => {
       <Route path="/" element={<ProductAll />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/find-account" element={<FindAccountPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/qa" element={<Qna />} />
       <Route path="/qa/:id" element={<AnswerPage />} />
@@ -51,15 +55,15 @@ const AppRouter = () => {
       <Route path="/store" element={<StorePage />} />
       <Route path="/term" element={<TermPage />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route path="/collection" element={<CollectionPage />} />
+        <Route path="/shop" element={<ShopPage />} />
+        <Route path="/notice" element={<NoticePage />} />
+        <Route path="/notice/:id" element={<NoticeDetailPage />} />
       <Route element={<PrivateRoute permissionLevel="customer" />}>
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment/success" element={<OrderCompletePage />} />
         <Route path="/account/purchase" element={<MyPage />} />
-        <Route path="/collection" element={<CollectionPage />} />
-        <Route path="/shop" element={<ShopPage />} />
-        <Route path="/notice" element={<NoticePage />} />
-        <Route path="/notice/:id" element={<NoticeDetailPage />} />
         <Route path="/write" element={<WritePage />} />
         <Route path="/product/:id/Query" element={<QueryPage />}/>
         <Route path="/mypage" element={<MyPage />} />

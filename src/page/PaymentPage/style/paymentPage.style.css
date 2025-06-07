@@ -31,6 +31,16 @@
     display:none;
 }
 
+/* 주소 검색 관련 스타일 */
+.address-search-btn {
+    min-width: 80px;
+    height: 38px;
+}
+
+.readonly-input {
+    background-color: #f8f9fa !important;
+}
+
 @media screen and (max-width: 63rem) {
     .form-area{
         margin-top: 20px;
