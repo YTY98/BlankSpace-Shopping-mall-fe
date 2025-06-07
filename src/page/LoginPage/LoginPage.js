@@ -131,6 +131,23 @@ const Login = () => {
     window.location.href = SOCIAL_LOGIN_URLS.naver;
   }
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const res = await axios.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            {
+              headers: { Authorization: `Bearer ${response.access_token}` },
+            }
+        );
+        dispatch(loginWithGoogle(res.data));
+      } catch (error) {
+        console.error("Google login error:", error);
+      }
+    },
+    onError: () => console.log("Google Login Failed"),
+  });
+
   useEffect(() => {
     if (user) {
       navigate("/");
@@ -171,9 +188,9 @@ const Login = () => {
               </Button>
             </div>
             <div className="account-links-area">
-
-              <Link className="account-links" to="/find-account">아이디 | 비밀번호 찾기 | </Link>
-              <Link className="account-links" to="/register"> 회원가입</Link>{" "}
+              <Link className="account-link" to="/find-account">아이디/비밀번호 찾기</Link>
+              <span className="link-divider">|</span>
+              <Link className="account-link" to="/register">회원가입</Link>
             </div>
           </Form>
 
@@ -196,38 +213,23 @@ const Login = () => {
                 type="button"
             >
               <span className="sns-icon">
-                <img src="/kakao_logo.png" alt="네이버 로고" width="24" height="24" />
+                <img src="/kakao_logo.png" alt="카카오 로고" width="24" height="24" />
               </span>
               <span className="divider" />
               <span className="text-label">카카오로 로그인</span>
             </button>
 
-            {/* <button
-              className="btnSns google-login"
-              onClick={() => window.location.href = SOCIAL_LOGIN_URLS.google}
-              type="button"
+            <button
+                className="btnSns google-login"
+                onClick={() => googleLogin()}
+                type="button"
             >
               <span className="sns-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="12" fill="#4285F4"/>
-                  <text x="6" y="18" fill="white" fontSize="14" fontWeight="bold">G</text>
-                </svg>
+                <img src="/google_logo.png" alt="구글 로고" width="24" height="24" />
               </span>
               <span className="divider" />
               <span className="text-label">구글로 로그인</span>
-            </button> */}
-            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-              <div className="google-login-wrapper">
-                <GoogleLogin
-                    onSuccess={handleGoogleLogin}
-                    onError={() => console.log("Google Login Failed")}
-                    theme="outline"
-                    size="large"
-                    text="signin_with"
-                    locale="ko"
-                />
-              </div>
-            </GoogleOAuthProvider>
+            </button>
           </div>
         </Container>
       </>
