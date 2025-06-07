@@ -50,74 +50,151 @@ const RegisterPage = () => {
     }
   };
 
+  const [allChecked, setAllChecked] = useState(false);
+  const [checks, setChecks] = useState({
+    terms: false,
+    privacy: false,
+    sms: false,
+    email: false,
+  });
+
+  // "모두 동의" 체크박스 핸들러
+  const handleAllChecked = (e) => {
+    const isChecked = e.target.checked;
+    setAllChecked(isChecked);
+    setChecks({
+      privacyCollection: isChecked,
+      privacy: isChecked,
+      sms: isChecked,
+      email: isChecked,
+    });
+  };
+
+  // 개별 체크박스 핸들러
+  const handleCheckChange = (e) => {
+    const { name, checked } = e.target;
+    setChecks((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+
+    // 모든 체크박스가 선택되었는지 확인
+    const allSelected = Object.values({ ...checks, [name]: checked }).every(
+        (value) => value === true
+    );
+    setAllChecked(allSelected);
+  };
+
   return (
-    <Container className="register-area">
-      {registrationError && (
-        <div>
-          <Alert variant="danger" className="error-message">
-            {registrationError}
-          </Alert>
-        </div>
-      )}
-      <Form onSubmit={register}>
-        <Form.Group className="mb-3">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            id="email"
-            placeholder="Enter email"
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Name</Form.Label>
-          <Form.Control
-            type="text"
-            id="name"
-            placeholder="Enter name"
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            id="password"
-            placeholder="Password"
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Confirm Password</Form.Label>
-          <Form.Control
-            type="password"
-            id="confirmPassword"
-            placeholder="Confirm Password"
-            onChange={handleChange}
-            required
-            isInvalid={passwordError}
-          />
-          <Form.Control.Feedback type="invalid">
-            {passwordError}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Check
-            type="checkbox"
-            label="이용약관에 동의합니다"
-            id="policy"
-            onChange={handleChange}
-            isInvalid={policyError}
-          />
-        </Form.Group>
-        <Button variant="danger" type="submit">
-          회원가입
-        </Button>
-      </Form>
-    </Container>
+      <Container className="register-area">
+        {registrationError && (
+            <div>
+              <Alert variant="danger" className="error-message">
+                {registrationError}
+              </Alert>
+            </div>
+        )}
+        <Form onSubmit={register}>
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+                type="email"
+                id="email"
+                placeholder="Enter email"
+                onChange={handleChange}
+                required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Name</Form.Label>
+            <Form.Control
+                type="text"
+                id="name"
+                placeholder="Enter name"
+                onChange={handleChange}
+                required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+                type="password"
+                id="password"
+                placeholder="Password"
+                onChange={handleChange}
+                required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Confirm Password</Form.Label>
+            <Form.Control
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirm Password"
+                onChange={handleChange}
+                required
+                isInvalid={passwordError}
+            />
+            <Form.Control.Feedback type="invalid">
+              {passwordError}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+          </Form.Group>
+          <div className="agreement-section">
+            <h3>서비스 이용 동의</h3>
+            <label className="checkbox-label">
+              <input
+                  type="checkbox"
+                  checked={allChecked}
+                  onChange={handleAllChecked}
+              />
+              <strong>이용약관에 모두 동의합니다. (선택 정보 포함)  이용약관 및 개인정보수집 및 이용에 모두 동의합니다.</strong>
+            </label>
+            <div className="sub-checks">
+              <label className="checkbox-label">
+                <input
+                    type="checkbox"
+                    name="privacyCollection"
+                    checked={checks.privacyCollection}
+                    onChange={handleCheckChange}
+                />
+                [필수] 개인정보 수집 및 이용에 동의합니다.
+              </label>
+              <label className="checkbox-label">
+                <input
+                    type="checkbox"
+                    name="privacy"
+                    checked={checks.privacy}
+                    onChange={handleCheckChange}
+                />
+                [필수] 이용약관에 동의합니다.
+              </label>
+              <label className="checkbox-label">
+                <input
+                    type="checkbox"
+                    name="sms"
+                    checked={checks.sms}
+                    onChange={handleCheckChange}
+                />
+                [선택] SMS 알림에 동의합니다.
+              </label>
+              <label className="checkbox-label">
+                <input
+                    type="checkbox"
+                    name="email"
+                    checked={checks.email}
+                    onChange={handleCheckChange}
+                />
+                [선택] 이메일 알림에 동의합니다.
+              </label>
+            </div>
+          </div>
+          <Button type="submit" className="register-button">
+            회원가입
+          </Button>
+        </Form>
+      </Container>
   );
 };
 

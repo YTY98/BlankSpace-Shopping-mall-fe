@@ -4,77 +4,122 @@ import { useNavigate } from "react-router";
 import { useLocation } from "react-router-dom";
 import { currencyFormat } from "../../../utils/number";
 import { Row, Col } from "react-bootstrap";
+import "./OrderReceipt.css";
+
 const OrderReceipt = ({ cartList, totalPrice, mileage }) => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  console.log(totalPrice, mileage);
+  const isCartPage = location.pathname.includes("/cart");
+  const deliveryFee = totalPrice >= 50000 ? 0 : 3000;
+  const finalPrice = totalPrice + deliveryFee - (mileage || 0);
 
   return (
-    <div className="receipt-container">
-      <h3 className="receipt-title">주문 내역</h3>
-      <ul className="receipt-list">
-        <Row>
-          {cartList.length > 0 &&
-            cartList.map((item, index) => (
-              <Row style={{paddingRight: "0px"}}>
-                <Col xs={8} sm={8} md={6} lg={8} style={{paddingRight: "0px"}}>
-                  <div>{item.productId.name}</div>
-                </Col>
-                <Col xs={1} sm={1} md={1} lg={1} style={{ textAlign: "right" }}>
-                  <div>₩</div>
-                </Col>
-                <Col xs={3} sm={3} md={4} lg={3} style={{ justifyContent: "flex-end", textAlign: "right", paddingRight: "0px"}}>
-                  <div>{currencyFormat(item.productId.price * item.qty)}</div>
-                </Col>
-                </Row>
-            ))}
-        </Row>
-      </ul>
-      <div className="display-flex space-between receipt-title">
-        <div>
-          <strong>Total:</strong>
+      <div className="receipt-container">
+        <div className="receipt-header">
+          <h3 className="receipt-title">{isCartPage ? "쇼핑백" : "결제 내역"}</h3>
         </div>
-        <div>
-      {location.pathname.includes("/cart") ? (
-        // "/cart" 페이지에서는 마일리지 관련 표시 안 함
-        <strong>₩ {currencyFormat(totalPrice)}</strong>
-      ) : (
-        // 다른 페이지 (예: "/payment")에서 마일리지 조건에 따라 표시
-        <div>
-          {mileage !== 0 ? (
-            <>
-              <strong style={{ textDecoration: "line-through" }}>
-                ₩ {currencyFormat(totalPrice)}
-              </strong>
-              <strong> ₩ {currencyFormat(totalPrice - mileage)}</strong>
-            </>
+
+        {/* 상품 목록 */}
+        <div className="product-list">
+          <h4 className="section-title">주문 상품 정보</h4>
+          {cartList.length > 0 &&
+              cartList.map((item, index) => (
+                  <div key={index} className="product-item">
+                    <div className="product-image">
+                      <img
+                          src={item.productId.image[0]}
+                          alt={item.productId.name}
+                          className="thumbnail"
+                      />
+                    </div>
+                    <div className="product-info">
+                      <div className="product-name">{item.productId.name}</div>
+                      <div className="product-option">
+                        <span className="option-label">구매수량:</span> {item.qty}개
+                        {item.size && <span className="size-info">ㆍ{item.size}</span>}
+                      </div>
+                      <div className="product-price">₩ {currencyFormat(item.productId.price * item.qty)}</div>
+                    </div>
+                  </div>
+              ))}
+        </div>
+
+        {/* 가격 정보 */}
+        <div className="price-summary">
+          <h4 className="section-title">결제 예정 금액</h4>
+          <div className="summary-row">
+            <span>상품 금액</span>
+            <span>₩ {currencyFormat(totalPrice)}</span>
+          </div>
+          <div className="summary-row">
+            <span>배송비</span>
+            <span>
+            {deliveryFee === 0 ? (
+                <span className="free-delivery">무료배송</span>
+            ) : (
+                `₩ ${currencyFormat(deliveryFee)}`
+            )}
+          </span>
+          </div>
+          {!isCartPage && mileage > 0 && (
+              <div className="summary-row discount">
+                <span>마일리지 할인</span>
+                <span>- ₩ {currencyFormat(mileage)}</span>
+              </div>
+          )}
+          <div className="total-row">
+            <span>총 결제예정금액</span>
+            <span className="final-price">₩ {currencyFormat(finalPrice)}</span>
+          </div>
+        </div>
+
+        {/* 배송비 안내 */}
+        <div className="delivery-info">
+          {totalPrice < 50000 ? (
+              <p className="free-delivery-guide">
+                ₩{currencyFormat(50000 - totalPrice)}원 추가 구매 시, 무료배송 혜택을 받으실 수 있습니다.
+              </p>
           ) : (
-            <strong>₩ {currencyFormat(totalPrice)}</strong>
+              <p className="free-delivery-applied">
+                무료배송 혜택이 적용되었습니다.
+              </p>
           )}
         </div>
-      )}
-    </div>
-      </div>
-      {location.pathname.includes("/cart") && cartList.length > 0 && (
-        <Button
-          variant="dark"
-          className="payment-button"
-          onClick={() => navigate("/payment")}
-        >
-          결제 계속하기
-        </Button>
-      )}
 
-      <div>
-        가능한 결제 수단 귀하가 결제 단계에 도달할 때까지 가격 및 배송료는
-        확인되지 않습니다.
-        <div>
-          30일의 반품 가능 기간, 반품 수수료 및 미수취시 발생하는 추가 배송 요금
-          읽어보기 반품 및 환불
-        </div>
+        {/* 장바구니 페이지에서만 보이는 결제 계속하기 버튼 */}
+        {isCartPage && cartList.length > 0 && (
+            <Button
+                variant="dark"
+                className="payment-button"
+                onClick={() => navigate("/payment")}
+            >
+              결제 계속하기
+            </Button>
+        )}
+
+        {/* 결제 안내 */}
+        {!isCartPage && (
+            <div className="payment-info">
+              <div className="payment-methods">
+                <p className="method-title">이용 가능한 결제 수단</p>
+                <ul>
+                  <li>신용카드: 전체 카드사 이용 가능</li>
+                  <li>체크카드: 전체 카드사 이용 가능</li>
+                  <li>실시간 계좌이체: 계좌 잔액 내 결제 가능</li>
+                  <li>무통장 입금: 가상계좌 발급 후 입금</li>
+                </ul>
+              </div>
+              <div className="payment-notice">
+                <p className="notice-title">안내사항</p>
+                <ul>
+                  <li>카드사 할부 안내: 무이자할부 혜택은 카드사 정책에 따라 다를 수 있습니다.</li>
+                  <li>주문 완료 후 평균 1-3일 이내 출고됩니다. (주말/공휴일 제외)</li>
+                  <li>결제 완료 후 주문 내역은 마이페이지에서 확인하실 수 있습니다.</li>
+                </ul>
+              </div>
+            </div>
+        )}
       </div>
-    </div>
   );
 };
 

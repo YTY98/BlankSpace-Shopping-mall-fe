@@ -1,0 +1,76 @@
+.find-account-area {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 15px;
+}
+
+.find-account-area .nav-tabs {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+}
+
+.find-account-area .nav-tabs .nav-link {
+    color: #333;
+    font-weight: 500;
+    border: none;
+    padding: 8px 20px;
+    margin-right: 10px;
+    background: transparent;
+    position: relative;
+}
+
+.find-account-area .nav-tabs .nav-link:hover {
+    border: none;
+    color: #000;
+}
+
+.find-account-area .nav-tabs .nav-link.active {
+    color: #000;
+    font-weight: bold;
+    border: none;
+    background: transparent;
+}
+
+.find-account-area .nav-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+}
+
+.find-account-area .form-label {
+    font-weight: 500;
+}
+
+.find-account-area .form-group {
+    margin-bottom: 12px;
+}
+
+.find-account-area .btn-primary {
+    background-color: #000;
+    border-color: #000;
+    margin-top: 5px;
+}
+
+.find-account-area .btn-primary:hover {
+    background-color: #333;
+    border-color: #333;
+}
+
+.find-account-area .btn-link {
+    color: #666;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.find-account-area .btn-link:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+.white-space-pre-line {
+    white-space: pre-line;
+} 

@@ -34,50 +34,54 @@ import StorePage from "../common/component/FooterDetail/StorePage";
 import TermPage from "../common/component/FooterDetail/TermPage";
 import AboutPage from "../page/AboutPage/AboutPage";
 import ReviewWritePage from "../page/ReviewWritePage/ReviewWritePage";
+import FindAccountPage from "../page/FindAccountPage/FindAccountPage";
+import ResetPasswordPage from "../page/ResetPasswordPage/ResetPasswordPage";
 
 const AppRouter = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<ProductAll />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/product/:id" element={<ProductDetail />} />
-      <Route path="/qa" element={<Qna />} />
-      <Route path="/qa/:id" element={<AnswerPage />} />
-      <Route path="/service" element={<ServicePage />} />
-      <Route path="/per" element={<PerPage />} />
-      <Route path="/send" element={<SendPage />} />
-      <Route path="/store" element={<StorePage />} />
-      <Route path="/term" element={<TermPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route element={<PrivateRoute permissionLevel="customer" />}>
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/payment/success" element={<OrderCompletePage />} />
-        <Route path="/account/purchase" element={<MyPage />} />
-        <Route path="/collection" element={<CollectionPage />} />
-        <Route path="/shop" element={<ShopPage />} />
-        <Route path="/notice" element={<NoticePage />} />
-        <Route path="/notice/:id" element={<NoticeDetailPage />} />
-        <Route path="/write" element={<WritePage />} />
-        <Route path="/product/:id/Query" element={<QueryPage />}/>
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/mypage/order" element={<MyOrderPage />} />
-        <Route path="/mypage/profile" element={<MyProfilePage />} />
-        <Route path="/mypage/wishlist" element={<MyWishlistPage />} />
-        <Route path="/mypage/mileage" element={<MyMileagePage />} />
-        <Route path="/mypage/membership" element={<MyMembershipPage />} />
-        <Route path="/mypage/qna" element={<MyQnaPage />} />
-        <Route path="/write-review/:productId" element={<ReviewWritePage />} />
-      </Route>
-      <Route element={<PrivateRoute permissionLevel="admin" />}>
-        <Route path="/admin/management" element={<AdminDashBoardPage/>} />
-        <Route path="/admin/product" element={<AdminProduct />} />
-        <Route path="/admin/order" element={<AdminOrderPage />} />
-        <Route path="/admin/notices" element={<AdminNoticePage />} />
-      </Route>
-    </Routes>
-  );
+    return (
+        <Routes>
+            <Route path="/" element={<ProductAll />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/find-account" element={<FindAccountPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/qa" element={<Qna />} />
+            <Route path="/qa/:id" element={<AnswerPage />} />
+            <Route path="/service" element={<ServicePage />} />
+            <Route path="/per" element={<PerPage />} />
+            <Route path="/send" element={<SendPage />} />
+            <Route path="/store" element={<StorePage />} />
+            <Route path="/term" element={<TermPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/collection" element={<CollectionPage />} />
+            <Route path="/shop" element={<ShopPage />} />
+            <Route path="/notice" element={<NoticePage />} />
+            <Route path="/notice/:id" element={<NoticeDetailPage />} />
+            <Route element={<PrivateRoute permissionLevel="customer" />}>
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/payment" element={<PaymentPage />} />
+                <Route path="/payment/success" element={<OrderCompletePage />} />
+                <Route path="/account/purchase" element={<MyPage />} />
+                <Route path="/write" element={<WritePage />} />
+                <Route path="/product/:id/Query" element={<QueryPage />}/>
+                <Route path="/mypage" element={<MyPage />} />
+                <Route path="/mypage/order" element={<MyOrderPage />} />
+                <Route path="/mypage/profile" element={<MyProfilePage />} />
+                <Route path="/mypage/wishlist" element={<MyWishlistPage />} />
+                <Route path="/mypage/mileage" element={<MyMileagePage />} />
+                <Route path="/mypage/membership" element={<MyMembershipPage />} />
+                <Route path="/mypage/qna" element={<MyQnaPage />} />
+                <Route path="/write-review/:productId" element={<ReviewWritePage />} />
+            </Route>
+            <Route element={<PrivateRoute permissionLevel="admin" />}>
+                <Route path="/admin/management" element={<AdminDashBoardPage/>} />
+                <Route path="/admin/product" element={<AdminProduct />} />
+                <Route path="/admin/order" element={<AdminOrderPage />} />
+                <Route path="/admin/notices" element={<AdminNoticePage />} />
+            </Route>
+        </Routes>
+    );
 };
 
 export default AppRouter;

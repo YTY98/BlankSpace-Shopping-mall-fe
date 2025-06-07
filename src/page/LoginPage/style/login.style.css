@@ -1,15 +1,135 @@
 .login-button-area{
     align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.login-button{
+    background-color: #333333 !important;
+    width: 100%;
+    color: #f8f7f6 !important;
+    padding: 12px;
+    margin: 20px 0;
+}
+
+.login-button:hover{
+    background-color: #111111 !important;
+}
+
+.account-links-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.account-links{
+    color: #333333;
+    text-decoration: none;
 }
 
 .login-form{
-    width: 100%;
-      
-  }
-  .login-area{
+    width: 90%;
+    margin: 20px 0;
+}
+
+.login-area{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    max-width: 550px;
-  }
+    width: 60%;
+    padding: 30px 0;
+}
+
+.naver-login-image {
+    width: 150px;
+    height: auto;
+    max-width: 100%;
+    border-radius: 6px;
+    transition: opacity 0.2s ease;
+}
+
+.naver-login-image:hover {
+    opacity: 0.8;
+}
+
+.kakao-login-image {
+    width: 150px;
+    height: auto;
+    max-width: 100%;
+    border-radius: 6px;
+    transition: opacity 0.2s ease;
+}
+
+.kakao-login-image:hover {
+    opacity: 0.8;
+}
+
+
+
+.social-login-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.btnSns {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 80px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: box-shadow 0.2s, opacity 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    padding: 0 18px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.btnSns:hover {
+    opacity: 0.85;
+}
+
+.sns-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    margin-right: 12px;
+}
+
+.divider {
+    width: 1px;
+    height: 28px;
+    background: #e0e0e0;
+    margin-right: 16px;
+}
+
+.text-label {
+    flex: 1;
+    text-align: left;
+    color: #222;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+
+
+
+.naver-login .sns-icon svg { background: #03C75A; border-radius: 4px; }
+.naver-login .text-label { color: #222; }
+.google-login .sns-icon svg { background: #fff; border-radius: 4px; }
+.google-login .text-label { color: #222; }
+.kakao-login .sns-icon svg { background: #FEE500; border-radius: 4px; }
+.kakao-login .text-label { color: #222; }
