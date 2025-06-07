@@ -59,6 +59,7 @@ export const logout = createAsyncThunk(
   "user/logout",
   async (_, { dispatch }) => {
     sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
     dispatch(initialCart());
     dispatch(
       showToastMessage({

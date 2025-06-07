@@ -29,6 +29,7 @@ const PaymentPage = () => {
     lastName: "",
     contact: "",
     address: "",
+    address2: "",
     city: "",
     zip: "",
   });
@@ -56,14 +57,13 @@ const PaymentPage = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // 오더 생성하기
-    const { firstName, lastName, contact, address, city, zip } = shipInfo;
+    const { firstName, lastName, contact, address, address2, city, zip } = shipInfo;
     dispatch(
       createOrder({
         totalPrice,
         useMileage,
         currentMileage,
-        shipTo: { address, city, zip },
+        shipTo: { address: `${address} ${address2 || ''}`, city, zip },
         contact: { contact, lastName, firstName },
         orderList: cartList.map((item) => {
           return {
@@ -74,7 +74,6 @@ const PaymentPage = () => {
           };
         }),
       })
-      
     );
   };
   
@@ -120,6 +119,20 @@ const PaymentPage = () => {
   const handleInputFocus = (e) => {
     setCardValue({ ...cardValue, focus: e.target.name });
   };
+
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function(data) {
+        setShipInfo({
+          ...shipInfo,
+          zip: data.zonecode,
+          address: data.address,
+          city: data.sido,
+        });
+      }
+    }).open();
+  };
+
   if (cartList?.length === 0) {
     navigate("/cart");
   }
@@ -163,35 +176,53 @@ const PaymentPage = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formGridAddress2">
+                <Row className="mb-3">
+                  <Form.Group as={Col} md={4} controlId="formGridZip">
+                    <Form.Label>우편번호</Form.Label>
+                    <div className="d-flex">
+                      <Form.Control
+                        value={shipInfo.zip}
+                        readOnly
+                        name="zip"
+                        className="readonly-input"
+                      />
+                      <Button variant="outline-secondary" onClick={handleAddressSearch} className="ms-2 address-search-btn">
+                        검색
+                      </Button>
+                    </div>
+                  </Form.Group>
+                </Row>
+
+                <Form.Group className="mb-3" controlId="formGridAddress">
                   <Form.Label>주소</Form.Label>
                   <Form.Control
-                    placeholder="Apartment, studio, or floor"
-                    onChange={handleFormChange}
-                    required
+                    value={shipInfo.address}
+                    readOnly
                     name="address"
+                    className="readonly-input"
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="formGridAddress2">
+                  <Form.Label>상세주소</Form.Label>
+                  <Form.Control
+                    placeholder="상세주소를 입력하세요"
+                    onChange={handleFormChange}
+                    name="address2"
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="formGridCity">
+                  <Form.Label>도시</Form.Label>
+                  <Form.Control
+                    value={shipInfo.city}
+                    readOnly
+                    name="city"
+                    className="readonly-input"
                   />
                 </Form.Group>
 
                 <Row className="mb-3">
-                  <Form.Group as={Col} controlId="formGridCity">
-                    <Form.Label>City</Form.Label>
-                    <Form.Control
-                      onChange={handleFormChange}
-                      required
-                      name="city"
-                    />
-                  </Form.Group>
-
-                  <Form.Group as={Col} controlId="formGridZip">
-                    <Form.Label>zip</Form.Label>
-                    <Form.Control
-                      onChange={handleFormChange}
-                      required
-                      name="zip"
-                    />
-                  </Form.Group>
-
                   <Form.Group as={Col} controlId="formGridMileage">
                     <Form.Label>마일리지</Form.Label>
                     <Form.Control
