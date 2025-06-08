@@ -50,9 +50,20 @@ api.interceptors.response.use(
     return response;
   },
   function (error) {
-    error = error.response.data;
-    console.log("RESPONSE ERROR", error);
-    return Promise.reject(error);
+    // 에러 응답이 있는 경우 해당 에러 메시지를 사용
+    if (error.response && error.response.data) {
+      const errorMessage = error.response.data.error || '요청 처리 중 오류가 발생했습니다.';
+      return Promise.reject({
+        message: errorMessage,
+        status: error.response.status,
+        data: error.response.data
+      });
+    }
+    // 네트워크 에러 등 응답이 없는 경우
+    return Promise.reject({
+      message: '서버와의 통신 중 오류가 발생했습니다.',
+      status: 500
+    });
   }
 );
 
