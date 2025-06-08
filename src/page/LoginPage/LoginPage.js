@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,7 @@ import { loginWithEmail, loginWithGoogle } from "../../features/user/userSlice";
 import { clearErrors } from "../../features/user/userSlice";
 import { loginWithToken } from "../../features/user/userSlice";
 import {setAuthToken} from "../../utils/api";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+// import { GoogleOAuthProvider } from "@react-oauth/google";
 import axios from "axios";
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
@@ -26,7 +26,7 @@ const Login = () => {
   const SOCIAL_LOGIN_URLS = {
     naver: "http://localhost:5000/auth/naver",
     kakao: "http://localhost:5000/auth/kakao",
-    google: "http://localhost:5000/auth/google/",
+    google: "http://localhost:5000/google/",
   };
 
   // useEffect(() => {
@@ -112,6 +112,7 @@ const Login = () => {
     }
   }, [loginError, dispatch]);
 
+
   const handleLoginWithEmail = (event) => {
     event.preventDefault();
     dispatch(loginWithEmail({ email, password }));
@@ -131,22 +132,27 @@ const Login = () => {
     window.location.href = SOCIAL_LOGIN_URLS.naver;
   }
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (response) => {
-      try {
-        const res = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: { Authorization: `Bearer ${response.access_token}` },
-          }
-        );
-        dispatch(loginWithGoogle(res.data));
-      } catch (error) {
-        console.error("Google login error:", error);
-      }
-    },
-    onError: () => console.log("Google Login Failed"),
-  });
+  useEffect(() => {
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        callback: handleGoogleLogin,
+        ux_mode: 'popup',            // 팝업 사용
+        use_fedcm_for_prompt: false  // FedCM 비활성화
+      });
+      
+    }
+  }, []);
+  
+  // 2. 버튼 클릭 핸들러 수정 (새로 추가)
+  const initiateGoogleLogin = () => {
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      window.google.accounts.id.prompt();
+    } else {
+      console.error("Google Identity API가 로드되지 않았습니다");
+    }
+  };
+
 
   useEffect(() => {
     if (user) {
@@ -221,8 +227,8 @@ const Login = () => {
 
             <button 
               className="btnSns google-login" 
-              onClick={() => googleLogin()}
               type="button"
+              onClick={initiateGoogleLogin}  // 여기만 수정
             >
               <span className="sns-icon">
                 <img src="/google_logo.png" alt="구글 로고" width="24" height="24" />
@@ -230,6 +236,7 @@ const Login = () => {
               <span className="divider" />
               <span className="text-label">구글로 로그인</span>
             </button>
+
           </div>
         </Container>
       </>
