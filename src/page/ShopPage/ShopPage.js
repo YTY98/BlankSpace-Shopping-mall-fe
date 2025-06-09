@@ -112,7 +112,6 @@ const ShopPage = () => {
       priceLowToHigh: ["price", "asc"],
       priceHighToLow: ["price", "desc"],
       latest: ["createdAt", "desc"],
-      sales: ["sales", "desc"],
     };
     setSortOrder(sortOptions[option] || ["createdAt", "desc"]);
   };
@@ -163,7 +162,6 @@ const ShopPage = () => {
               <Dropdown.Item onClick={() => handleSortChange("latest")}>신상품순</Dropdown.Item>
               <Dropdown.Item onClick={() => handleSortChange("priceLowToHigh")}>가격 낮은 순</Dropdown.Item>
               <Dropdown.Item onClick={() => handleSortChange("priceHighToLow")}>가격 높은 순</Dropdown.Item>
-              <Dropdown.Item onClick={() => handleSortChange("sales")}>판매량 순</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
           <SearchBox
