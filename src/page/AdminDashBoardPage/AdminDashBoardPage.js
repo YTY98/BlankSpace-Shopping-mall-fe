@@ -30,7 +30,7 @@ import {
 } from "chart.js";
 import { getProductList } from "../../features/product/productSlice";
 import { getAdminOrderList } from "../../features/order/orderSlice";
-import { getUserList, updateMembership } from "../../features/user/userSlice";
+import { getUserList, updateMembership, updateUserLevel } from "../../features/user/userSlice";
 import { getQnAList } from "../../features/qna/qnaSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -341,32 +341,19 @@ const AdminDashBoardPage = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/users/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ level: userToUpdate.level }), // 변경할 level 값 전송
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const updatedUser = data.user;
+      const resultAction = await dispatch(updateUserLevel({
+        userId,
+        level: userToUpdate.level
+      })).unwrap();
 
       setUserListState((prev) =>
-        prev.map((user) => (user._id === updatedUser._id ? updatedUser : user))
+        prev.map((user) => (user._id === resultAction._id ? resultAction : user))
       );
 
       alert("사용자 역할이 성공적으로 업데이트되었습니다.");
     } catch (error) {
       console.error("역할 업데이트 실패:", error.message);
-      alert("역할 업데이트 중 오류가 발생했습니다.");
+      alert(error.message || "역할 업데이트 중 오류가 발생했습니다.");
     }
   };
 
