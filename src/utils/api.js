@@ -8,16 +8,36 @@ const api = axios.create({
   baseURL: LOCAL_BACKEND,
   headers: {
     "Content-Type": "application/json",
-    authorization: `Bearer ${sessionStorage.getItem("token")}`,
+    authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
+
+export const setAuthToken = (token) => {
+  if (token) {
+    // 로컬 스토리지에 토큰 저장
+    localStorage.setItem("token", token);
+
+    // API 요청 헤더에 토큰 설정
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log("인증 토큰 설정됨:", token.substring(0, 15) + "...");
+  } else {
+    localStorage.removeItem("token");
+    delete api.defaults.headers.common['Authorization'];
+    console.log("인증 토큰 제거됨");
+  }
+};
+
 /**
  * console.log all requests and responses
  */
 api.interceptors.request.use(
   (request) => {
-    console.log("Starting Request", request);
-    request.headers.authorization = `Bearer ${sessionStorage.getItem("token")}`;
+    const token = localStorage.getItem("token");
+    // console.log("Starting Request", request);
+    // request.headers.authorization = `Bearer ${token}`;
+    if (token) {
+      request.headers.Authorization = `Bearer ${token}`;
+    }
     return request;
   },
   function (error) {
@@ -30,9 +50,20 @@ api.interceptors.response.use(
     return response;
   },
   function (error) {
-    error = error.response.data;
-    console.log("RESPONSE ERROR", error);
-    return Promise.reject(error);
+    // 에러 응답이 있는 경우 해당 에러 메시지를 사용
+    if (error.response && error.response.data) {
+      const errorMessage = error.response.data.error || '요청 처리 중 오류가 발생했습니다.';
+      return Promise.reject({
+        message: errorMessage,
+        status: error.response.status,
+        data: error.response.data
+      });
+    }
+    // 네트워크 에러 등 응답이 없는 경우
+    return Promise.reject({
+      message: '서버와의 통신 중 오류가 발생했습니다.',
+      status: 500
+    });
   }
 );
 

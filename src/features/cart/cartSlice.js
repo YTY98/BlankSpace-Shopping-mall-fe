@@ -17,22 +17,25 @@ export const addToCart = createAsyncThunk(
   async ({ id, size }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post("/cart", { size, productId: id, qty: 1 });
-      if (response.status !== 200) throw new Error(response.error);
-      dispatch(
-        showToastMessage({
-          message: "카트에 아이템이 추가됐습니다!",
-          status: "success",
-        })
-      );
-      return response.data.cartItemQty;
+      if (response.status >= 200 && response.status < 300) {
+        dispatch(
+          showToastMessage({
+            message: "카트에 아이템이 추가됐습니다!",
+            status: "success",
+          })
+        );
+        return response.data.cartItemQty;
+      }
+      throw new Error(response.error);
     } catch (error) {
+      const errorMessage = error.message || error.data?.error || "카트에 아이템 추가 실패";
       dispatch(
         showToastMessage({
-          message: "카트에 아이템 추가 실패",
+          message: errorMessage,
           status: "error",
         })
       );
-      return rejectWithValue(error.error);
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -69,11 +72,12 @@ export const deleteCartItem = createAsyncThunk(
 
 export const updateQty = createAsyncThunk(
   "cart/updateQty",
-  async ({ id, value }, { rejectWithValue }) => {
+  async ({ id, value }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.put(`/cart/${id}`, { qty: value });
       if (response.status !== 200) throw new Error(response.error);
-      // if (response.status !== 200) throw new Error(response.statusText || "An error occurred");
+      // 카트 목록을 다시 가져오기
+      dispatch(getCartList());
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error);
@@ -147,10 +151,13 @@ const cartSlice = createSlice({
 
         if (index !== -1) {
           state.cartList[index] = updatedItem;
+          // 개별 아이템의 총 가격 업데이트
+          state.cartList[index].totalPrice = updatedItem.productId.price * updatedItem.qty;
         } else {
           console.warn("해당하는 아이템을 찾을 수 없습니다:", updatedItem);
         }
 
+        // 전체 카트의 총 가격 업데이트
         state.totalPrice = state.cartList.reduce(
           (total, item) =>
             total + (item.productId ? item.productId.price * item.qty : 0),

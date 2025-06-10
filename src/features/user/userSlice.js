@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api, { setAuthToken } from "../../utils/api";
 import { showToastMessage } from "../common/uiSlice";
-import api from "../../utils/api";
 import { initialCart } from "../cart/cartSlice";
 
 // 회원 목록 가져오기 Thunk 액션
@@ -19,7 +19,7 @@ export const loginWithEmail = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await api.post("/auth/login", { email, password });
-      sessionStorage.setItem("token", response.data.token);
+      setAuthToken(response.data.token);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);
@@ -33,7 +33,7 @@ export const loginWithGoogle = createAsyncThunk(
   async (token, { rejectWithValue }) => {
     try {
       const response = await api.post("/auth/google", { token });
-      sessionStorage.setItem("token", response.data.token);
+      setAuthToken(response.data.token);
       return response.data.user;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);
@@ -58,7 +58,7 @@ export const loginWithToken = createAsyncThunk(
 export const logout = createAsyncThunk(
   "user/logout",
   async (_, { dispatch }) => {
-    sessionStorage.removeItem("token");
+    setAuthToken(null);
     dispatch(initialCart());
     dispatch(
       showToastMessage({
@@ -99,13 +99,11 @@ export const fetchUserInfo = createAsyncThunk(
   "user/fetchUserInfo",
   async (_, { rejectWithValue }) => {
     try {
-      const token = sessionStorage.getItem("token"); // 토큰 가져오기
+      const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token is missing");
 
-      const response = await api.get("/user/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.user; // API에서 반환된 사용자 데이터
+      const response = await api.get("/user/me");
+      return response.data.user;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);
     }
@@ -116,7 +114,7 @@ export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async ({ currentPassword }, { rejectWithValue }) => {
     try {
-      const token = sessionStorage.getItem("token");
+      const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token is missing");
 
       await api.delete("/user/delete", {
@@ -124,7 +122,7 @@ export const deleteUser = createAsyncThunk(
         data: { currentPassword },
       });
 
-      sessionStorage.removeItem("token"); // 토큰 삭제
+      setAuthToken(null);
       return null;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);
@@ -136,7 +134,7 @@ export const updateUserInfo = createAsyncThunk(
   "user/updateUserInfo",
   async ({ name, newPassword, currentPassword }, { rejectWithValue }) => {
     try {
-      const token = sessionStorage.getItem("token");
+      const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token is missing");
 
       const response = await api.put(
@@ -158,7 +156,7 @@ export const addToWishlist = createAsyncThunk(
   "user/addToWishlist",
   async ({ productId }, { getState, rejectWithValue }) => {
     try {
-      const token = sessionStorage.getItem("token");
+      const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token is missing");
 
       const userId = getState().user.user._id; // 현재 사용자 ID

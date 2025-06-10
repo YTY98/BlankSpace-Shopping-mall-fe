@@ -9,6 +9,7 @@ import {
   createProduct,
   editProduct,
 } from "../../../features/product/productSlice";
+import { WASH_METHODS } from "../../../constants/product.constants";
 
 const InitialFormData = {
   name: "",
@@ -68,6 +69,17 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     const totalStock = stock.reduce((total, item) => {
       return { ...total, [item[0]]: parseInt(item[1]) };
     }, {});
+
+    const selectedWashMethodObjects = WASH_METHODS.filter((method) =>
+      formData.washMethods.includes(method.value)
+    );
+
+    const finalData = {
+      ...formData,
+      stock: totalStock,
+      washMethods: selectedWashMethodObjects, // ✅ 변환된 객체 배열로 저장
+    };
+    
     if (mode === "new") {
       dispatch(createProduct({ ...formData, stock: totalStock }));
     } else {
@@ -292,24 +304,33 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
           </Form.Group>
         </Row>
 
-        {/* <Form.Group as={Col} controlId="washMethod">
-          <Form.Label>Wash Method</Form.Label>
-          <Form.Select
-            value={formData.washMethod}
-            onChange={handleChange}
-            required
-          >
-            <option value="" disabled hidden>
-              Please Choose...
-            </option>
-            {formData.WASH_METHODS.map((method, idx) => (
-              <option key={idx} value={method.value}>
-                {method.label}
-              </option>
+        <Form.Group className="mb-3" controlId="washMethods">
+          <Form.Label>세탁 방법</Form.Label>
+          <div className="d-flex flex-wrap gap-3">
+            {WASH_METHODS.map((method, idx) => (
+              <div key={idx} className="d-flex align-items-center">
+                <Form.Check
+                  type="checkbox"
+                  id={`wash-${method.value}`}
+                  value={method.value}
+                  checked={formData.washMethods.includes(method.value)}
+                  onChange={handleWashMethodChange}
+                  className="me-2"
+                />
+                <label htmlFor={`wash-${method.value}`} className="d-flex align-items-center">
+                  <img
+                    src={method.image}
+                    alt={method.label}
+                    width={32}
+                    height={32}
+                    style={{ objectFit: "contain", marginRight: "8px" }}
+                  />
+                  <span>{method.label}</span>
+                </label>
+              </div>
             ))}
-          </Form.Select>
-        </Form.Group> */}
-
+          </div>
+        </Form.Group>
 
         <Row className="mb-3">
           <Form.Group as={Col} controlId="height">

@@ -98,14 +98,15 @@ export const updateOrder = createAsyncThunk(
 // 판매량순 정렬 데이터 가져오기 Thunk
 export const getProductsSortedBySales = createAsyncThunk(
   "order/getProductsSortedBySales",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (category, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.get("/products-sorted-by-sales/"); // API 호출
-      if (response.status !== 200) throw new Error(response.error); // 상태 확인
-      console.log("work!");
-      return response.data; // 데이터 반환
+      const response = await api.get("/product/products-sorted-by-sales", { 
+        params: { category } 
+      });
+      if (response.status !== 200) throw new Error(response.error);
+      return response.data.data;
     } catch (error) {
-      dispatch(showToastMessage({ message: error.message, status: "error" })); // 에러 처리
+      dispatch(showToastMessage({ message: error.message, status: "error" }));
       return rejectWithValue(error.message);
     }
   }

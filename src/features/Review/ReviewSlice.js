@@ -1,6 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 
+//전체리뷰
+export const getAllReviews = createAsyncThunk(
+  "reviews/getAllReviews",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/reviews");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "전체 리뷰 불러오기 실패");
+    }
+  }
+);
 // 리뷰 목록 가져오기
 export const getReviews = createAsyncThunk(
   "reviews/getReviews",
@@ -8,7 +20,7 @@ export const getReviews = createAsyncThunk(
     try {
       const response = await api.get(`/reviews/${productId}`);
       console.log("response: ", response.data)
-      return response.data ; // 리뷰 데이터 반환, 없으면 빈 배열
+      return response.data ; 
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch reviews"
@@ -18,12 +30,14 @@ export const getReviews = createAsyncThunk(
 );
 
 // 리뷰 작성
+//확인용 콘솔
 export const createReview = createAsyncThunk(
-  "reviews/createReview",
+  "reviews/createNewReview",
   async (formData, { rejectWithValue }) => {
     try {
-      console.log("Sending review data:", formData); // 디버깅용 로그
-
+      
+      console.log("Sending review data:", formData); // 확인용
+      console.log("보낼 formData:", formData);
       const response = await api.post(`/reviews`, formData, {
         headers: {
           "Content-Type": "application/json", // JSON 형식 명시
@@ -33,11 +47,22 @@ export const createReview = createAsyncThunk(
       if (response.status !== 200 && response.status !== 201) {
         throw new Error("Failed to submit review");
       }
-
-      return response.data; // 작성된 리뷰 데이터 반환
+      console.log("보낼 formData:", formData);
     } catch (error) {
-      console.error("Error in createReview:", error.response?.data);
+      console.error("Error in createNewReview:", error.response?.data);
       return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const deleteReview = createAsyncThunk(
+  "reviews/deleteReview",
+  async (reviewId, { rejectWithValue }) => {
+    try {
+      await api.delete(`/reviews/${reviewId}`);
+      return reviewId;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "리뷰 삭제 실패");
     }
   }
 );
@@ -82,7 +107,29 @@ const reviewSlice = createSlice({
       .addCase(createReview.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      }) 
+      // 전체 리뷰 불러오기
+      .addCase(getAllReviews.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllReviews.fulfilled, (state, action) => {
+        state.loading = false;
+        state.reviews = action.payload;
+      })
+      .addCase(getAllReviews.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // 리뷰 삭제
+      .addCase(deleteReview.fulfilled, (state, action) => {
+        state.reviews = state.reviews.filter(r => r._id !== action.payload);
+      })
+      .addCase(deleteReview.rejected, (state, action) => {
+        state.error = action.payload;
       });
+
   },
 });
 

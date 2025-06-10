@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createReview } from "../../features/Review/ReviewSlice";
 import { Modal, Button } from "react-bootstrap";
+import CloudinaryUploadWidget from "../../utils/CloudinaryUploadWidget";
 
 import "./style/ReviewWritePage.style.css";
 
@@ -27,6 +28,9 @@ const ReviewWritePage = () => {
     setRating(star);
   };
 
+  const uploadImage = (url) => {
+    setImages((prev) => [...prev, url]);
+  };  
 
   const handleTextChange = (e) => {
     const text = e.target.value;
@@ -37,7 +41,6 @@ const ReviewWritePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
     // 주문 ID를 포함한 데이터 생성
     const formData = {
       productId,
@@ -45,6 +48,7 @@ const ReviewWritePage = () => {
       text: reviewText,
       name: user.name,
       orderId: state.orderId, // 주문 ID 추가
+      imageUrls: images, // 추가됨!
     };
   
     // 디버깅: 전송 데이터 확인
@@ -111,22 +115,16 @@ const ReviewWritePage = () => {
           </Button>
         </div>
 
-        {/* <div className="write-review-image-upload-section">
-          <label htmlFor="write-review-image-upload">이미지 업로드:</label>
-          <input
-            type="file"
-            id="write-review-image-upload"
-            accept="image/*"
-            multiple
-            onChange={handleImageChange}
-            className="write-review-image-upload-input"
-          />
+        <div className="write-review-image-upload-section">
+          <label>이미지 업로드:</label>
+          <CloudinaryUploadWidget uploadImage={uploadImage} />
+          <img id="uploadedimage" style={{ display: "none" }} alt="업로드된 이미지" /> {/* 추가 */}
           <div className="write-review-image-preview">
             {images.map((image, index) => (
               <img key={index} src={image} alt={`preview-${index}`} />
             ))}
           </div>
-        </div> */}
+        </div>
 
         <div className="write-review-submit-section">
           <button type="submit" className="write-review-btn-submit">
