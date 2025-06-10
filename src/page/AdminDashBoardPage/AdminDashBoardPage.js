@@ -30,7 +30,7 @@ import {
 } from "chart.js";
 import { getProductList } from "../../features/product/productSlice";
 import { getAdminOrderList } from "../../features/order/orderSlice";
-import { getUserList } from "../../features/user/userSlice";
+import { getUserList, updateMembership } from "../../features/user/userSlice";
 import { getQnAList } from "../../features/qna/qnaSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -379,32 +379,19 @@ const AdminDashBoardPage = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/users/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ membership : userToUpdate.membership }), // 변경할 level 값 전송
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const updatedUser = data.user;
+      const resultAction = await dispatch(updateMembership({
+        userId,
+        membership: userToUpdate.membership
+      })).unwrap();
 
       setUserListState((prev) =>
-        prev.map((user) => (user._id === updatedUser._id ? updatedUser : user))
+        prev.map((user) => (user._id === resultAction._id ? resultAction : user))
       );
 
-      alert("사용자 역할이 성공적으로 업데이트되었습니다.");
+      alert("멤버십 등급이 성공적으로 업데이트되었습니다.");
     } catch (error) {
-      console.error("역할 업데이트 실패:", error.message);
-      alert("역할 업데이트 중 오류가 발생했습니다.");
+      console.error("멤버십 업데이트 실패:", error.message);
+      alert(error.message || "멤버십 등급 업데이트 중 오류가 발생했습니다.");
     }
   };
 
@@ -1207,20 +1194,21 @@ const AdminDashBoardPage = () => {
       <Modal
         show={adminManagementModal}
         onHide={handleAdminManagementModalClose}
-        size="lg"
+        size="xl"
+        dialogClassName="modal-90w"
       >
         <Modal.Header closeButton>
           <Modal.Title>Admin 권한 관리</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <Table striped bordered hover>
+        <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <Table striped bordered hover responsive>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>이름</th>
-                <th>이메일</th>
-                <th>역할</th>
-                <th>작업</th>
+                <th style={{ width: '20%' }}>ID</th>
+                <th style={{ width: '20%' }}>이름</th>
+                <th style={{ width: '30%' }}>이메일</th>
+                <th style={{ width: '15%' }}>역할</th>
+                <th style={{ width: '15%' }}>작업</th>
               </tr>
             </thead>
             <tbody>
@@ -1231,10 +1219,11 @@ const AdminDashBoardPage = () => {
                   <td>{user.email}</td>
                   <td>
                     <select
+                      className="form-select"
                       value={user.level}
                       onChange={(e) =>
                         handleRoleSelect(user._id, e.target.value)
-                      } // 드롭다운 변경 시 상태 갱신
+                      }
                     >
                       <option value="admin">Admin</option>
                       <option value="customer">Customer</option>
@@ -1243,7 +1232,7 @@ const AdminDashBoardPage = () => {
                   <td>
                     <Button
                       variant="primary"
-                      onClick={() => handleRoleUpdate(user._id)} // 해당 사용자 업데이트
+                      onClick={() => handleRoleUpdate(user._id)}
                     >
                       확인
                     </Button>
@@ -1264,20 +1253,21 @@ const AdminDashBoardPage = () => {
       <Modal
         show={userManagementModal}
         onHide={handleUserManagementModalClose}
-        size="lg"
+        size="xl"
+        dialogClassName="modal-90w"
       >
         <Modal.Header closeButton>
           <Modal.Title>User 멤버십 권한 관리</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <Table striped bordered hover>
+        <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <Table striped bordered hover responsive>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>이름</th>
-                <th>이메일</th>
-                <th>역할</th>
-                <th>작업</th>
+                <th style={{ width: '20%' }}>ID</th>
+                <th style={{ width: '20%' }}>이름</th>
+                <th style={{ width: '30%' }}>이메일</th>
+                <th style={{ width: '15%' }}>멤버십</th>
+                <th style={{ width: '15%' }}>작업</th>
               </tr>
             </thead>
             <tbody>
@@ -1288,10 +1278,11 @@ const AdminDashBoardPage = () => {
                   <td>{user.email}</td>
                   <td>
                     <select
+                      className="form-select"
                       value={user.membership}
                       onChange={(e) =>
                         handleMembershipSelect(user._id, e.target.value)
-                      } // 드롭다운 변경 시 상태 갱신
+                      }
                     >
                       <option value="bronze">Bronze</option>
                       <option value="silver">Silver</option>
@@ -1303,7 +1294,7 @@ const AdminDashBoardPage = () => {
                   <td>
                     <Button
                       variant="primary"
-                      onClick={() => handleMembershipUpdate(user._id)} // 해당 사용자 업데이트
+                      onClick={() => handleMembershipUpdate(user._id)}
                     >
                       확인
                     </Button>
