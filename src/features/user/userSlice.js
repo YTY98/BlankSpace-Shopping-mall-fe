@@ -175,6 +175,50 @@ export const addToWishlist = createAsyncThunk(
   }
 );
 
+export const updateMembership = createAsyncThunk(
+  "user/updateMembership",
+  async ({ userId, membership }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Authentication token is missing");
+
+      const response = await api.put(
+        `/user/${userId}`,
+        { membership },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return response.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+  }
+);
+
+export const updateUserLevel = createAsyncThunk(
+  "user/updateUserLevel",
+  async ({ userId, level }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Authentication token is missing");
+
+      const response = await api.put(
+        `/user/${userId}`,
+        { level },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return response.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+  }
+);
+
 // Slice 생성
 const userSlice = createSlice({
   name: "user",
@@ -299,6 +343,40 @@ const userSlice = createSlice({
         state.user.wishlist = action.payload; // wishlist 업데이트
       })
       .addCase(addToWishlist.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateMembership.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMembership.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.user && state.user._id === action.payload._id) {
+          state.user = action.payload;
+        }
+        state.userList = state.userList.map(user =>
+          user._id === action.payload._id ? action.payload : user
+        );
+      })
+      .addCase(updateMembership.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUserLevel.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserLevel.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.user && state.user._id === action.payload._id) {
+          state.user = action.payload;
+        }
+        state.userList = state.userList.map(user =>
+          user._id === action.payload._id ? action.payload : user
+        );
+      })
+      .addCase(updateUserLevel.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
