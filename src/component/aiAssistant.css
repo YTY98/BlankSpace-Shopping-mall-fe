@@ -59,13 +59,62 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  resize: both;
   min-width: 350px;
   min-height: 400px;
   max-width: 90vw;
   max-height: 80vh;
   border: 1px solid rgba(0, 0, 0, 0.1);
   animation: slideUp 0.3s ease-out;
+  transition: none;
+}
+
+/* 드래그가 끝난 후 부드러운 트랜지션 */
+.ai-assistant-panel:not(.resizing) .ai-message-bubble,
+.ai-assistant-panel:not(.resizing) .ai-message-content {
+  transition: max-width 0.3s ease;
+}
+
+/* 커스텀 크기 조절 핸들 - 왼쪽 위 */
+.ai-resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  cursor: nw-resize;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 20px 0 0 0;
+  transition: background 0.2s ease;
+}
+
+.ai-resize-handle:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.ai-resize-icon {
+  color: rgba(102, 126, 234, 0.6);
+  font-size: 14px;
+  font-weight: bold;
+  transform: rotate(-45deg);
+  user-select: none;
+  line-height: 1;
+}
+
+.ai-resize-handle:hover .ai-resize-icon {
+  color: rgba(102, 126, 234, 1);
+}
+
+/* 드래그 중 커서 스타일 */
+body.resizing {
+  cursor: nw-resize !important;
+}
+
+body.resizing * {
+  cursor: nw-resize !important;
 }
 
 @keyframes slideUp {
@@ -142,6 +191,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  min-width: 0;
 }
 
 /* 커스텀 스크롤바 */
@@ -195,7 +245,7 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  max-width: 280px;
+  max-width: 85%;
 }
 
 .ai-suggestions button {
@@ -221,6 +271,7 @@
   gap: 12px;
   max-width: 100%;
   animation: fadeInUp 0.3s ease-out;
+  width: 100%;
 }
 
 @keyframes fadeInUp {
@@ -257,6 +308,7 @@
 .ai-message-content {
   flex: 1;
   min-width: 0;
+  max-width: calc(100% - 48px);
 }
 
 .ai-message-role {
@@ -276,7 +328,7 @@
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
-  max-width: 280px;
+  max-width: 85%;
 }
 
 .ai-message.user .ai-message-bubble {
@@ -596,35 +648,111 @@
 
 .ai-mic-button,
 .ai-clear-button {
-  padding: 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  background: white;
+  background: #667eea;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s ease;
-  width: 44px;
-  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+/* TTS 토글 버튼 스타일 */
+.ai-tts-toggle-button {
+  background: #667eea;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.ai-tts-toggle-button.enabled {
+  background: #34c759; /* 활성화 시 초록색 */
+}
+
+.ai-tts-toggle-button.disabled {
+  background: #ff3b30; /* 비활성화 시 빨간색 */
+}
+
+.ai-tts-toggle-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.ai-tts-toggle-button.enabled:hover:not(:disabled) {
+  background: #30d158; /* 활성화 상태 호버 */
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+}
+
+.ai-tts-toggle-button.disabled:hover:not(:disabled) {
+  background: #ff453a; /* 비활성화 상태 호버 */
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+}
+
+/* TTS 중지 버튼 스타일 */
+.ai-tts-stop-button {
+  background: #ff9500;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  animation: pulse-orange 1.5s infinite;
+}
+
+.ai-tts-stop-button:hover:not(:disabled) {
+  background: #ffb143;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+}
+
+@keyframes pulse-orange {
+  0%, 100% { 
+    opacity: 1; 
+    box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.7);
+  }
+  50% { 
+    opacity: 0.8; 
+    box-shadow: 0 0 0 10px rgba(255, 149, 0, 0);
+  }
 }
 
 .ai-mic-button:hover:not(:disabled),
 .ai-clear-button:hover:not(:disabled) {
-  border-color: #667eea;
-  background: #f8faff;
-  transform: translateY(-1px);
+  background: #5a52d5;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .ai-mic-button:disabled,
-.ai-clear-button:disabled {
+.ai-clear-button:disabled,
+.ai-tts-toggle-button:disabled,
+.ai-tts-stop-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .ai-mic-button.listening {
   background: #ef4444;
-  border-color: #ef4444;
   color: white;
   animation: pulse 1.5s infinite;
 }
@@ -643,17 +771,17 @@
     max-width: none;
     height: 70vh;
   }
-
+  
   .ai-floating-button {
     right: 20px;
     bottom: 20px;
     width: 50px;
     height: 50px;
     font-size: 20px;
-  }
+}
 
   .ai-message-bubble {
-    max-width: 240px;
+    max-width: 90%;
   }
 }
 
@@ -679,7 +807,7 @@
   }
 
   .ai-message-bubble {
-    max-width: 200px;
+    max-width: 95%;
   }
 
   .ai-suggestions {
