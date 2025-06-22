@@ -56,7 +56,14 @@ const ProductDetail = () => {
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
 
   const [showTryOn, setShowTryOn] = useState(false);
-  const apiKey = process.env.REACT_APP_FASHN_API_KEY;
+  const apiKey = process.env.REACT_APP_FASHN_API_KEY || "demo_key_for_testing";
+
+  // API 키 상태 확인을 위한 디버깅
+  useEffect(() => {
+    if (!process.env.REACT_APP_FASHN_API_KEY) {
+      console.warn("⚠️ REACT_APP_FASHN_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.");
+    }
+  }, []);
 
   const getRatingCounts = () => {
     const counts = [0, 0, 0, 0, 0]; // 별점별 카운트 초기화

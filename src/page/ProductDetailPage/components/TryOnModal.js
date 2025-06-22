@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Spinner, Form, Row, Col, Carousel } from "react-bootstrap";
 import axios from "axios";
 
@@ -10,16 +10,60 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
   const [selectedClothImage, setSelectedClothImage] = useState(clothImageUrl);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // 모델 이미지 URL이 변경될 때 결과 초기화
+  useEffect(() => {
+    setResultImage(null);
+    setError("");
+  }, [modelImageUrl]);
+
+  // 모달이 열릴 때 상태 초기화
+  useEffect(() => {
+    if (show) {
+      setModelImageUrl("");
+      setResultImage(null);
+      setError("");
+      setSelectedClothImage(clothImageUrl);
+      setActiveIndex(0);
+    }
+  }, [show, clothImageUrl]);
+
   const handleSelect = (selectedIndex) => {
     setActiveIndex(selectedIndex);
     setSelectedClothImage(selectedIndex === 0 ? clothImageUrl : clothImageUrl2);
+    
+    // 새로운 의류를 선택할 때 이전 결과와 오류 초기화
+    setResultImage(null);
+    setError("");
   };
 
   const handleTryOn = async () => {
     setLoading(true);
     setError("");
     setResultImage(null);
+    
+    // API 키 검증
+    if (!apiKey) {
+      setError("API 키가 설정되지 않았습니다. 관리자에게 문의하세요.");
+      setLoading(false);
+      return;
+    }
+
+    // 입력값 검증
+    if (!modelImageUrl.trim()) {
+      setError("모델 이미지 URL을 입력해주세요.");
+      setLoading(false);
+      return;
+    }
+
+    if (!selectedClothImage) {
+      setError("의류 이미지를 선택해주세요.");
+      setLoading(false);
+      return;
+    }
+
     try {
+      console.log("API 호출 시작:", { modelImageUrl, selectedClothImage });
+      
       const runRes = await axios.post(
         "https://api.fashn.ai/v1/run",
         {
@@ -37,38 +81,76 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
           },
         }
       );
+      
+      console.log("API 응답:", runRes.data);
       const predictionId = runRes.data.id;
 
       let status = "starting";
       let outputUrl = null;
       let pollCount = 0;
+      
       while (
         status !== "completed" &&
         status !== "failed" &&
         pollCount < 20
       ) {
         await new Promise((res) => setTimeout(res, 2000));
-        const statusRes = await axios.get(
-          `https://api.fashn.ai/v1/status/${predictionId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-            },
+        
+        try {
+          const statusRes = await axios.get(
+            `https://api.fashn.ai/v1/status/${predictionId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${apiKey}`,
+              },
+            }
+          );
+          
+          console.log("상태 확인:", statusRes.data);
+          status = statusRes.data.status;
+          
+          if (status === "completed") {
+            outputUrl = statusRes.data.output?.[0];
           }
-        );
-        status = statusRes.data.status;
-        if (status === "completed") {
-          outputUrl = statusRes.data.output?.[0];
+        } catch (statusError) {
+          console.error("상태 확인 오류:", statusError);
+          setError("처리 상태를 확인하는 중 오류가 발생했습니다.");
+          setLoading(false);
+          return;
         }
+        
         pollCount++;
       }
+      
       if (status === "completed" && outputUrl) {
         setResultImage(outputUrl);
+        console.log("가상 시착 완료:", outputUrl);
+      } else if (status === "failed") {
+        setError("AI 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
       } else {
-        setError("가상 시착 결과를 가져오지 못했습니다.");
+        setError("처리 시간이 초과되었습니다. 다시 시도해주세요.");
       }
     } catch (err) {
-      setError("API 호출에 실패했습니다.");
+      console.error("API 호출 오류:", err);
+      
+      if (err.response) {
+        // 서버 응답이 있는 경우
+        if (err.response.status === 401) {
+          setError("API 키가 유효하지 않습니다. 관리자에게 문의하세요.");
+        } else if (err.response.status === 400) {
+          setError("잘못된 요청입니다. 이미지 URL을 확인해주세요.");
+        } else if (err.response.status === 429) {
+          setError("요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.");
+        } else {
+          setError(`API 오류 (${err.response.status}): ${err.response.data?.message || '알 수 없는 오류'}`);
+        }
+      } else if (err.request) {
+        // 요청은 보냈지만 응답이 없는 경우
+        setError("서버에 연결할 수 없습니다. 인터넷 연결을 확인해주세요.");
+      } else {
+        // 요청 설정 중 오류
+        setError("요청을 보내는 중 오류가 발생했습니다.");
+      }
     } finally {
       setLoading(false);
     }
@@ -177,7 +259,12 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
             type="text"
             placeholder="모델 이미지의 URL을 입력하세요"
             value={modelImageUrl}
-            onChange={e => setModelImageUrl(e.target.value)}
+            onChange={(e) => {
+              setModelImageUrl(e.target.value);
+              // URL 입력 시 이전 결과 초기화
+              setResultImage(null);
+              setError("");
+            }}
           />
           {modelImageUrl && (
             <div className="mt-2">
