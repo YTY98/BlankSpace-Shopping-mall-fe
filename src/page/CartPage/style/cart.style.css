@@ -42,3 +42,22 @@
     background-color: white;
     padding: 20px;
 }
+
+/* 가상 시착 버튼 스타일 */
+.try-on-btn {
+    transition: all 0.3s ease;
+}
+
+.try-on-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.try-on-all-btn {
+    transition: all 0.3s ease;
+}
+
+.try-on-all-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

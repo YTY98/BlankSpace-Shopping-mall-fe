@@ -1,11 +1,11 @@
 import React from "react";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Row, Col, Form } from "react-bootstrap";
+import { faTrash, faTshirt } from "@fortawesome/free-solid-svg-icons";
+import { Row, Col, Form, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useDispatch } from "react-redux";
 import { currencyFormat } from "../../../utils/number";
 import { updateQty, deleteCartItem } from "../../../features/cart/cartSlice";
-const CartProductCard = ({ item }) => {
+const CartProductCard = ({ item, onTryOnClick }) => {
   const dispatch = useDispatch();
 
   const handleQtyChange = (id, value) => {
@@ -14,6 +14,12 @@ const CartProductCard = ({ item }) => {
 
   const deleteCart = (id) => {
     dispatch(deleteCartItem(id));
+  };
+
+  const handleTryOnClick = () => {
+    if (onTryOnClick) {
+      onTryOnClick();
+    }
   };
 
   return (
@@ -60,6 +66,17 @@ const CartProductCard = ({ item }) => {
               <option value={9}>9</option>
               <option value={10}>10</option>
             </Form.Select>
+          </div>
+          <div className="mt-2">
+            <Button 
+              variant="outline-primary" 
+              size="sm"
+              onClick={handleTryOnClick}
+              className="try-on-btn"
+            >
+              <FontAwesomeIcon icon={faTshirt} className="me-1" />
+              가상 시착
+            </Button>
           </div>
         </Col>
       </Row>
