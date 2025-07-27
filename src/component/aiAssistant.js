@@ -12,6 +12,7 @@ const CLEAR_HISTORY_API_URL = `${API_BASE_URL}/clear-history`;
 const STT_API_URL = `${API_BASE_URL}/stt`;
 const TTS_API_URL = `${API_BASE_URL}/tts`;
 const TTS_STATUS_API_URL = `${API_BASE_URL}/tts-status`;
+const TTS_TOGGLE_API_URL = `${API_BASE_URL}/tts-toggle`;
 
 const AiAssistant = () => {
   // --- 상태 및 Ref 선언 ---
@@ -23,8 +24,9 @@ const AiAssistant = () => {
   const [error, setError] = useState(null);
   const [currentPageInfo, setCurrentPageInfo] = useState(null);
   const [ttsAvailable, setTtsAvailable] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
   const [textInput, setTextInput] = useState('');
-
+  
   const sessionIdRef = useRef(`session_${Date.now()}`);
   const conversationContainerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -33,6 +35,11 @@ const AiAssistant = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const panelRef = useRef(null);
+
+  // 크기 조절을 위한 상태 추가
+  const [panelSize, setPanelSize] = useState({ width: 420, height: 600 });
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeStartRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
   // --- useEffect Hooks ---
 
@@ -44,13 +51,16 @@ const AiAssistant = () => {
         if (response.ok) {
           const data = await response.json();
           setTtsAvailable(data.available && data.korean_supported);
-          if (!data.korean_supported && data.available) {
-            console.log('TTS는 사용 가능하지만 한국어를 지원하지 않습니다.');
+          setTtsEnabled(data.enabled || false);
+          console.log('TTS 상태:', data);
+          if (data.available && data.korean_supported) {
+            console.log(`한국어 TTS가 지원됩니다! 현재 상태: ${data.enabled ? '활성화' : '비활성화'}`);
           }
         }
       } catch (err) {
         console.error('TTS 상태 확인 실패:', err);
         setTtsAvailable(false);
+        setTtsEnabled(false);
       }
     };
     checkTTSStatus();
@@ -108,12 +118,66 @@ const AiAssistant = () => {
     } else if (path.match(/\/mypage/)) {
       pageInfo = { type: 'mypage', path };
     }
-
+    
     console.log('페이지 컨텍스트 정보:', pageInfo);
     setCurrentPageInfo(pageInfo);
   }, [location]);
 
   // --- 핵심 로직 함수 ---
+
+  // 크기 조절 시작
+  const handleResizeStart = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    resizeStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width: panelSize.width,
+      height: panelSize.height
+    };
+  };
+
+  // 크기 조절 중
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+
+      const deltaX = resizeStartRef.current.x - e.clientX;
+      const deltaY = resizeStartRef.current.y - e.clientY;
+      
+      const newWidth = Math.max(350, Math.min(window.innerWidth * 0.9, resizeStartRef.current.width + deltaX));
+      const newHeight = Math.max(400, Math.min(window.innerHeight * 0.8, resizeStartRef.current.height + deltaY));
+      
+      setPanelSize({ width: newWidth, height: newHeight });
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      // 드래그 중 텍스트 선택 방지
+      document.body.style.userSelect = 'none';
+      document.body.classList.add('resizing');
+      // 패널에도 resizing 클래스 추가
+      if (panelRef.current) {
+        panelRef.current.classList.add('resizing');
+      }
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = '';
+      document.body.classList.remove('resizing');
+      // 패널에서도 resizing 클래스 제거
+      if (panelRef.current) {
+        panelRef.current.classList.remove('resizing');
+      }
+    };
+  }, [isResizing]);
 
   // TTS 음성 중지 함수
   const stopTTS = () => {
@@ -123,13 +187,58 @@ const AiAssistant = () => {
     }
     setIsSpeaking(false);
   };
+  
+  // TTS 켜기/끄기 토글 함수
+  const toggleTTS = async () => {
+    try {
+      const newState = !ttsEnabled;
+      const response = await fetch(TTS_TOGGLE_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: newState }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTtsEnabled(data.enabled);
+        console.log(`TTS 상태 변경: ${data.enabled ? '활성화' : '비활성화'}`);
+        
+        // TTS가 비활성화되면 현재 재생 중인 음성 중지
+        if (!data.enabled && isSpeaking) {
+          stopTTS();
+        }
+      } else {
+        console.error('TTS 토글 실패');
+      }
+    } catch (err) {
+      console.error('TTS 토글 오류:', err);
+    }
+  };
 
   // 텍스트를 음성으로 변환하고 재생
   const playTTS = async (text) => {
-    if (!text || isSpeaking || !ttsAvailable) return;
+    console.log('🔊 TTS 호출 - 조건 체크:', {
+      text: !!text,
+      textLength: text?.length,
+      isSpeaking,
+      ttsAvailable,
+      ttsEnabled
+    });
+    
+    if (!text || isSpeaking || !ttsAvailable || !ttsEnabled) {
+      console.log('❌ TTS 건너뜀:', {
+        noText: !text,
+        alreadySpeaking: isSpeaking,
+        notAvailable: !ttsAvailable,
+        notEnabled: !ttsEnabled
+      });
+      return;
+    }
+    
     setIsSpeaking(true);
     setError(null);
     try {
+      console.log(`🔊 TTS 요청 전송: "${text.substring(0, 50)}..."`);
       const response = await fetch(TTS_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,36 +247,57 @@ const AiAssistant = () => {
 
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
+        // JSON 응답인 경우 (오류 또는 비활성화 메시지)
         const data = await response.json();
-        if (data.error) {
-          console.log('TTS 미지원:', data.message);
+        console.log('TTS JSON 응답:', data);
+        if (data.enabled === false) {
+          console.log('TTS가 비활성화되어 있습니다.');
+        }
+        setIsSpeaking(false);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(`TTS 요청 실패: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      console.log(`✅ TTS 응답 받음: ${audioBlob.size} bytes`);
+      
+      if (audioBlob.size === 0) {
+        console.warn('❌ 빈 오디오 데이터');
+        setIsSpeaking(false);
+        return;
+      }
+
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.onended = () => {
           setIsSpeaking(false);
-          return;
+          URL.revokeObjectURL(audioUrl);
+          console.log('🎵 TTS 재생 완료');
+        };
+        audioRef.current.onerror = (e) => {
+          console.error('TTS 재생 오류:', e);
+          setIsSpeaking(false);
+          URL.revokeObjectURL(audioUrl);
+        };
+        
+        try {
+          await audioRef.current.play();
+          console.log('🎵 TTS 재생 시작');
+        } catch (playError) {
+          console.error('TTS 재생 시작 오류:', playError);
+          setIsSpeaking(false);
+          URL.revokeObjectURL(audioUrl);
         }
       }
 
-      if (!response.ok) throw new Error('TTS 음성 생성에 실패했습니다.');
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-
-      stopTTS();
-
-      const newAudio = new Audio(audioUrl);
-      audioRef.current = newAudio;
-      newAudio.play();
-
-      newAudio.onended = () => {
-        setIsSpeaking(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-      newAudio.onerror = () => {
-        console.log('음성 재생 실패 - 한국어 TTS가 지원되지 않을 수 있습니다.');
-        setIsSpeaking(false);
-        URL.revokeObjectURL(audioUrl);
-      };
     } catch (err) {
-      console.error('TTS 처리 오류:', err);
+      console.error('❌ TTS 처리 오류:', err);
+      setError(`음성 변환 실패: ${err.message}`);
       setIsSpeaking(false);
     }
   };
@@ -215,11 +345,11 @@ const AiAssistant = () => {
       }
       
       setConversation(prev => [...prev, { role: 'assistant', text: data.message }]);
-
+      
       if (data.message) {
         await playTTS(data.message);
       }
-
+      
       if (data.action) {
         handleAction(data.action);
       }
@@ -233,7 +363,7 @@ const AiAssistant = () => {
       setIsProcessing(false);
     }
   };
-
+  
   // 음성 녹음 시작
   const startRecording = async () => {
     stopTTS();
@@ -253,16 +383,33 @@ const AiAssistant = () => {
         
         const formData = new FormData();
         formData.append('audio', audioBlob, 'voice.webm');
+        
+        console.log('STT FormData 생성:', {
+          audioSize: audioBlob.size,
+          audioType: audioBlob.type,
+          formDataEntries: [...formData.entries()]
+        });
 
         try {
-          const sttResponse = await fetch(STT_API_URL, { method: 'POST', body: formData });
-          if (!sttResponse.ok) throw new Error('음성 인식에 실패했습니다.');
-          
+        const sttResponse = await fetch(STT_API_URL, { 
+          method: 'POST', 
+          body: formData 
+        });
+        
+        console.log('STT 응답 상태:', sttResponse.status);
+        console.log('STT 응답 헤더:', Object.fromEntries(sttResponse.headers));
+        
+        if (!sttResponse.ok) {
+          const errorText = await sttResponse.text();
+          console.error('STT 오류 응답:', errorText);
+          throw new Error('음성 인식에 실패했습니다.');
+        }
+        
           const { transcribedText } = await sttResponse.json();
-          if (transcribedText) {
-            await sendMessage(transcribedText);
-          } else {
-            setConversation(prev => [...prev, { role: 'assistant', text: "음성을 인식하지 못했습니다." }]);
+        if (transcribedText) {
+          await sendMessage(transcribedText);
+        } else {
+           setConversation(prev => [...prev, { role: 'assistant', text: "음성을 인식하지 못했습니다." }]);
           }
         } catch (err) {
           console.error('STT 처리 오류:', err);
@@ -340,7 +487,7 @@ const AiAssistant = () => {
     const lines = textContent.split('\n');
     console.log('Number of lines:', lines.length);
     console.log('First 5 lines:', lines.slice(0, 5));
-    
+
     // 테스트: 간단한 마크다운으로 테스트
     const testMarkdown = "## 테스트\n\n**볼드 텍스트** 일반 텍스트\n\n1. 첫 번째\n2. 두 번째";
     console.log('Test markdown render:');
@@ -447,12 +594,12 @@ const AiAssistant = () => {
         </ReactMarkdown>
         
         {/* 디버깅용 - 원본 텍스트 표시 (숨김) */}
-        <details style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
+        {/*<details style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
           <summary>디버그: 원본 텍스트</summary>
           <pre style={{ whiteSpace: 'pre-wrap', background: '#f0f0f0', padding: '10px' }}>
             {textContent}
           </pre>
-        </details>
+        </details>*/}
       </div>
     );
   };
@@ -466,11 +613,23 @@ const AiAssistant = () => {
         aria-label="AI 어시스턴트 열기/닫기"
       >
         💬
-      </button>
+        </button>
 
       {/* AI 어시스턴트 패널 */}
       {isPanelOpen && (
-        <div className="ai-assistant-panel" ref={panelRef}>
+        <div 
+          className="ai-assistant-panel" 
+          ref={panelRef}
+          style={{ width: `${panelSize.width}px`, height: `${panelSize.height}px` }}
+        >
+          {/* 크기 조절 핸들 - 왼쪽 위 */}
+          <div 
+            className="ai-resize-handle"
+            onMouseDown={handleResizeStart}
+          >
+            <div className="ai-resize-icon">⋮⋮</div>
+          </div>
+
           {/* 헤더 */}
           <div className="ai-assistant-header">
             <h3>✨ Blanky AI 어시스턴트</h3>
@@ -563,6 +722,31 @@ const AiAssistant = () => {
 
             {/* 버튼 그룹 */}
             <div className="ai-button-group">
+              {/* TTS 토글 버튼 */}
+              {ttsAvailable && (
+                <button
+                  className={`ai-tts-toggle-button ${ttsEnabled ? 'enabled' : 'disabled'}`}
+                  onClick={toggleTTS}
+                  disabled={isProcessing}
+                  aria-label={`TTS ${ttsEnabled ? '끄기' : '켜기'}`}
+                  title={`TTS ${ttsEnabled ? '끄기' : '켜기'}`}
+                >
+                  {ttsEnabled ? '🔊' : '🔇'}
+                </button>
+              )}
+
+              {/* TTS 중지 버튼 (재생 중일 때만 표시) */}
+              {isSpeaking && (
+                <button
+                  className="ai-tts-stop-button"
+                  onClick={stopTTS}
+                  aria-label="음성 중지"
+                  title="음성 중지"
+                >
+                  ⏹️
+                </button>
+              )}
+
               {/* 음성 녹음 버튼 */}
               <button
                 className={`ai-mic-button ${isListening ? 'listening' : ''}`}
