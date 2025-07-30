@@ -1,63 +1,157 @@
 .product-card-cart{
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
+
+.product-card-cart:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #d0d0d0;
+}
+
 .qty-dropdown{
-    max-width:400px;
+    max-width: 400px;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease;
 }
+
+.qty-dropdown:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
 .trash-button{
-    background-color: white;
-    border: 1px solid gray;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 6px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    color: #000000;
 }
-.product-card-cart{
-    background-color: ghostwhite;
-    padding:10px;
+
+.trash-button:hover {
+    background-color: #000000;
+    color: #ffffff;
+    transform: scale(1.05);
 }
+
+.trash-button:active {
+    transform: scale(0.95);
+}
+
 .receipt-container{
-    border: 1px solid gray;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
     padding: 32px 24px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .receipt-list{
     list-style-type: none;
     padding: 0;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #dee2e6;
 }
 
 .receipt-list li{
     padding-bottom: 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.receipt-list li:last-child {
+    border-bottom: none;
 }
 
 .receipt-title{
     margin-bottom: 20px;
+    color: #495057;
+    font-weight: 600;
 }
 
 .payment-button{
    width: 100%;
    padding: 16px;
    margin-bottom: 20px;
+   border-radius: 8px;
+   font-weight: 600;
+   transition: all 0.3s ease;
 }
+
+.payment-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .text-align-center{
     text-align: center;
 }
+
 .empty-bag{
-    background-color: white;
-    padding: 20px;
+    background-color: #ffffff;
+    padding: 40px 20px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* 가상 시착 버튼 스타일 */
 .try-on-btn {
     transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .try-on-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
 .try-on-all-btn {
     transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .try-on-all-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* 카드 내부 요소들의 간격 조정 */
+.product-card-cart h3 {
+    margin-bottom: 12px;
+    color: #212529;
+    font-weight: 600;
+}
+
+.product-card-cart strong {
+    color: #007bff;
+    font-size: 1.1em;
+}
+
+.product-card-cart div {
+    margin-bottom: 8px;
+    color: #6c757d;
+}
+
+/* 반응형 디자인 개선 */
+@media (max-width: 768px) {
+    .product-card-cart {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .product-card-cart:hover {
+        transform: translateY(-2px) scale(1.01);
+    }
 }

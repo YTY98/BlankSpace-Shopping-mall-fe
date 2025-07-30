@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { faTrash, faTshirt } from "@fortawesome/free-solid-svg-icons";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CartProductCard from "./component/CartProductCard";
 import CartTryOnModal from "./component/CartTryOnModal";
 import TryOnModal from "../ProductDetailPage/components/TryOnModal";
@@ -44,6 +46,9 @@ const CartPage = () => {
                   onClick={handleCartTryOnClick}
                   className="try-on-all-btn"
                 >
+                  {typeof FontAwesomeIcon !== 'undefined' && (
+                    <FontAwesomeIcon icon={faTshirt} className="me-1" />
+                  )}
                   전체 가상 시착
                 </Button>
               </div>

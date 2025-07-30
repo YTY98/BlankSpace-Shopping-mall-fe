@@ -23,11 +23,15 @@ const ProductTable = ({ header, data, deleteItem, openEditForm }) => {
                 <th style={{ minWidth: "100px" }}>{item.name}</th>
                 <th>{currencyFormat(item.price)}</th>
                 <th>
-                  {Object.keys(item.stock).map((size, index) => (
-                    <div key={index}>
-                      {size}:{item.stock[size]}
-                    </div>
-                  ))}
+                  {item.stock && typeof item.stock === 'object' ? (
+                    Object.keys(item.stock).map((size, index) => (
+                      <div key={index}>
+                        {size}: {item.stock[size]}
+                      </div>
+                    ))
+                  ) : (
+                    <span className="text-muted">재고 정보 없음</span>
+                  )}
                 </th>
                 <th>
                   <img src={item.image[0]} width={100} alt="image" />

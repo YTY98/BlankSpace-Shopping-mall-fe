@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Spinner, Form, Row, Col, Card, Badge, Carousel } from "react-bootstrap";
 import axios from "axios";
+import CloudinaryUploadWidget from "../../../utils/CloudinaryUploadWidget";
 
 const CartTryOnModal = ({ show, onClose, cartItems, apiKey }) => {
   const [modelImageUrl, setModelImageUrl] = useState("");
@@ -14,6 +15,7 @@ const CartTryOnModal = ({ show, onClose, cartItems, apiKey }) => {
   const [processingStep, setProcessingStep] = useState(""); // "top", "bottom", "complete"
   const [topPageIndex, setTopPageIndex] = useState(0);
   const [bottomPageIndex, setBottomPageIndex] = useState(0);
+  const [uploadedModelImages, setUploadedModelImages] = useState([]);
 
   // 상의와 하의 분류
   const tops = cartItems.filter(item => {
@@ -77,6 +79,7 @@ const CartTryOnModal = ({ show, onClose, cartItems, apiKey }) => {
       setTopPageIndex(0);
       setBottomPageIndex(0);
       setProcessingStep("");
+      setUploadedModelImages([]);
     }
   }, [show]);
 
@@ -86,6 +89,28 @@ const CartTryOnModal = ({ show, onClose, cartItems, apiKey }) => {
     setError("");
     setProcessingStep("");
   }, [modelImageUrl]);
+
+  // 이미지 업로드 핸들러
+  const handleModelImageUpload = (url) => {
+    setUploadedModelImages(prev => [...prev, url]);
+    setModelImageUrl(url);
+    setResultImage(null);
+    setError("");
+    setProcessingStep("");
+  };
+
+  // 이미지 삭제 핸들러
+  const handleImageDelete = (urlToDelete) => {
+    setUploadedModelImages(prev => prev.filter(url => url !== urlToDelete));
+    
+    // 삭제된 이미지가 현재 선택된 이미지였다면 선택 해제
+    if (modelImageUrl === urlToDelete) {
+      setModelImageUrl("");
+      setResultImage(null);
+      setError("");
+      setProcessingStep("");
+    }
+  };
 
   const handleTopSelect = (item) => {
     setSelectedTop(item);
@@ -215,7 +240,7 @@ const CartTryOnModal = ({ show, onClose, cartItems, apiKey }) => {
 
     // 입력값 검증
     if (!modelImageUrl.trim()) {
-      setError("모델 이미지 URL을 입력해주세요.");
+      setError("모델 이미지를 업로드하거나 URL을 입력해주세요.");
       setLoading(false);
       return;
     }
@@ -457,29 +482,94 @@ const CartTryOnModal = ({ show, onClose, cartItems, apiKey }) => {
             .product-selection-container.no-pagination {
               gap: 0;
             }
+            
+            /* 이미지 업로드 스타일 */
+            .uploaded-images {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 10px;
+              margin-top: 10px;
+            }
+            .uploaded-image {
+              width: 80px;
+              height: 80px;
+              object-fit: cover;
+              border-radius: 8px;
+              cursor: pointer;
+              border: 2px solid transparent;
+              transition: border-color 0.3s ease;
+            }
+            .uploaded-image.selected {
+              border-color: #007bff;
+            }
+            .image-upload-section {
+              margin-bottom: 20px;
+            }
+            .upload-instructions {
+              font-size: 0.9em;
+              color: #6c757d;
+              margin-bottom: 10px;
+            }
+            .uploaded-image-container {
+              position: relative;
+              display: inline-block;
+            }
+            .delete-image-btn {
+              position: absolute;
+              top: -5px;
+              right: -5px;
+              background-color: #dc3545;
+              color: white;
+              border: none;
+              border-radius: 50%;
+              width: 20px;
+              height: 20px;
+              font-size: 14px;
+              cursor: pointer;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 10;
+              opacity: 0.7;
+              transition: opacity 0.3s ease;
+            }
+            .uploaded-image-container:hover .delete-image-btn {
+              opacity: 1;
+            }
           `}
         </style>
 
-        {/* 모델 이미지 URL 입력 */}
+        {/* 모델 이미지 업로드 */}
         <div className="model-url-section">
-          <Form.Group>
-            <Form.Label><strong>모델 이미지 URL</strong></Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="모델 이미지의 URL을 입력하세요"
-              value={modelImageUrl}
-              onChange={(e) => setModelImageUrl(e.target.value)}
-            />
-            {modelImageUrl && (
-              <div className="mt-2">
-                <img 
-                  src={modelImageUrl} 
-                  alt="Model Preview" 
-                  style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px' }} 
-                />
-              </div>
-            )}
-          </Form.Group>
+          <Form.Label><strong>모델 이미지 업로드</strong></Form.Label>
+          
+          {/* 이미지 업로드 위젯 */}
+          <CloudinaryUploadWidget uploadImage={handleModelImageUpload} />
+          
+          {/* 업로드된 이미지 미리보기 */}
+          {uploadedModelImages.length > 0 && (
+            <div className="uploaded-images">
+              {uploadedModelImages.map((url, index) => (
+                <div key={index} className="uploaded-image-container">
+                  <img
+                    src={url}
+                    alt={`Uploaded ${index + 1}`}
+                    className={`uploaded-image ${modelImageUrl === url ? 'selected' : ''}`}
+                    onClick={() => setModelImageUrl(url)}
+                  />
+                  <button 
+                    className="delete-image-btn" 
+                    onClick={(e) => {
+                      e.stopPropagation(); // 이미지 클릭 시 삭제 버튼 클릭 방지
+                      handleImageDelete(url);
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 상의 선택 */}

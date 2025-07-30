@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Modal, Button, Row, Col, Alert } from "react-bootstrap";
+import { Form, Modal, Button, Row, Col, Alert, Spinner, Card, Badge } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import CloudinaryUploadWidget from "../../../utils/CloudinaryUploadWidget";
 import { CATEGORY, STATUS, SIZE } from "../../../constants/product.constants";
@@ -10,6 +10,7 @@ import {
   editProduct,
 } from "../../../features/product/productSlice";
 import { WASH_METHODS } from "../../../constants/product.constants";
+import axios from "axios";
 
 const InitialFormData = {
   name: "",
@@ -19,10 +20,10 @@ const InitialFormData = {
   description: "",
   category: [],
   status: "active",
-  price: 0,
-  height: 0,
-  weight: 0,
-  washMethods: [], // 세탁 방법 필드 추가
+  price: "",
+  height: "",
+  weight: "",
+  washMethods: [],
 };
 
 const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
@@ -35,10 +36,27 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   const [stock, setStock] = useState([]);
   const dispatch = useDispatch();
   const [stockError, setStockError] = useState(false);
+  
+  // AI 추출 관련 상태
+  const [aiExtractedInfo, setAiExtractedInfo] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState("");
+  const [hasUploadedImage, setHasUploadedImage] = useState(false);
 
   useEffect(() => {
-    if (success) setShowDialog(false);
-  }, [success]);
+    if (success) {
+      setShowDialog(false);
+      // 모든 상태 초기화
+      setFormData({ ...InitialFormData });
+      setStock([]);
+      setAiExtractedInfo(null);
+      setAnalysisError("");
+      setHasUploadedImage(false);
+      setStockError(false); // stock 오류 상태 초기화
+      // success 상태 초기화
+      dispatch(clearError());
+    }
+  }, [success, dispatch]);
 
   useEffect(() => {
     if (error || !success) {
@@ -52,50 +70,185 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
           selectedProduct.stock[size],
         ]);
         setStock(sizeArray);
+        setHasUploadedImage(true); // 편집 모드에서는 이미지가 이미 있음
       } else {
         setFormData({ ...InitialFormData });
         setStock([]);
+        setAiExtractedInfo(null);
+        setAnalysisError("");
+        setHasUploadedImage(false);
       }
     }
   }, [showDialog]);
 
   const handleClose = () => {
     setShowDialog(false);
+    setAiExtractedInfo(null);
+    setAnalysisError("");
+    setHasUploadedImage(false);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (stock.length === 0) return setStockError(true);
+    
+    console.log('🔍 제출 전 stock 상태:', stock);
+    
+    // stock 검증 개선 - 빈 문자열과 undefined 체크
+    const validStock = stock.filter(item => 
+      item && 
+      item[0] && 
+      item[0].trim() !== '' && 
+      item[1] && 
+      item[1].toString().trim() !== '' && 
+      parseInt(item[1]) > 0
+    );
+    
+    console.log('✅ 유효한 재고 항목:', validStock);
+    
+    if (validStock.length === 0) {
+      setStockError(true);
+      alert("재고 정보를 입력해주세요. (사이즈와 수량을 모두 입력해야 합니다)");
+      return;
+    }
+    
+    if (formData.image.length === 0) {
+      alert("이미지를 업로드해주세요.");
+      return;
+    }
+    
+    try {
     const totalStock = stock.reduce((total, item) => {
-      return { ...total, [item[0]]: parseInt(item[1]) };
+        // 사이즈와 수량이 모두 있고 유효한 경우만 처리
+        if (item && 
+            item[0] && 
+            item[0].trim() !== '' && 
+            item[1] && 
+            item[1].toString().trim() !== '') {
+          const size = item[0].trim();
+          const quantity = parseInt(item[1]);
+          if (!isNaN(quantity) && quantity > 0) {
+            return { ...total, [size]: quantity };
+          }
+        }
+        return total;
     }, {});
+      
+      console.log('📦 원본 stock 배열:', stock);
+      console.log('📦 변환된 totalStock:', totalStock);
+      
+      // totalStock이 비어있는지 확인
+      if (Object.keys(totalStock).length === 0) {
+        setStockError(true);
+        alert("유효한 재고 정보가 없습니다. 사이즈와 수량을 모두 입력해주세요.");
+        return;
+      }
 
     const selectedWashMethodObjects = WASH_METHODS.filter((method) =>
       formData.washMethods.includes(method.value)
     );
 
+    // AI 분석 결과 요약 생성
+    const generateSummary = (aiInfo) => {
+      if (!aiInfo) return "";
+      
+      const summaryParts = [];
+      
+      // 카테고리
+      if (aiInfo.category?.primaryCategory) {
+        summaryParts.push(aiInfo.category.primaryCategory);
+      }
+      
+      // 주요 색상
+      if (aiInfo.colors?.primaryColor) {
+        summaryParts.push(aiInfo.colors.primaryColor);
+      }
+      
+      // 패턴
+      if (aiInfo.pattern?.type) {
+        summaryParts.push(aiInfo.pattern.type);
+      }
+      
+      // 스타일
+      if (aiInfo.style?.type) {
+        summaryParts.push(aiInfo.style.type);
+      }
+      
+      // 소재
+      if (aiInfo.material?.type) {
+        summaryParts.push(aiInfo.material.type);
+      }
+      
+      // 추정 세탁
+      if (aiInfo.washMethodEstimation?.estimatedMethods) {
+        summaryParts.push(aiInfo.washMethodEstimation.estimatedMethods.join(', '));
+      }
+      
+      // 설명 (현재 폼에 입력된 description 사용)
+      if (formData.description && formData.description.trim() !== '') {
+        summaryParts.push(formData.description);
+      }
+      
+      return summaryParts.join(', ');
+    };
+
     const finalData = {
       ...formData,
       stock: totalStock,
-      washMethods: selectedWashMethodObjects, // ✅ 변환된 객체 배열로 저장
+      washMethods: selectedWashMethodObjects,
+      // AI 추출 정보 포함 (요약 필드 추가)
+      aiExtractedInfo: aiExtractedInfo ? {
+        ...aiExtractedInfo,
+        summary: generateSummary(aiExtractedInfo)
+      } : null,
+      aiAnalysis: {
+        confidence: aiExtractedInfo?.category?.confidence || 0.5,
+        analyzedAt: new Date(),
+        modelVersion: "CLIP-ViT-B/32"
+      },
+      // CLIP 특징벡터 포함 - AI 서버와 일치하는 구조로 변환
+      clipFeatures: aiExtractedInfo?.clipFeatures ? {
+        imageVector: aiExtractedInfo.clipFeatures.imageVector || [],
+        vectorDimension: aiExtractedInfo.clipFeatures.vectorDimension || 512
+      } : {
+        imageVector: [],
+        vectorDimension: 512
+      }
     };
+      
+      console.log('🚀 최종 전송 데이터:', finalData);
+      console.log('📊 AI 추출 정보:', aiExtractedInfo);
+      console.log('🧠 CLIP 특징벡터:', finalData.clipFeatures);
     
     if (mode === "new") {
-      dispatch(createProduct({ ...formData, stock: totalStock }));
+        dispatch(createProduct(finalData));
+        // 성공 시 즉시 모달 닫기 및 상태 초기화
+        setShowDialog(false);
+        setAiExtractedInfo(null);
+        setAnalysisError("");
+        setHasUploadedImage(false);
+        setFormData({ ...InitialFormData });
+        setStock([]);
+        setStockError(false); // stock 오류 상태 초기화
     } else {
       dispatch(
-        editProduct({ ...formData, stock: totalStock, id: selectedProduct._id })
-      );
+          editProduct({ ...finalData, id: selectedProduct._id })
+        );
+        // 편집 성공 시 즉시 모달 닫기
+        setShowDialog(false);
+      }
+    } catch (error) {
+      console.error('❌ 상품 등록 오류:', error);
+      alert('상품 등록 중 오류가 발생했습니다.');
     }
   };
 
   const handleChange = (event) => {
-    const { id, value } = event.target;
-    setFormData({ ...formData, [id]: value });
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const addStock = () => {
-    setStock([...stock, []]);
+    setStock([...stock, ['', '']]); // [사이즈, 수량] 구조로 초기화
   };
 
   const deleteStock = (idx) => {
@@ -105,12 +258,18 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
   const handleSizeChange = (value, index) => {
     const newStock = [...stock];
+    if (!newStock[index]) {
+      newStock[index] = ['', ''];
+    }
     newStock[index][0] = value;
     setStock(newStock);
   };
 
   const handleStockChange = (value, index) => {
     const newStock = [...stock];
+    if (!newStock[index]) {
+      newStock[index] = ['', ''];
+    }
     newStock[index][1] = value;
     setStock(newStock);
   };
@@ -119,7 +278,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     const selectedCategory = event.target.value;
     setFormData({
       ...formData,
-      category: [selectedCategory], // 카테고리를 하나만 선택할 수 있도록 설정
+      category: [selectedCategory],
     });
   };
 
@@ -132,199 +291,558 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   };
 
   const uploadImage = (url) => {
-    setFormData({ ...formData, image: [...formData.image,url] });
+    const newImages = [...formData.image, url];
+    setFormData({ ...formData, image: newImages });
+    setHasUploadedImage(true);
+    // 자동 분석 비활성화 - 수동 버튼으로 변경
+      // if (newImages.length > 0) { analyzeImages(newImages); }
+};
+
+// 이미지 삭제 핸들러
+const deleteImage = (indexToDelete) => {
+  const newImages = formData.image.filter((_, index) => index !== indexToDelete);
+  setFormData({ ...formData, image: newImages });
+  setHasUploadedImage(newImages.length > 0);
+  
+  // 이미지가 삭제되면 AI 분석 결과도 초기화
+  if (newImages.length === 0) {
+    setAiExtractedInfo(null);
+    setAnalysisError("");
+  }
+};
+
+  // AI 분석 시작 버튼 클릭 핸들러
+  const handleAnalyzeImages = () => {
+    if (formData.image.length === 0) {
+      alert("분석할 이미지를 먼저 업로드해주세요.");
+      return;
+    }
+    analyzeImages(formData.image);
+  };
+
+  // AI 이미지 분석 함수
+  const analyzeImages = async (imageUrls) => {
+    if (imageUrls.length === 0) return;
+    
+    setIsAnalyzing(true);
+    setAnalysisError("");
+    
+    try {
+      // 처음 2개 이미지만 분석 (업로드 순서대로)
+      const imagesToAnalyze = imageUrls.slice(0, 2);
+      console.log('🔍 AI 분석 시작:', imagesToAnalyze);
+      console.log(`📸 분석할 이미지: ${imagesToAnalyze.length}개 (총 ${imageUrls.length}개 업로드됨)`);
+      
+      let response;
+      
+      // 먼저 백엔드 서버를 통해 요청 시도
+      try {
+        console.log('🔄 백엔드 서버를 통한 요청 시도...');
+        response = await axios.post('/api/product/extract-info', {
+          imageUrls: imagesToAnalyze
+        }, {
+          timeout: 120000 // 120초로 타임아웃 증가
+        });
+        console.log('✅ 백엔드 서버 응답 성공');
+      } catch (backendError) {
+        console.warn('⚠️ 백엔드 서버 연결 실패, 직접 AI 서버로 요청 시도...');
+        
+        // 백엔드 서버가 실패하면 직접 AI 서버로 요청
+        const aiServerUrl = process.env.REACT_APP_AI_API_URL || 'http://165.229.89.159:8080';
+        console.log('🔄 직접 AI 서버로 요청:', aiServerUrl);
+        
+        response = await axios.post(`${aiServerUrl}/extract-product-info`, {
+          image_urls: imagesToAnalyze,  // AI 서버 형식에 맞춤
+          categories: ["Outer", "Top", "Pants", "Shoes", "Acc"]
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 120000 // 120초로 타임아웃 증가
+        });
+        console.log('✅ 직접 AI 서버 응답 성공');
+      }
+      
+      console.log('📡 서버 응답:', response.data);
+      
+      // 응답 데이터 추출 (백엔드와 직접 요청 모두 처리)
+      let extractedInfo;
+      if (response.data.success) {
+        // 백엔드 서버 응답 형식
+        extractedInfo = response.data.data;
+      } else {
+        // 직접 AI 서버 응답 형식
+        extractedInfo = response.data.data || response.data;
+      }
+      
+      console.log('📊 추출된 정보:', extractedInfo);
+      
+      // 데이터 구조 검증
+      if (!extractedInfo || Object.keys(extractedInfo).length === 0) {
+        console.warn('⚠️ 추출된 정보가 비어있음');
+        setAnalysisError('AI 분석 결과가 비어있습니다.');
+        return;
+      }
+      
+      // CLIP 특징벡터 검증 및 로깅
+      if (extractedInfo.clipFeatures) {
+        console.log('🧠 CLIP 특징벡터 발견:', {
+          imageVectors: extractedInfo.clipFeatures.imageVectors ? extractedInfo.clipFeatures.imageVectors.length : 0,
+          averageVector: extractedInfo.clipFeatures.averageVector ? extractedInfo.clipFeatures.averageVector.length : 0,
+          vectorDimension: extractedInfo.clipFeatures.vectorDimension
+        });
+      } else {
+        console.warn('⚠️ CLIP 특징벡터가 없음');
+      }
+      
+      // AI 분석 결과를 상태에 저장
+      setAiExtractedInfo(extractedInfo);
+      
+      // AI 추출 정보로 폼 데이터 자동 채우기 (안전한 접근)
+      setFormData(prev => ({
+        ...prev,
+        name: extractedInfo.autoGeneratedText?.name || '',
+        description: extractedInfo.autoGeneratedText?.description || '',
+        category: extractedInfo.category?.primaryCategory ? [extractedInfo.category.primaryCategory] : [],
+        washMethods: extractedInfo.washMethodEstimation?.estimatedMethods || []
+      }));
+      
+      console.log('✅ AI 분석 완료 및 폼 업데이트:', extractedInfo);
+    } catch (error) {
+      console.error('💥 AI 분석 오류:', error);
+      
+      // 더 자세한 오류 메시지 제공
+      if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+        console.error('📡 오류 응답:', { status, data });
+        
+        if (status === 503) {
+          setAnalysisError('백엔드 서버가 실행되지 않았습니다. 백엔드 서버를 시작해주세요.');
+        } else if (status === 500) {
+          setAnalysisError('AI 서버 내부 오류가 발생했습니다.');
+        } else {
+          setAnalysisError(`서버 오류 (${status}): ${data?.detail || data?.error || '알 수 없는 오류'}`);
+        }
+      } else if (error.request) {
+        console.error('📡 요청 실패:', error.request);
+        setAnalysisError('서버에 연결할 수 없습니다. 네트워크 연결과 서버 상태를 확인해주세요.');
+      } else {
+        console.error('📡 기타 오류:', error.message);
+        setAnalysisError(`AI 분석 중 오류가 발생했습니다: ${error.message}`);
+      }
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // AI 추출 정보 표시 컴포넌트
+  const AiAnalysisResult = () => {
+    if (!aiExtractedInfo) {
+      console.log('❌ aiExtractedInfo가 없음');
+      return null;
+    }
+    
+    console.log('🎯 AiAnalysisResult 렌더링:', aiExtractedInfo);
+    
+    // 각 항목별 신뢰도 계산
+    const categoryConfidence = aiExtractedInfo.category?.confidence || 0;
+    const colorConfidence = aiExtractedInfo.colors?.colorConfidences?.[0] || 0;
+    const patternConfidence = aiExtractedInfo.pattern?.confidence || 0;
+    const styleConfidence = aiExtractedInfo.style?.confidence || 0;
+    const materialConfidence = aiExtractedInfo.material?.confidence || 0;
+    const washConfidence = aiExtractedInfo.washMethodEstimation?.confidence || 0;
+    
+    // 평균 신뢰도 계산
+    const confidences = [categoryConfidence, colorConfidence, patternConfidence, styleConfidence, materialConfidence, washConfidence];
+    const averageConfidence = confidences.reduce((sum, conf) => sum + conf, 0) / confidences.length;
+    
+    return (
+      <Card className="mb-3">
+        <Card.Header>
+          <h6 className="mb-0">
+            🤖 AI 분석 결과
+            <Badge bg="success" className="ms-2">
+              평균 신뢰도: {Math.round(averageConfidence * 100)}%
+            </Badge>
+          </h6>
+        </Card.Header>
+        <Card.Body>
+          <Row>
+            <Col md={6}>
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <strong>카테고리:</strong>
+                  <Badge bg="info" size="sm">
+                    {Math.round(categoryConfidence * 100)}%
+                  </Badge>
+                </div>
+                <div className="text-muted small">
+                  {aiExtractedInfo.category?.primaryCategory || '분석 중...'}
+                </div>
+              </div>
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <strong>주요 색상:</strong>
+                  <Badge bg="info" size="sm">
+                    {Math.round(colorConfidence * 100)}%
+                  </Badge>
+                </div>
+                <div className="text-muted small">
+                  {aiExtractedInfo.colors?.primaryColor || '분석 중...'}
+                </div>
+              </div>
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <strong>패턴:</strong>
+                  <Badge bg="info" size="sm">
+                    {Math.round(patternConfidence * 100)}%
+                  </Badge>
+                </div>
+                <div className="text-muted small">
+                  {aiExtractedInfo.pattern?.type || '분석 중...'}
+                </div>
+              </div>
+            </Col>
+            <Col md={6}>
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <strong>스타일:</strong>
+                  <Badge bg="info" size="sm">
+                    {Math.round(styleConfidence * 100)}%
+                  </Badge>
+                </div>
+                <div className="text-muted small">
+                  {aiExtractedInfo.style?.type || '분석 중...'}
+                </div>
+              </div>
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <strong>소재:</strong>
+                  <Badge bg="info" size="sm">
+                    {Math.round(materialConfidence * 100)}%
+                  </Badge>
+                </div>
+                <div className="text-muted small">
+                  {aiExtractedInfo.material?.type || '분석 중...'}
+                </div>
+              </div>
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <strong>추정 세탁:</strong>
+                  <Badge bg="info" size="sm">
+                    {Math.round(washConfidence * 100)}%
+                  </Badge>
+                </div>
+                <div className="text-muted small">
+                  {aiExtractedInfo.washMethodEstimation?.estimatedMethods?.join(', ') || '분석 중...'}
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
+    );
+  };
+
+  // 이미지 업로드 안내 컴포넌트
+  const ImageUploadGuide = () => {
+    if (hasUploadedImage) return null;
+    
+    return (
+      <Alert variant="info" className="mb-3">
+        <h6>📸 이미지 업로드 안내</h6>
+        <p className="mb-0">
+          상품 등록을 위해 먼저 이미지를 업로드해주세요. 
+          이미지가 업로드되면 AI가 자동으로 상품 정보를 분석하여 입력 폼을 채워드립니다.
+        </p>
+      </Alert>
+    );
   };
 
   return (
-    <Modal show={showDialog} onHide={handleClose}>
+    <Modal show={showDialog} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
-        {mode === "new" ? (
-          <Modal.Title>Create New Product</Modal.Title>
-        ) : (
-          <Modal.Title>Edit Product</Modal.Title>
-        )}
+        <Modal.Title>
+          {mode === "new" ? "Add New Item" : "Edit Item"}
+        </Modal.Title>
       </Modal.Header>
-      {error && (
-        <div className="error-message">
-          <Alert variant="danger">{error}</Alert>
+      <Modal.Body>
+        <Form onSubmit={handleSubmit}>
+          {/* 이미지 업로드 안내 */}
+          <ImageUploadGuide />
+          
+          {/* 이미지 업로드 섹션 */}
+          <Form.Group className="mb-3" controlId="Image" required>
+            <Form.Label>Image *</Form.Label>
+            <CloudinaryUploadWidget uploadImage={uploadImage} />
+            <div className="mt-2">
+              {formData.image.map((img, index) => (
+                <div key={index} style={{ position: "relative", display: "inline-block", margin: "5px" }}>
+                  <img
+                    src={img}
+                    alt={`Product ${index + 1}`}
+                    style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                  />
+                  <button
+                    onClick={() => deleteImage(index)}
+                    style={{
+                      position: "absolute",
+                      top: "-5px",
+                      right: "-5px",
+                      backgroundColor: "#dc3545",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "20px",
+                      height: "20px",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 10,
+                      opacity: 0.7,
+                      transition: "opacity 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => e.target.style.opacity = "1"}
+                    onMouseLeave={(e) => e.target.style.opacity = "0.7"}
+                    title="이미지 삭제"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            {formData.image.length > 0 && (
+              <div className="mt-3">
+                <Button 
+                  variant="primary" 
+                  onClick={handleAnalyzeImages}
+                  disabled={isAnalyzing}
+                  className="me-2"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Spinner animation="border" size="sm" className="me-2" />
+                      AI 분석 중...
+                    </>
+                  ) : (
+                    "🤖 AI 분석 시작"
+                  )}
+                </Button>
+                <small className="text-muted">
+                  이미지를 업로드한 후 AI 분석을 시작하세요.
+                </small>
         </div>
       )}
-      <Form className="form-container" onSubmit={handleSubmit}>
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="sku">
-            <Form.Label>Sku</Form.Label>
-            <Form.Control
-              onChange={handleChange}
-              type="string"
-              placeholder="Enter Sku"
-              required
-              value={formData.sku}
-            />
           </Form.Group>
 
-          <Form.Group as={Col} controlId="name">
-            <Form.Label>Name</Form.Label>
+          {/* AI 분석 결과 표시 */}
+          {aiExtractedInfo && <AiAnalysisResult />}
+          
+          {/* 분석 중 표시 */}
+          {isAnalyzing && (
+            <Alert variant="info" className="mb-3">
+              <Spinner animation="border" size="sm" className="me-2" />
+              AI가 이미지를 분석하고 있습니다...
+            </Alert>
+          )}
+          
+          {/* 분석 오류 표시 */}
+          {analysisError && (
+            <Alert variant="danger" className="mb-3">
+              {analysisError}
+            </Alert>
+          )}
+
+          {/* 나머지 폼 필드들 (이미지 업로드 후 활성화) */}
+          <div className={formData.image.length === 0 ? "opacity-50" : ""}>
+            
+            {/* 관리자 직접 입력 영역 */}
+            <Card className="mb-3">
+              <Card.Header>
+                <h6 className="mb-0">📝 관리자 직접 입력</h6>
+              </Card.Header>
+              <Card.Body>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group className="mb-3" controlId="SKU" required>
+                      <Form.Label>SKU *</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter SKU"
+                        value={formData.sku}
+                        onChange={handleChange}
+                        name="sku"
+                        disabled={formData.image.length === 0}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3" controlId="Price" required>
+                      <Form.Label>Price *</Form.Label>
+                      <Form.Control
+                        type="number"
+                        placeholder="Enter price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        name="price"
+                        disabled={formData.image.length === 0}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group className="mb-3" controlId="Height" required>
+                      <Form.Label>Height *</Form.Label>
+                      <Form.Control
+                        type="number"
+                        placeholder="Enter height"
+                        value={formData.height}
+                        onChange={handleChange}
+                        name="height"
+                        disabled={formData.image.length === 0}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3" controlId="Weight" required>
+                      <Form.Label>Weight *</Form.Label>
             <Form.Control
+                        type="number"
+                        placeholder="Enter weight"
+                        value={formData.weight}
               onChange={handleChange}
-              type="string"
-              placeholder="Name"
-              required
+                        name="weight"
+                        disabled={formData.image.length === 0}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                
+                {/* 재고 관리 */}
+                <Form.Group className="mb-3" controlId="Stock" required>
+                  <Form.Label>Stock *</Form.Label>
+                  <div className="d-flex flex-wrap gap-2">
+                    {stock.map((item, index) => (
+                      <div key={index} className="d-flex align-items-center">
+                        <Form.Select
+                          value={item[0] || ""}
+                          onChange={(e) => handleSizeChange(e.target.value, index)}
+                          style={{ width: "100px" }}
+                          disabled={formData.image.length === 0}
+                        >
+                          <option value="">Size</option>
+                          {SIZE.map((size) => (
+                            <option key={size} value={size}>
+                              {size}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      <Form.Control
+                        type="number"
+                          value={item[1] || ""}
+                          onChange={(e) => handleStockChange(e.target.value, index)}
+                          style={{ width: "80px" }}
+                          placeholder="Qty"
+                          disabled={formData.image.length === 0}
+                        />
+                      <Button
+                          variant="outline-danger"
+                        size="sm"
+                        onClick={() => deleteStock(index)}
+                          disabled={formData.image.length === 0}
+                      >
+                          X
+                      </Button>
+                      </div>
+                    ))}
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={addStock}
+                      disabled={formData.image.length === 0}
+                    >
+                      + Add Size
+                    </Button>
+                  </div>
+                  {stockError && (
+                    <div className="text-danger mt-2">
+                      Please add at least one size and quantity.
+              </div>
+                  )}
+            </Form.Group>
+              </Card.Body>
+            </Card>
+
+            {/* AI 자동 채우기 영역 */}
+            <Card className="mb-3">
+              <Card.Header>
+                <h6 className="mb-0">🤖 AI 자동 채우기 (수정 가능)</h6>
+              </Card.Header>
+              <Card.Body>
+                <Form.Group className="mb-3" controlId="Name" required>
+                  <Form.Label>Name *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter product name"
               value={formData.name}
+                    onChange={handleChange}
+                    name="name"
+                    disabled={formData.image.length === 0}
             />
           </Form.Group>
-        </Row>
 
-        <Form.Group className="mb-3" controlId="description">
-          <Form.Label>Description</Form.Label>
+                <Form.Group className="mb-3" controlId="Description" required>
+                  <Form.Label>Description *</Form.Label>
           <Form.Control
-            type="string"
-            placeholder="Description"
             as="textarea"
-            onChange={handleChange}
             rows={3}
+                    placeholder="Enter product description"
             value={formData.description}
-            required
+                    onChange={handleChange}
+                    name="description"
+                    disabled={formData.image.length === 0}
           />
         </Form.Group>
 
-        <Form.Group className="mb-3" controlId="stock">
-          <Form.Label className="mr-1">Stock</Form.Label>
-          {stockError && (
-            <span className="error-message">재고를 추가해주세요</span>
-          )}
-          <Button size="sm" onClick={addStock}>
-            Add +
-          </Button>
-          <div className="mt-2">
-            {stock.map((item, index) => (
-              <Row key={index}>
-                <Col sm={4}>
+                <Form.Group className="mb-3" controlId="Category" required>
+                  <Form.Label>Category *</Form.Label>
                   <Form.Select
-                    onChange={(event) =>
-                      handleSizeChange(event.target.value, index)
-                    }
-                    required
-                    defaultValue={item[0] ? item[0].toLowerCase() : ""}
+                    value={formData.category}
+                    onChange={onHandleCategory}
+                    name="category"
+                    disabled={formData.image.length === 0}
                   >
-                    <option value="" disabled selected hidden>
-                      Please Choose...
-                    </option>
-                    {SIZE.map((item, index) => (
-                      <option
-                        inValid={true}
-                        value={item.toLowerCase()}
-                        disabled={stock.some(
-                          (size) => size[0] === item.toLowerCase()
-                        )}
-                        key={index}
-                      >
-                        {item}
+                    <option value="">Select category</option>
+                    {CATEGORY.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
                       </option>
                     ))}
                   </Form.Select>
-                </Col>
-                <Col sm={6}>
-                  <Form.Control
-                    onChange={(event) =>
-                      handleStockChange(event.target.value, index)
-                    }
-                    type="number"
-                    placeholder="number of stock"
-                    value={item[1]}
-                    required
-                  />
-                </Col>
-                <Col sm={2}>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => deleteStock(index)}
-                  >
-                    -
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-          </div>
-        </Form.Group>
+                </Form.Group>
+              </Card.Body>
+            </Card>
 
-        <Form.Group className="mb-3" controlId="Image" required>
-          <Form.Label>Image</Form.Label>
-          <CloudinaryUploadWidget uploadImage={uploadImage} />
-          <img
-            id="uploadedimage"
-            src={formData.image}
-            className="upload-image mt-2"
-          ></img>
-        </Form.Group>
-
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="price">
-            <Form.Label>Price</Form.Label>
-            <Form.Control
-              value={formData.price}
-              required
-              onChange={handleChange}
-              type="number"
-              placeholder="0"
-            />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId="category">
-            <Form.Label>Category</Form.Label>
-            <Form.Select
-              value={formData.category[0]} // 하나의 카테고리만 선택 가능
-              onChange={onHandleCategory}
-              required
-            >
-              <option value="" disabled hidden>
-                Please Choose...
-              </option>
-              {CATEGORY.map((item, idx) => (
-                <option key={idx} value={item.toLowerCase()}>
-                  {item}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-
-          <Form.Group as={Col} controlId="status">
-            <Form.Label>Status</Form.Label>
-            <Form.Select
-              value={formData.status}
-              onChange={handleChange}
-              required
-            >
-              {STATUS.map((item, idx) => (
-                <option key={idx} value={item.toLowerCase()}>
-                  {item}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Row>
-
-        <Form.Group className="mb-3" controlId="washMethods">
-          <Form.Label>세탁 방법</Form.Label>
+            <Form.Group className="mb-3">
+              <Form.Label>Wash Methods</Form.Label>
           <div className="d-flex flex-wrap gap-3">
-            {WASH_METHODS.map((method, idx) => (
-              <div key={idx} className="d-flex align-items-center">
+                {WASH_METHODS.map((method, index) => (
+                  <div key={index} className="d-flex align-items-center">
                 <Form.Check
                   type="checkbox"
                   id={`wash-${method.value}`}
                   value={method.value}
                   checked={formData.washMethods.includes(method.value)}
                   onChange={handleWashMethodChange}
+                      disabled={formData.image.length === 0}
                   className="me-2"
                 />
                 <label htmlFor={`wash-${method.value}`} className="d-flex align-items-center">
-                  <img
-                    src={method.image}
-                    alt={method.label}
-                    width={32}
-                    height={32}
-                    style={{ objectFit: "contain", marginRight: "8px" }}
-                  />
+                      <img src={method.image} alt={method.label} width={32} height={32} style={{ objectFit: "contain", marginRight: "8px" }} />
                   <span>{method.label}</span>
                 </label>
               </div>
@@ -332,40 +850,36 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
           </div>
         </Form.Group>
 
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="height">
-            <Form.Label>Height</Form.Label>
-            <Form.Control
+            <Form.Group className="mb-3" controlId="Status" required>
+              <Form.Label>Status *</Form.Label>
+              <Form.Select
+                value={formData.status}
               onChange={handleChange}
-              type="number"
-              placeholder="Enter Height"
-              required
-              value={formData.height}
-            />
+                name="status"
+                disabled={formData.image.length === 0}
+              >
+                {STATUS.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </Form.Select>
           </Form.Group>
-
-          <Form.Group as={Col} controlId="weight">
-            <Form.Label>Weight</Form.Label>
-            <Form.Control
-              onChange={handleChange}
-              type="number"
-              placeholder="Enter Weight"
-              required
-              value={formData.weight}
-            />
-          </Form.Group>
-        </Row>
-        
-        {mode === "new" ? (
-          <Button variant="primary" type="submit">
-            Submit
+          </div>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Cancel
           </Button>
-        ) : (
-          <Button variant="primary" type="submit">
-            Edit
+        <Button 
+          variant="primary" 
+          onClick={handleSubmit} 
+          disabled={formData.image.length === 0}
+        >
+          {mode === "new" ? "Create" : "Update"}
           </Button>
-        )}
-      </Form>
+      </Modal.Footer>
     </Modal>
   );
 };

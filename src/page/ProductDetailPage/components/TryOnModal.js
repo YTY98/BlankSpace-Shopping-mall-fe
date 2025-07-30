@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Spinner, Form, Row, Col, Carousel } from "react-bootstrap";
 import axios from "axios";
+import CloudinaryUploadWidget from "../../../utils/CloudinaryUploadWidget";
 
 const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) => {
   const [modelImageUrl, setModelImageUrl] = useState("");
@@ -9,6 +10,7 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
   const [error, setError] = useState("");
   const [selectedClothImage, setSelectedClothImage] = useState(clothImageUrl);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [uploadedModelImages, setUploadedModelImages] = useState([]);
 
   // 모델 이미지 URL이 변경될 때 결과 초기화
   useEffect(() => {
@@ -24,6 +26,7 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
       setError("");
       setSelectedClothImage(clothImageUrl);
       setActiveIndex(0);
+      setUploadedModelImages([]);
     }
   }, [show, clothImageUrl]);
 
@@ -34,6 +37,26 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
     // 새로운 의류를 선택할 때 이전 결과와 오류 초기화
     setResultImage(null);
     setError("");
+  };
+
+  // 이미지 업로드 핸들러
+  const handleModelImageUpload = (url) => {
+    setUploadedModelImages(prev => [...prev, url]);
+    setModelImageUrl(url);
+    setResultImage(null);
+    setError("");
+  };
+
+  // 이미지 삭제 핸들러
+  const handleImageDelete = (urlToDelete) => {
+    setUploadedModelImages(prev => prev.filter(url => url !== urlToDelete));
+    
+    // 삭제된 이미지가 현재 선택된 이미지였다면 선택 해제
+    if (modelImageUrl === urlToDelete) {
+      setModelImageUrl("");
+      setResultImage(null);
+      setError("");
+    }
   };
 
   const handleTryOn = async () => {
@@ -50,7 +73,7 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
 
     // 입력값 검증
     if (!modelImageUrl.trim()) {
-      setError("모델 이미지 URL을 입력해주세요.");
+      setError("모델 이미지를 업로드하거나 URL을 입력해주세요.");
       setLoading(false);
       return;
     }
@@ -251,27 +274,93 @@ const TryOnModal = ({ show, onClose, clothImageUrl, clothImageUrl2, apiKey }) =>
             .active.carousel-item-start {
               transform: translateX(-100%);
             }
+            .uploaded-images {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 10px;
+              margin-top: 10px;
+            }
+            .uploaded-image {
+              width: 80px;
+              height: 80px;
+              object-fit: cover;
+              border-radius: 8px;
+              cursor: pointer;
+              border: 2px solid transparent;
+              transition: border-color 0.3s ease;
+            }
+            .uploaded-image.selected {
+              border-color: #007bff;
+            }
+            .image-upload-section {
+              margin-bottom: 20px;
+            }
+            .upload-instructions {
+              font-size: 0.9em;
+              color: #6c757d;
+              margin-bottom: 10px;
+            }
+            .uploaded-image-container {
+              position: relative;
+              display: inline-block;
+            }
+            .delete-image-btn {
+              position: absolute;
+              top: -5px;
+              right: -5px;
+              background-color: #dc3545;
+              color: white;
+              border: none;
+              border-radius: 50%;
+              width: 20px;
+              height: 20px;
+              font-size: 14px;
+              cursor: pointer;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 10;
+              opacity: 0.7;
+              transition: opacity 0.3s ease;
+            }
+            .uploaded-image-container:hover .delete-image-btn {
+              opacity: 1;
+            }
           `}
         </style>
-        <Form.Group className="mb-3">
-          <Form.Label>모델 이미지 URL</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="모델 이미지의 URL을 입력하세요"
-            value={modelImageUrl}
-            onChange={(e) => {
-              setModelImageUrl(e.target.value);
-              // URL 입력 시 이전 결과 초기화
-              setResultImage(null);
-              setError("");
-            }}
-          />
-          {modelImageUrl && (
-            <div className="mt-2">
-              <img src={modelImageUrl} alt="Model Preview" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+        
+        <div className="image-upload-section">
+          <Form.Label>모델 이미지 업로드</Form.Label>
+          
+          {/* 이미지 업로드 위젯 */}
+          <CloudinaryUploadWidget uploadImage={handleModelImageUpload} />
+          
+          {/* 업로드된 이미지 미리보기 */}
+          {uploadedModelImages.length > 0 && (
+            <div className="uploaded-images">
+              {uploadedModelImages.map((url, index) => (
+                <div key={index} className="uploaded-image-container">
+                  <img
+                    src={url}
+                    alt={`Uploaded ${index + 1}`}
+                    className={`uploaded-image ${modelImageUrl === url ? 'selected' : ''}`}
+                    onClick={() => setModelImageUrl(url)}
+                  />
+                  <button
+                    className="delete-image-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleImageDelete(url);
+                    }}
+                    title="이미지 삭제"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
           )}
-        </Form.Group>
+        </div>
 
         <Form.Group className="mb-3">
           <Form.Label>의류 이미지 선택</Form.Label>
