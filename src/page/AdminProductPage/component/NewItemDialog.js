@@ -504,22 +504,26 @@ const deleteImage = (indexToDelete) => {
       return 'danger';
     };
     
-    // 색상과 신뢰도를 매핑하여 표시할 색상 목록 생성 (최대 2개)
-    const displayColors = colorPalette.slice(0, 2).map((color, index) => ({
+    // 색상과 신뢰도를 매핑하여 표시할 색상 목록 생성 (신뢰도 0.0 초과인 것만)
+    const validColorPairs = colorPalette.map((color, index) => ({
       name: color,
       confidence: colorConfidences[index] || 0
-    }));
+    })).filter(color => color.confidence > 0.0);
     
-    // 색상 신뢰도 평균 계산 (최대 2개)
-    const colorConfidencesForAverage = colorConfidences.slice(0, 2);
-    const averageColorConfidence = colorConfidencesForAverage.length > 0 
-      ? colorConfidencesForAverage.reduce((sum, conf) => sum + conf, 0) / colorConfidencesForAverage.length 
-      : 0;
+    // 신뢰도 순으로 정렬
+    const sortedColorPairs = validColorPairs.sort((a, b) => b.confidence - a.confidence);
+    
+    // 최고 신뢰도 찾기
+    const maxColorConfidence = sortedColorPairs.length > 0 ? sortedColorPairs[0].confidence : 0;
+    
+    // 최고 신뢰도와 동일한 신뢰도를 가진 색상들만 선택 (개수 제한 없음)
+    const displayColors = sortedColorPairs
+      .filter(color => color.confidence === maxColorConfidence);
     
     // 프론트엔드에서 계산하는 평균 신뢰도 (표시되는 모든 신뢰도 포함)
     const allConfidences = [
       categoryConfidence,
-      averageColorConfidence, // 색상 평균 신뢰도 사용
+      maxColorConfidence, // 색상 최고 신뢰도 사용
       patternConfidence,
       styleConfidence,
       materialConfidence
@@ -556,8 +560,8 @@ const deleteImage = (indexToDelete) => {
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <strong>주요 색상:</strong>
-                  <Badge bg={getConfidenceBadgeColor(averageColorConfidence)} size="sm">
-                    {Math.round(averageColorConfidence * 100)}%
+                  <Badge bg={getConfidenceBadgeColor(maxColorConfidence)} size="sm">
+                    {Math.round(maxColorConfidence * 100)}%
                   </Badge>
                 </div>
                 <div className="text-muted small">
