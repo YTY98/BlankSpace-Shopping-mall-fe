@@ -485,24 +485,56 @@ const deleteImage = (indexToDelete) => {
     
     console.log('🎯 AiAnalysisResult 렌더링:', aiExtractedInfo);
     
-    // 각 항목별 신뢰도 계산
-    const categoryConfidence = aiExtractedInfo.category?.confidence || 0;
-    const colorConfidence = aiExtractedInfo.colors?.colorConfidences?.[0] || 0;
-    const patternConfidence = aiExtractedInfo.pattern?.confidence || 0;
-    const styleConfidence = aiExtractedInfo.style?.confidence || 0;
-    const materialConfidence = aiExtractedInfo.material?.confidence || 0;
-    const washConfidence = aiExtractedInfo.washMethodEstimation?.confidence || 0;
+    // 백엔드에서 제공하는 신뢰도 정보 사용
+    const confidenceBreakdown = aiExtractedInfo.confidenceBreakdown || {};
+    const categoryConfidence = confidenceBreakdown.category || aiExtractedInfo.category?.confidence || 0;
+    const colorConfidences = confidenceBreakdown.colors || aiExtractedInfo.colors?.colorConfidences || [0];
+    const patternConfidence = confidenceBreakdown.pattern || aiExtractedInfo.pattern?.confidence || 0;
+    const styleConfidence = confidenceBreakdown.style || aiExtractedInfo.style?.confidence || 0;
+    const materialConfidence = confidenceBreakdown.material || aiExtractedInfo.material?.confidence || 0;
     
-    // 평균 신뢰도 계산
-    const confidences = [categoryConfidence, colorConfidence, patternConfidence, styleConfidence, materialConfidence, washConfidence];
-    const averageConfidence = confidences.reduce((sum, conf) => sum + conf, 0) / confidences.length;
+    // 색상 정보 (최대 2개만 표시)
+    const colorPalette = aiExtractedInfo.colors?.colorPalette || [];
+    
+    // 신뢰도 배지 색상 결정 함수
+    const getConfidenceBadgeColor = (confidence) => {
+      if (confidence >= 0.8) return 'success';
+      if (confidence >= 0.6) return 'info';
+      if (confidence >= 0.4) return 'warning';
+      return 'danger';
+    };
+    
+    // 색상과 신뢰도를 매핑하여 표시할 색상 목록 생성 (최대 2개)
+    const displayColors = colorPalette.slice(0, 2).map((color, index) => ({
+      name: color,
+      confidence: colorConfidences[index] || 0
+    }));
+    
+    // 색상 신뢰도 평균 계산 (최대 2개)
+    const colorConfidencesForAverage = colorConfidences.slice(0, 2);
+    const averageColorConfidence = colorConfidencesForAverage.length > 0 
+      ? colorConfidencesForAverage.reduce((sum, conf) => sum + conf, 0) / colorConfidencesForAverage.length 
+      : 0;
+    
+    // 프론트엔드에서 계산하는 평균 신뢰도 (표시되는 모든 신뢰도 포함)
+    const allConfidences = [
+      categoryConfidence,
+      averageColorConfidence, // 색상 평균 신뢰도 사용
+      patternConfidence,
+      styleConfidence,
+      materialConfidence
+    ];
+    const averageConfidence = allConfidences.reduce((sum, conf) => sum + conf, 0) / allConfidences.length;
+    
+    // 평균 신뢰도 배지 색상
+    const averageConfidenceColor = getConfidenceBadgeColor(averageConfidence);
     
     return (
       <Card className="mb-3">
         <Card.Header>
           <h6 className="mb-0">
-            🤖 AI 분석 결과
-            <Badge bg="success" className="ms-2">
+            🤖 AI 분석 결과 (앞면/뒷면 신뢰도 기반 선택)
+            <Badge bg={averageConfidenceColor} className="ms-2">
               평균 신뢰도: {Math.round(averageConfidence * 100)}%
             </Badge>
           </h6>
@@ -513,7 +545,7 @@ const deleteImage = (indexToDelete) => {
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <strong>카테고리:</strong>
-                  <Badge bg="info" size="sm">
+                  <Badge bg={getConfidenceBadgeColor(categoryConfidence)} size="sm">
                     {Math.round(categoryConfidence * 100)}%
                   </Badge>
                 </div>
@@ -524,18 +556,22 @@ const deleteImage = (indexToDelete) => {
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <strong>주요 색상:</strong>
-                  <Badge bg="info" size="sm">
-                    {Math.round(colorConfidence * 100)}%
+                  <Badge bg={getConfidenceBadgeColor(averageColorConfidence)} size="sm">
+                    {Math.round(averageColorConfidence * 100)}%
                   </Badge>
                 </div>
                 <div className="text-muted small">
-                  {aiExtractedInfo.colors?.primaryColor || '분석 중...'}
+                  {displayColors.map((color, index) => (
+                    <div key={index}>
+                      <span>{color.name}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <strong>패턴:</strong>
-                  <Badge bg="info" size="sm">
+                  <Badge bg={getConfidenceBadgeColor(patternConfidence)} size="sm">
                     {Math.round(patternConfidence * 100)}%
                   </Badge>
                 </div>
@@ -548,7 +584,7 @@ const deleteImage = (indexToDelete) => {
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <strong>스타일:</strong>
-                  <Badge bg="info" size="sm">
+                  <Badge bg={getConfidenceBadgeColor(styleConfidence)} size="sm">
                     {Math.round(styleConfidence * 100)}%
                   </Badge>
                 </div>
@@ -559,7 +595,7 @@ const deleteImage = (indexToDelete) => {
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <strong>소재:</strong>
-                  <Badge bg="info" size="sm">
+                  <Badge bg={getConfidenceBadgeColor(materialConfidence)} size="sm">
                     {Math.round(materialConfidence * 100)}%
                   </Badge>
                 </div>
@@ -571,7 +607,7 @@ const deleteImage = (indexToDelete) => {
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <strong>추정 세탁:</strong>
                   <Badge bg="info" size="sm">
-                    {Math.round(washConfidence * 100)}%
+                    AI 추정
                   </Badge>
                 </div>
                 <div className="text-muted small">
