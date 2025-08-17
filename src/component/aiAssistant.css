@@ -607,6 +607,86 @@ body.resizing * {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+/* 이미지 업로드 버튼 */
+.ai-image-button {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-image-button:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.ai-image-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-image-icon {
+  width: 20px;
+  height: 20px;
+  color: #666;
+}
+
+/* 이미지 미리보기 */
+.ai-image-preview {
+  position: relative;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f5f5f5;
+  padding: 5px;
+}
+
+.ai-image-preview img {
+  max-width: 100%;
+  max-height: 150px;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.ai-remove-image {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.ai-remove-image:hover {
+  background: rgba(255, 0, 0, 0.8);
+}
+
+/* 대화 내 이미지 표시 */
+.ai-message-image {
+  margin-bottom: 10px;
+}
+
+.ai-message-image img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 10px;
+  display: block;
+}
+
 .ai-text-input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
